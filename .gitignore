@@ -1,2 +1,7 @@
 .env
 venv/
+cogs/__pycache__/
+__pycache__/
+squarecloud.app
+backup.py
+cookies.txt

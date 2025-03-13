@@ -3,8 +3,11 @@ from discord.ext import commands
 import yt_dlp
 import asyncio
 from collections import deque
+import os
 
 queue = deque()
+
+COOKIES_PATH = "cookies.txt"
 
 class Music(commands.Cog):
     def __init__(self, bot):
@@ -15,6 +18,7 @@ class Music(commands.Cog):
         """Toca uma música do YouTube diretamente no canal de voz"""
         ydl_opts = {
             'format': 'bestaudio/best',
+            "cookiefile": COOKIES_PATH,  # Agora usando o arquivo .txt correto
             'quiet': True,
             'noplaylist': True
         }
