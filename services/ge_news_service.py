@@ -15,6 +15,7 @@ from xml.etree.ElementTree import ParseError
 
 
 GE_FOOTBALL_RSS_URL = "https://ge.globo.com/Esportes/Rss/0,,AS0-9825,00.xml"
+GE_FOOTBALL_PAGE_URL = "https://ge.globo.com/futebol/"
 MAX_SEEN_ITEMS = 300
 REQUEST_TIMEOUT_SECONDS = 20
 MAX_NEWS_AGE_DAYS = 2
@@ -31,12 +32,12 @@ class GeNewsItem:
 
 
 class GeNewsFeedClient:
-    def __init__(self, feed_url: str = GE_FOOTBALL_RSS_URL) -> None:
+    def __init__(self, feed_url: str = GE_FOOTBALL_PAGE_URL) -> None:
         self.feed_url = feed_url
 
     async def fetch_news(self) -> list[GeNewsItem]:
         content = await asyncio.to_thread(self._fetch_feed_content)
-        return parse_ge_news_feed(content)
+        return parse_ge_news_content(content)
 
     def _fetch_feed_content(self) -> str:
         request = Request(
@@ -86,6 +87,18 @@ class GeNewsStateRepository:
             json.dump(data, file, ensure_ascii=False, indent=2)
 
 
+def parse_ge_news_content(content: str) -> list[GeNewsItem]:
+    sanitized_content = content.lstrip("\ufeff\r\n\t ")
+    if not sanitized_content.startswith("<"):
+        preview = sanitized_content[:80].replace("\n", " ").replace("\r", " ")
+        raise ValueError(f"GE nao retornou HTML/XML valido. Inicio da resposta: {preview!r}")
+
+    if re.match(r"<(?:!DOCTYPE\s+)?html\b", sanitized_content[:80], re.IGNORECASE):
+        return parse_ge_news_page(sanitized_content)
+
+    return parse_ge_news_feed(sanitized_content)
+
+
 def parse_ge_news_feed(xml_content: str) -> list[GeNewsItem]:
     sanitized_content = xml_content.lstrip("\ufeff\r\n\t ")
     if not sanitized_content.startswith("<"):
@@ -125,6 +138,41 @@ def parse_ge_news_feed(xml_content: str) -> list[GeNewsItem]:
     return news_items
 
 
+def parse_ge_news_page(html_content: str) -> list[GeNewsItem]:
+    links = re.findall(
+        r'<a\b[^>]*href=["\'](https://ge\.globo\.com/[^"\']+?\.ghtml)["\'][^>]*>(.*?)</a>',
+        html_content,
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+    news_items: list[GeNewsItem] = []
+    seen_links: set[str] = set()
+
+    for link, raw_title in links:
+        normalized_link = _normalize_ge_link(link)
+        if normalized_link in seen_links or not _is_ge_news_link(normalized_link):
+            continue
+
+        title = _clean_text(raw_title)
+        if not title or title.lower() == "mostrar mais":
+            continue
+
+        seen_links.add(normalized_link)
+        news_items.append(
+            GeNewsItem(
+                identifier=normalized_link,
+                title=title,
+                link=normalized_link,
+                summary="",
+                published_at=None,
+            )
+        )
+
+    if not news_items:
+        raise ValueError("Pagina do GE nao trouxe links de noticias reconheciveis.")
+
+    return news_items
+
+
 def get_unseen_news(items: list[GeNewsItem], seen_ids: set[str]) -> list[GeNewsItem]:
     unseen = [item for item in items if item.identifier not in seen_ids]
     return list(reversed(unseen))
@@ -160,6 +208,16 @@ def _clean_text(value: str) -> str:
     unescaped = html.unescape(value or "")
     without_tags = re.sub(r"<[^>]+>", "", unescaped)
     return re.sub(r"\s+", " ", without_tags).strip()
+
+
+def _normalize_ge_link(link: str) -> str:
+    return link.split("#", 1)[0].split("?", 1)[0]
+
+
+def _is_ge_news_link(link: str) -> bool:
+    if "/jogo/" in link or "/index/feed/" in link:
+        return False
+    return "/futebol/" in link and ("/noticia/" in link or "/post/" in link)
 
 
 def _parse_rss_date(value: str) -> datetime | None:

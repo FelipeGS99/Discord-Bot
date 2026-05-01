@@ -10,7 +10,9 @@ from services.ge_news_service import (
     GeNewsStateRepository,
     get_recent_unseen_news,
     get_unseen_news,
+    parse_ge_news_content,
     parse_ge_news_feed,
+    parse_ge_news_page,
 )
 
 
@@ -34,6 +36,30 @@ RSS_SAMPLE = """<?xml version="1.0" encoding="UTF-8"?>
 </rss>
 """
 
+HTML_SAMPLE = """
+<!DOCTYPE html>
+<html>
+  <body>
+    <a class="feed-post-link" href="https://ge.globo.com/futebol/times/palmeiras/noticia/2026/04/30/noticia-nova.ghtml">
+      <h2>Noticia nova do Palmeiras</h2>
+    </a>
+    <a href="https://ge.globo.com/futebol/times/palmeiras/noticia/2026/04/30/noticia-nova.ghtml">
+      <img alt="Noticia nova do Palmeiras">
+    </a>
+    <a href="https://ge.globo.com/futebol/libertadores/jogo/30-04-2026/time-a-time-b.ghtml">
+      Time A x Time B - Ao vivo
+    </a>
+    <a href="https://ge.globo.com/futebol/index/feed/pagina-2.ghtml">Mostrar mais</a>
+    <a href="https://ge.globo.com/blogs/blog-do-irlan-simoes/post/2026/04/30/postagem.ghtml">
+      Blog com assunto de futebol
+    </a>
+    <a href="https://ge.globo.com/basquete/noticia/2026/04/30/noticia-do-nbb.ghtml">
+      Noticia do NBB
+    </a>
+  </body>
+</html>
+"""
+
 
 class GeNewsServiceTests(unittest.TestCase):
     def test_parse_ge_news_feed_extracts_items(self) -> None:
@@ -45,6 +71,21 @@ class GeNewsServiceTests(unittest.TestCase):
         self.assertEqual(items[0].summary, "Resumo da primeira noticia.")
         self.assertIsNotNone(items[0].published_at)
         self.assertEqual(items[1].identifier, "https://ge.globo.com/futebol/noticia/segunda.ghtml")
+
+    def test_parse_ge_news_content_accepts_rss(self) -> None:
+        items = parse_ge_news_content(RSS_SAMPLE)
+
+        self.assertEqual([item.title for item in items], ["Primeira noticia", "Segunda noticia"])
+
+    def test_parse_ge_news_page_extracts_current_news_links(self) -> None:
+        items = parse_ge_news_page(HTML_SAMPLE)
+
+        self.assertEqual([item.title for item in items], ["Noticia nova do Palmeiras"])
+        self.assertEqual(
+            items[0].identifier,
+            "https://ge.globo.com/futebol/times/palmeiras/noticia/2026/04/30/noticia-nova.ghtml",
+        )
+        self.assertIsNone(items[0].published_at)
 
     def test_get_unseen_news_returns_oldest_first(self) -> None:
         items = parse_ge_news_feed(RSS_SAMPLE)
