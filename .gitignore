@@ -1,7 +1,13 @@
 .env
+.venv/
 venv/
-cogs/__pycache__/
 __pycache__/
+cogs/__pycache__/
+services/__pycache__/
 squarecloud.app
 backup.py
 cookies.txt
+ge_news_state.json
+brasileirao_state.json
+libertadores_state.json
+sulamericana_state.json

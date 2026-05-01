@@ -1,0 +1,34 @@
+{
+  "temas": [
+    {
+      "tema": "animais",
+      "facil": ["gato", "cachorro", "vaca", "pato", "leao"],
+      "medio": ["girafa", "tigre", "zebra", "coelho", "cavalo"],
+      "dificil": ["ornitorrinco", "chimpanze", "rinoceronte", "hipopotamo", "tamandua", "guaxinim", "canguru", "suricato", "dromedario", "antilope"]
+    },
+    {
+      "tema": "games",
+      "facil": ["minecraft", "roblox", "fortnite", "terraria", "valorant"],
+      "medio": ["overwatch", "fallguys", "palworld", "subnautica", "stardewvalley"],
+      "dificil": ["counterstrike", "leagueoflegends", "eldenring", "cyberpunk", "reddeadredemption", "hollowknight", "rainbowsixsiege", "thewitcher", "assassinscreed", "baldursgate"]
+    },
+    {
+      "tema": "comida",
+      "facil": ["arroz", "feijao", "pao", "leite", "ovo"],
+      "medio": ["macarrao", "lasanha", "hamburguer", "salgado", "sorvete"],
+      "dificil": ["estrogonofe", "parmegiana", "ratatouille", "carbonara", "yakisoba", "ceviche", "guacamole", "quiche", "fondue", "bruschetta"]
+    },
+    {
+      "tema": "esportes",
+      "facil": ["futebol", "tenis", "volei", "boxe", "golf"],
+      "medio": ["basquete", "natacao", "ciclismo", "corrida", "skate"],
+      "dificil": ["halterofilismo", "parapente", "snowboard", "escalada", "badminton", "handebol", "triatlo", "pentatlo", "esgrima", "canoagem"]
+    },
+    {
+      "tema": "paises",
+      "facil": ["brasil", "china", "india", "mexico", "canada"],
+      "medio": ["argentina", "portugal", "alemanha", "franca", "italia"],
+      "dificil": ["cazaquistao", "azerbaijao", "liechtenstein", "luxemburgo", "madagascar", "quirguistao", "tajiquistao", "uzbequistao", "mocambique", "filipinas"]
+    }
+  ]
+}
