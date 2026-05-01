@@ -8,6 +8,7 @@ from services.brasileirao_service import (
     parse_goal_scorers,
     parse_fixtures_response,
     select_current_round_fixtures,
+    select_missing_live_fixture_ids,
     select_next_round_fixtures,
     select_previous_round_fixtures,
     should_monitor_fixtures,
@@ -70,6 +71,49 @@ class BrasileiraoServiceTests(unittest.TestCase):
         now = datetime(2026, 5, 1, 18, 45, tzinfo=timezone.utc)
 
         self.assertTrue(should_monitor_fixtures(fixtures, now=now))
+
+    def test_select_missing_live_fixture_ids(self) -> None:
+        previous_fixtures = parse_fixtures_response(
+            {
+                "results": [
+                    {
+                        "id": 1,
+                        "league": {"id": 9, "name": "Sul-Americana"},
+                        "home_team": "Red Bull Bragantino",
+                        "away_team": "River Plate",
+                        "home_score": 0,
+                        "away_score": 1,
+                        "status": "2nd_half",
+                    },
+                    {
+                        "id": 2,
+                        "league": {"id": 9, "name": "Sul-Americana"},
+                        "home_team": "Alianza Atletico",
+                        "away_team": "Macara",
+                        "home_score": 0,
+                        "away_score": 2,
+                        "status": "1st_half",
+                    },
+                ]
+            }
+        )
+        current_live_fixtures = parse_fixtures_response(
+            {
+                "results": [
+                    {
+                        "id": 2,
+                        "league": {"id": 9, "name": "Sul-Americana"},
+                        "home_team": "Alianza Atletico",
+                        "away_team": "Macara",
+                        "home_score": 0,
+                        "away_score": 2,
+                        "status": "1st_half",
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(select_missing_live_fixture_ids(previous_fixtures, current_live_fixtures), {1})
 
     def test_select_current_and_next_round_fixtures(self) -> None:
         payload = {

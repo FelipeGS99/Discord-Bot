@@ -311,6 +311,18 @@ def should_monitor_fixtures(fixtures: list[BrasileiraoFixture], now: datetime | 
     return False
 
 
+def select_missing_live_fixture_ids(
+    previous_fixtures: list[BrasileiraoFixture],
+    current_live_fixtures: list[BrasileiraoFixture],
+) -> set[int]:
+    current_live_ids = {fixture.fixture_id for fixture in current_live_fixtures}
+    return {
+        fixture.fixture_id
+        for fixture in previous_fixtures
+        if fixture.is_live and fixture.fixture_id not in current_live_ids
+    }
+
+
 def serialize_fixtures(fixtures: list[BrasileiraoFixture]) -> list[dict[str, Any]]:
     return [
         {

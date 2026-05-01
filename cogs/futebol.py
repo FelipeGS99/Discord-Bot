@@ -13,6 +13,7 @@ from services.brasileirao_service import (
     BrasileiraoStateRepository,
     describe_fixture_update,
     deserialize_fixtures,
+    select_missing_live_fixture_ids,
     serialize_fixtures,
     should_monitor_fixtures,
 )
@@ -147,6 +148,22 @@ class Futebol(commands.Cog):
         fixtures_to_compare = live_fixtures
         if fixtures_to_compare:
             checked_date = date.today().isoformat()
+            missing_live_fixture_ids = select_missing_live_fixture_ids(fixtures_today, live_fixtures)
+            if missing_live_fixture_ids:
+                try:
+                    fixtures_today = await self.api_client.fetch_fixtures(league_id, date.today())
+                except Exception as exc:
+                    print(f"Erro ao consultar jogos encerrados ou em intervalo de {competition_name}: {exc}")
+                    return
+
+                live_fixture_ids = {fixture.fixture_id for fixture in live_fixtures}
+                tracked_updates = [
+                    fixture
+                    for fixture in fixtures_today
+                    if fixture.fixture_id in missing_live_fixture_ids
+                    and fixture.fixture_id not in live_fixture_ids
+                ]
+                fixtures_to_compare = live_fixtures + tracked_updates
 
         if not fixtures_to_compare:
             had_live_snapshot = any(fixture.is_live for fixture in fixtures_today)
