@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import date
+from html import escape
 from pathlib import Path
 
 from discord.ext import commands, tasks
@@ -39,6 +40,18 @@ COMMANDS = {
 TELEGRAM_POLL_SECONDS = 5
 SCORE_POLL_MINUTES = 1
 MAX_TRACKED_MATCHES = 100
+TELEGRAM_HTML_PARSE_MODE = "HTML"
+ESPORTS_STATUS_LABELS = {
+    "not_started": "Não iniciada",
+    "notstarted": "Não iniciada",
+    "not_started_yet": "Não iniciada",
+    "running": "Ao vivo",
+    "finished": "Encerrada",
+    "canceled": "Cancelada",
+    "cancelled": "Cancelada",
+    "postponed": "Adiada",
+    "delayed": "Atrasada",
+}
 
 
 class TelegramAlerts(commands.Cog):
@@ -225,7 +238,11 @@ class TelegramAlerts(commands.Cog):
         for fixture in changed_fixtures:
             reason = describe_fixture_update(fixture, snapshots_by_competition.get(str(fixture.fixture_id)))
             scorers = await self._fetch_goal_scorers(fixture)
-            await self._broadcast(chat_ids, _format_football_update(competition_name, fixture, reason, scorers))
+            await self._broadcast(
+                chat_ids,
+                _format_football_update(competition_name, fixture, reason, scorers),
+                parse_mode=TELEGRAM_HTML_PARSE_MODE,
+            )
             snapshots_by_competition[str(fixture.fixture_id)] = fixture.snapshot_key
 
         football_state["fixtures_today"][competition_name] = serialize_fixtures(fixtures_to_compare)
@@ -278,14 +295,22 @@ class TelegramAlerts(commands.Cog):
             ]
             for match in changed_matches:
                 reason = describe_match_update(match, match_snapshots.get(str(match.match_id)))
-                await self._broadcast(chat_ids, _format_esports_update(config.title, match, reason))
+                await self._broadcast(
+                    chat_ids,
+                    _format_esports_update(config.title, match, reason),
+                    parse_mode=TELEGRAM_HTML_PARSE_MODE,
+                )
                 match_snapshots[str(match.match_id)] = match.snapshot_key
 
             filtered_live_matches = [
                 match for match in live_matches if _match_belongs_to_api_path(match, config.api_path)
             ]
             for match, game in _new_running_games(filtered_live_matches, game_state["game_snapshots"]):
-                await self._broadcast(chat_ids, _format_esports_game_start(config.title, match, game))
+                await self._broadcast(
+                    chat_ids,
+                    _format_esports_game_start(config.title, match, game),
+                    parse_mode=TELEGRAM_HTML_PARSE_MODE,
+                )
 
             game_state["tracked_matches"] = serialize_matches(
                 [match for match in matches_to_compare if not match.is_finished][:MAX_TRACKED_MATCHES]
@@ -328,15 +353,15 @@ class TelegramAlerts(commands.Cog):
             game_state["match_snapshots"].setdefault(str(match.match_id), match.snapshot_key)
         _store_current_game_snapshots(game_state, live_matches)
 
-    async def _broadcast(self, chat_ids: list[int], text: str) -> None:
+    async def _broadcast(self, chat_ids: list[int], text: str, parse_mode: str | None = None) -> None:
         for chat_id in chat_ids:
-            await self._send_telegram_message(chat_id, text)
+            await self._send_telegram_message(chat_id, text, parse_mode=parse_mode)
 
-    async def _send_telegram_message(self, chat_id: int, text: str) -> None:
+    async def _send_telegram_message(self, chat_id: int, text: str, parse_mode: str | None = None) -> None:
         if self.telegram_client is None:
             return
         try:
-            await self.telegram_client.send_message(chat_id, text)
+            await self.telegram_client.send_message(chat_id, text, parse_mode=parse_mode)
         except Exception as exc:
             print(f"Erro ao enviar mensagem no Telegram para {chat_id}: {exc}")
 
@@ -378,54 +403,80 @@ def _format_football_update(
     reason: str,
     scorers: list[str],
 ) -> str:
+    status = fixture.status_long or fixture.status_short or "Indisponível"
+    if fixture.elapsed is not None:
+        status = f"{status} - {fixture.elapsed}'"
+
     lines = [
-        competition_name,
-        f"{reason}: {fixture.home_team} {fixture.score_text} {fixture.away_team}",
-        f"Status: {fixture.status_long or fixture.status_short or 'Indisponível'}"
-        + (f" - {fixture.elapsed}'" if fixture.elapsed is not None else ""),
+        f"<b>{_html(competition_name)}</b>",
+        f"<b>{_html(reason)}</b>",
+        "",
+        _format_score_line(fixture.home_team, fixture.score_text, fixture.away_team),
+        "",
+        f"<b>Status:</b> {_html(status)}",
     ]
     if fixture.kickoff_at is not None:
-        lines.append(f"Data: {fixture.kickoff_at.astimezone().strftime('%d/%m/%Y %H:%M')}")
+        lines.append(f"<b>Data:</b> {_html(fixture.kickoff_at.astimezone().strftime('%d/%m/%Y %H:%M'))}")
     if scorers:
-        lines.append("Gols: " + " | ".join(scorers))
+        lines.append(f"<b>Gols:</b> {_html(' | '.join(scorers))}")
     return "\n".join(lines)
 
 
 def _format_esports_update(game_title: str, match: PandaScoreMatch, reason: str) -> str:
     lines = [
-        f"{game_title} - {_format_competition_name(match)}",
-        reason,
-        f"{match.opponents[0]} {match.score_text} {match.opponents[1]}",
-        f"Status: {match.status}",
+        f"<b>{_html(game_title)} - {_html(_format_competition_name(match))}</b>",
+        f"<b>{_html(reason)}</b>",
+        "",
+        _format_score_line(match.opponents[0], match.score_text, match.opponents[1]),
+        "",
+        f"<b>Status:</b> {_html(_format_esports_status(match.status))}",
     ]
     start_at = match.begin_at or match.scheduled_at
     if start_at is not None:
-        lines.append(f"Horário: {start_at.astimezone().strftime('%d/%m/%Y %H:%M')}")
+        lines.append(f"<b>Horário:</b> {_html(start_at.astimezone().strftime('%d/%m/%Y %H:%M'))}")
     if match.number_of_games is not None:
-        lines.append(f"Formato: melhor de {match.number_of_games}")
+        lines.append(f"<b>Formato:</b> Melhor de {match.number_of_games}")
     stream_link = _stream_link_for_match(match)
     if stream_link is not None:
-        lines.append(f"{stream_link[0]}: {stream_link[1]}")
+        lines.append(_format_telegram_stream_link(stream_link[0], stream_link[1]))
     return "\n".join(lines)
 
 
 def _format_esports_game_start(game_title: str, match: PandaScoreMatch, game: PandaScoreGame) -> str:
     label = "mapa" if game_title in {"CS2", "Valorant"} else "jogo"
     lines = [
-        f"{game_title} - {_format_competition_name(match)}",
-        f"Início do {label} {game.position}",
-        f"{match.opponents[0]} {match.score_text} {match.opponents[1]}",
+        f"<b>{_html(game_title)} - {_html(_format_competition_name(match))}</b>",
+        f"<b>Início do {label} {game.position}</b>",
+        "",
+        _format_score_line(match.opponents[0], match.score_text, match.opponents[1]),
     ]
     if game.begin_at is not None:
-        lines.append(f"Horário: {game.begin_at.astimezone().strftime('%d/%m/%Y %H:%M')}")
+        lines.extend(["", f"<b>Horário:</b> {_html(game.begin_at.astimezone().strftime('%d/%m/%Y %H:%M'))}"])
     stream_link = _stream_link_for_match(match)
     if stream_link is not None:
-        lines.append(f"{stream_link[0]}: {stream_link[1]}")
+        lines.append(_format_telegram_stream_link(stream_link[0], stream_link[1]))
     return "\n".join(lines)
 
 
 def _format_competition_name(match: PandaScoreMatch) -> str:
     return " - ".join(value for value in (match.league, match.serie, match.tournament) if value) or "Competição indisponível"
+
+
+def _format_score_line(first: str, score_text: str, second: str) -> str:
+    return f"{_html(first)} <b>{_html(score_text)}</b> {_html(second)}"
+
+
+def _format_esports_status(status: str) -> str:
+    normalized_status = status.strip().lower()
+    return ESPORTS_STATUS_LABELS.get(normalized_status, status or "Indisponível")
+
+
+def _format_telegram_stream_link(label: str, stream_url: str) -> str:
+    return f"<b>{_html(label)}:</b> <a href=\"{_html(stream_url)}\">Assistir</a>"
+
+
+def _html(value: object) -> str:
+    return escape(str(value), quote=True)
 
 
 def _store_current_game_snapshots(game_state: dict[str, object], live_matches: list[PandaScoreMatch]) -> None:

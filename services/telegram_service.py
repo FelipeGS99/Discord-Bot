@@ -28,8 +28,8 @@ class TelegramClient:
     async def fetch_updates(self, offset: int | None) -> list[TelegramMessage]:
         return await asyncio.to_thread(self._fetch_updates, offset)
 
-    async def send_message(self, chat_id: int, text: str) -> None:
-        await asyncio.to_thread(self._send_message, chat_id, text)
+    async def send_message(self, chat_id: int, text: str, parse_mode: str | None = None) -> None:
+        await asyncio.to_thread(self._send_message, chat_id, text, parse_mode)
 
     def _fetch_updates(self, offset: int | None) -> list[TelegramMessage]:
         params: dict[str, Any] = {"timeout": 0, "allowed_updates": json.dumps(["message"])}
@@ -58,14 +58,18 @@ class TelegramClient:
             messages.append(TelegramMessage(update_id=update_id, chat_id=chat_id, text=text))
         return messages
 
-    def _send_message(self, chat_id: int, text: str) -> None:
+    def _send_message(self, chat_id: int, text: str, parse_mode: str | None = None) -> None:
+        params = {
+            "chat_id": chat_id,
+            "text": text[:4096],
+            "disable_web_page_preview": True,
+        }
+        if parse_mode is not None:
+            params["parse_mode"] = parse_mode
+
         self._post_json(
             "sendMessage",
-            {
-                "chat_id": chat_id,
-                "text": text[:4096],
-                "disable_web_page_preview": True,
-            },
+            params,
         )
 
     def _post_json(self, method: str, params: dict[str, Any]) -> dict[str, Any]:
