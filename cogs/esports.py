@@ -12,10 +12,12 @@ from config import settings
 from services.pandascore_service import (
     LolChampionPick,
     PandaScoreClient,
+    PandaScoreGame,
     PandaScoreMatch,
     PandaScoreStateRepository,
     describe_match_update,
     deserialize_matches,
+    game_snapshot_key,
     select_missing_running_match_ids,
     serialize_matches,
 )
@@ -49,13 +51,20 @@ GAME_CONFIGS = {
         state_file="cs2_state.json",
         color=0xF0A202,
     ),
+    "valorant": EsportsGameConfig(
+        key="valorant",
+        title="Valorant",
+        api_path="valorant",
+        state_file="valorant_state.json",
+        color=0xFF4655,
+    ),
 }
 
 
 OFFICIAL_STREAMS = {
     "cblol": "https://www.youtube.com/@CBLOL",
     "lck": "https://www.youtube.com/@LCK",
-    "lpl": "https://www.youtube.com/@lpl",
+    "lpl": "https://www.youtube.com/@LPL_English",
     "lec": "https://www.youtube.com/@LEC",
     "lcs": "https://www.youtube.com/@LCS",
     "lcp": "https://www.youtube.com/@lolesportspacific",
@@ -67,6 +76,10 @@ OFFICIAL_STREAMS = {
     "blast": "https://www.twitch.tv/blastpremier",
     "pgl": "https://www.twitch.tv/pgl",
     "starladder": "https://www.twitch.tv/starladder_cs_en",
+    "valorant": "https://www.youtube.com/@ValorantEsports",
+    "vct": "https://www.youtube.com/@ValorantEsports",
+    "challengers": "https://www.youtube.com/@ValorantEsports",
+    "game changers": "https://www.youtube.com/@ValorantEsports",
 }
 
 
@@ -76,16 +89,20 @@ class EsportsGameState:
         self.repository = PandaScoreStateRepository(base_path / config.state_file)
 
         state = self.repository.load()
-        self.channel_id: int | None = state["channel_id"]
+        self.channel_ids: list[int] = state["channel_ids"]
         self.match_snapshots: dict[str, str] = {
             str(key): str(value) for key, value in state["match_snapshots"].items()
+        }
+        self.game_snapshots: dict[str, str] = {
+            str(key): str(value) for key, value in state["game_snapshots"].items()
         }
         self.tracked_matches: list[PandaScoreMatch] = deserialize_matches(state["tracked_matches"])
 
     def save(self) -> None:
         self.repository.save(
-            self.channel_id,
+            self.channel_ids,
             self.match_snapshots,
+            self.game_snapshots,
             serialize_matches(self.tracked_matches),
         )
 
@@ -112,13 +129,16 @@ class Esports(commands.Cog):
             "\n".join(
                 [
                     "**E-sports**",
-                    "Use `lol` e `cs2` separadamente para consultar partidas e ativar notificações em canais diferentes.",
+                    "Use `lol`, `cs2` e `valorant` separadamente para consultar partidas e ativar notificações em canais diferentes.",
                     f"`{prefix}lol` - Ajuda completa dos comandos de League of Legends.",
                     f"`{prefix}cs2` - Ajuda completa dos comandos de CS2.",
+                    f"`{prefix}valorant` - Ajuda completa dos comandos de Valorant.",
                     f"`{prefix}lol hoje` - Mostra partidas de LoL de hoje.",
                     f"`{prefix}cs2 hoje` - Mostra partidas de CS2 de hoje.",
+                    f"`{prefix}valorant hoje` - Mostra partidas de Valorant de hoje.",
                     f"`{prefix}lol canal #canal` - Ativa alertas de LoL. Exemplo: `{prefix}lol canal #lol`.",
                     f"`{prefix}cs2 canal #canal` - Ativa alertas de CS2. Exemplo: `{prefix}cs2 canal #cs2`.",
+                    f"`{prefix}valorant canal #canal` - Ativa alertas de Valorant. Exemplo: `{prefix}valorant canal #valorant`.",
                 ]
             )
         )
@@ -131,6 +151,10 @@ class Esports(commands.Cog):
     async def cs2_group(self, ctx: commands.Context) -> None:
         await self._send_game_help(ctx, GAME_CONFIGS["cs2"])
 
+    @commands.group(name="valorant", aliases=["val"], invoke_without_command=True)
+    async def valorant_group(self, ctx: commands.Context) -> None:
+        await self._send_game_help(ctx, GAME_CONFIGS["valorant"])
+
     @lol_group.command(name="canal")
     async def lol_set_channel(self, ctx: commands.Context, channel: discord.TextChannel) -> None:
         await self._set_channel(ctx, GAME_CONFIGS["lol"], channel)
@@ -138,6 +162,10 @@ class Esports(commands.Cog):
     @cs2_group.command(name="canal")
     async def cs2_set_channel(self, ctx: commands.Context, channel: discord.TextChannel) -> None:
         await self._set_channel(ctx, GAME_CONFIGS["cs2"], channel)
+
+    @valorant_group.command(name="canal")
+    async def valorant_set_channel(self, ctx: commands.Context, channel: discord.TextChannel) -> None:
+        await self._set_channel(ctx, GAME_CONFIGS["valorant"], channel)
 
     @lol_group.command(name="aovivo", aliases=["live"])
     async def lol_running(self, ctx: commands.Context) -> None:
@@ -147,6 +175,10 @@ class Esports(commands.Cog):
     async def cs2_running(self, ctx: commands.Context) -> None:
         await self._send_running_matches(ctx, GAME_CONFIGS["cs2"])
 
+    @valorant_group.command(name="aovivo", aliases=["live"])
+    async def valorant_running(self, ctx: commands.Context) -> None:
+        await self._send_running_matches(ctx, GAME_CONFIGS["valorant"])
+
     @lol_group.command(name="hoje")
     async def lol_today(self, ctx: commands.Context) -> None:
         await self._send_matches_for_date(ctx, GAME_CONFIGS["lol"], date.today(), "hoje")
@@ -154,6 +186,10 @@ class Esports(commands.Cog):
     @cs2_group.command(name="hoje")
     async def cs2_today(self, ctx: commands.Context) -> None:
         await self._send_matches_for_date(ctx, GAME_CONFIGS["cs2"], date.today(), "hoje")
+
+    @valorant_group.command(name="hoje")
+    async def valorant_today(self, ctx: commands.Context) -> None:
+        await self._send_matches_for_date(ctx, GAME_CONFIGS["valorant"], date.today(), "hoje")
 
     @lol_group.command(name="amanha")
     async def lol_tomorrow(self, ctx: commands.Context) -> None:
@@ -163,6 +199,10 @@ class Esports(commands.Cog):
     async def cs2_tomorrow(self, ctx: commands.Context) -> None:
         await self._send_matches_for_date(ctx, GAME_CONFIGS["cs2"], date.today() + timedelta(days=1), "amanha")
 
+    @valorant_group.command(name="amanha")
+    async def valorant_tomorrow(self, ctx: commands.Context) -> None:
+        await self._send_matches_for_date(ctx, GAME_CONFIGS["valorant"], date.today() + timedelta(days=1), "amanha")
+
     @lol_group.command(name="status")
     async def lol_status(self, ctx: commands.Context) -> None:
         await self._send_status(ctx, GAME_CONFIGS["lol"])
@@ -170,6 +210,10 @@ class Esports(commands.Cog):
     @cs2_group.command(name="status")
     async def cs2_status(self, ctx: commands.Context) -> None:
         await self._send_status(ctx, GAME_CONFIGS["cs2"])
+
+    @valorant_group.command(name="status")
+    async def valorant_status(self, ctx: commands.Context) -> None:
+        await self._send_status(ctx, GAME_CONFIGS["valorant"])
 
     @lol_group.command(name="parar")
     async def lol_stop_alerts(self, ctx: commands.Context) -> None:
@@ -179,11 +223,16 @@ class Esports(commands.Cog):
     async def cs2_stop_alerts(self, ctx: commands.Context) -> None:
         await self._stop_alerts(ctx, GAME_CONFIGS["cs2"])
 
+    @valorant_group.command(name="parar")
+    async def valorant_stop_alerts(self, ctx: commands.Context) -> None:
+        await self._stop_alerts(ctx, GAME_CONFIGS["valorant"])
+
     @lol_set_channel.error
     @cs2_set_channel.error
+    @valorant_set_channel.error
     async def set_channel_error(self, ctx: commands.Context, error: commands.CommandError) -> None:
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send("Informe o canal. Exemplo: `lol canal #placares` ou `cs2 canal #placares`.")
+            await ctx.send("Informe o canal. Exemplo: `lol canal #placares`, `cs2 canal #placares` ou `valorant canal #placares`.")
             return
         if isinstance(error, commands.BadArgument):
             await ctx.send("Canal invalido. Marque um canal de texto valido.")
@@ -203,7 +252,7 @@ class Esports(commands.Cog):
                     f"`{prefix}{config.key} canal #canal` - Ativa alertas neste canal. Exemplo: `{prefix}{config.key} canal #placares`.",
                     f"`{prefix}{config.key} status` - Mostra canal configurado, API e partidas sendo monitoradas.",
                     f"`{prefix}{config.key} parar` - Desativa os alertas automáticos desse jogo.",
-                    "Os alertas avisam início de partida, mudança de placar/status e fim de partida.",
+                    "Os alertas avisam início de partida, início de mapas/jogos, mudança de placar/status e fim de partida.",
                 ]
             )
         )
@@ -226,18 +275,20 @@ class Esports(commands.Cog):
         except Exception as exc:
             await ctx.send(f"Nao consegui consultar a PandaScore agora: {exc}")
             return
+        live_matches = await self._fetch_live_matches(config)
 
         game_state = self.game_states[config.key]
-        game_state.channel_id = channel.id
+        if channel.id not in game_state.channel_ids:
+            game_state.channel_ids.append(channel.id)
         game_state.tracked_matches = running_matches[:MAX_TRACKED_MATCHES]
-        game_state.match_snapshots = {
-            str(match.match_id): match.snapshot_key for match in game_state.tracked_matches
-        }
+        for match in game_state.tracked_matches:
+            game_state.match_snapshots.setdefault(str(match.match_id), match.snapshot_key)
+        self._store_current_game_snapshots(game_state, live_matches)
         game_state.save()
 
         await ctx.send(
             f"Alertas de {config.title} ativados em {channel.mention}. "
-            "Vou avisar quando partidas começarem, terminarem ou mudarem de placar."
+            "Vou avisar quando partidas começarem, mapas/jogos começarem, terminarem ou mudarem de placar."
         )
 
     async def _send_running_matches(self, ctx: commands.Context, config: EsportsGameConfig) -> None:
@@ -283,9 +334,12 @@ class Esports(commands.Cog):
     async def _send_status(self, ctx: commands.Context, config: EsportsGameConfig) -> None:
         game_state = self.game_states[config.key]
         channel_text = "desativado"
-        if game_state.channel_id is not None:
-            channel = self.bot.get_channel(game_state.channel_id)
-            channel_text = channel.mention if isinstance(channel, discord.TextChannel) else f"`{game_state.channel_id}`"
+        if game_state.channel_ids:
+            channel_mentions = []
+            for channel_id in game_state.channel_ids:
+                channel = self.bot.get_channel(channel_id)
+                channel_mentions.append(channel.mention if isinstance(channel, discord.TextChannel) else f"`{channel_id}`")
+            channel_text = ", ".join(channel_mentions)
 
         await ctx.send(
             "\n".join(
@@ -305,26 +359,27 @@ class Esports(commands.Cog):
             return
 
         game_state = self.game_states[config.key]
-        game_state.channel_id = None
+        if ctx.channel.id in game_state.channel_ids:
+            game_state.channel_ids.remove(ctx.channel.id)
         game_state.save()
-        await ctx.send(f"Alertas de {config.title} desativados.")
+        await ctx.send(f"Alertas de {config.title} desativados neste canal.")
 
     @tasks.loop(minutes=POLL_INTERVAL_MINUTES)
     async def check_esports_matches(self) -> None:
         if self.api_client is None:
             return
 
+        live_matches = await self._fetch_live_matches()
         for config in GAME_CONFIGS.values():
-            await self._check_game_matches(config)
+            await self._check_game_matches(config, _filter_live_matches(live_matches, config))
 
-    async def _check_game_matches(self, config: EsportsGameConfig) -> None:
+    async def _check_game_matches(
+        self,
+        config: EsportsGameConfig,
+        live_matches: list[PandaScoreMatch] | None = None,
+    ) -> None:
         game_state = self.game_states[config.key]
-        if game_state.channel_id is None:
-            return
-
-        channel = self.bot.get_channel(game_state.channel_id)
-        if not isinstance(channel, discord.TextChannel):
-            print(f"Canal de alertas de {config.title} nao encontrado: {game_state.channel_id}")
+        if not game_state.channel_ids:
             return
 
         try:
@@ -332,6 +387,8 @@ class Esports(commands.Cog):
         except Exception as exc:
             print(f"Erro ao buscar partidas ao vivo de {config.title} na PandaScore: {exc}")
             return
+        if live_matches is None:
+            live_matches = await self._fetch_live_matches(config)
 
         matches_to_compare = list(running_matches)
         missing_running_ids = select_missing_running_match_ids(game_state.tracked_matches, running_matches)
@@ -356,18 +413,23 @@ class Esports(commands.Cog):
                 not previous_snapshot or not previous_snapshot.startswith("running|")
             )
             reason = describe_match_update(match, game_state.match_snapshots.get(str(match.match_id)))
-            try:
-                await channel.send(embed=self._build_match_update_embed(match, reason, config))
-                if config.key == "lol" and is_match_start:
+            sent_channels = await self._send_to_alert_channels(
+                game_state,
+                config,
+                self._build_match_update_embed(match, reason, config),
+            )
+            if config.key == "lol" and is_match_start:
+                for channel in sent_channels:
                     await self._send_lol_composition_if_available(channel, match, config)
-            except discord.Forbidden:
-                print(f"Sem permissao para enviar alertas de {config.title} no canal {channel.id}.")
-                return
-            except discord.HTTPException as exc:
-                print(f"Erro ao enviar alerta de {config.title} no Discord: {exc}")
-                return
 
             game_state.match_snapshots[str(match.match_id)] = match.snapshot_key
+
+        for match, game in _new_running_games(live_matches, game_state.game_snapshots):
+            await self._send_to_alert_channels(
+                game_state,
+                config,
+                self._build_game_update_embed(match, game, config),
+            )
 
         game_state.tracked_matches = [
             match for match in matches_to_compare if not match.is_finished
@@ -378,7 +440,57 @@ class Esports(commands.Cog):
             for match_id, snapshot in game_state.match_snapshots.items()
             if match_id in tracked_match_ids
         }
+        self._store_current_game_snapshots(game_state, live_matches)
         game_state.save()
+
+    async def _fetch_live_matches(self, config: EsportsGameConfig | None = None) -> list[PandaScoreMatch]:
+        if self.api_client is None:
+            return []
+        try:
+            return await self.api_client.fetch_live_matches(config.api_path if config else None)
+        except Exception as exc:
+            game_name = config.title if config else "e-sports"
+            print(f"Erro ao buscar lives de {game_name} na PandaScore: {exc}")
+            return []
+
+    @staticmethod
+    def _store_current_game_snapshots(
+        game_state: EsportsGameState,
+        live_matches: list[PandaScoreMatch],
+    ) -> None:
+        live_match_ids = {match.match_id for match in live_matches}
+        for match in live_matches:
+            for game in match.games:
+                game_state.game_snapshots[game_snapshot_key(match.match_id, game.position)] = game.status
+
+        game_state.game_snapshots = {
+            key: status
+            for key, status in game_state.game_snapshots.items()
+            if _snapshot_match_id(key) in live_match_ids
+        }
+
+    async def _send_to_alert_channels(
+        self,
+        game_state: EsportsGameState,
+        config: EsportsGameConfig,
+        embed: discord.Embed,
+    ) -> list[discord.TextChannel]:
+        sent_channels: list[discord.TextChannel] = []
+        for channel_id in game_state.channel_ids:
+            channel = self.bot.get_channel(channel_id)
+            if not isinstance(channel, discord.TextChannel):
+                print(f"Canal de alertas de {config.title} não encontrado: {channel_id}")
+                continue
+            try:
+                await channel.send(embed=embed)
+            except discord.Forbidden:
+                print(f"Sem permissão para enviar alertas de {config.title} no canal {channel.id}.")
+                continue
+            except discord.HTTPException as exc:
+                print(f"Erro ao enviar alerta de {config.title} no Discord: {exc}")
+                continue
+            sent_channels.append(channel)
+        return sent_channels
 
     async def _send_lol_composition_if_available(
         self,
@@ -463,9 +575,27 @@ class Esports(commands.Cog):
         embed.set_author(name=author_name)
         if match.begin_at is not None:
             embed.timestamp = match.begin_at
-        official_stream_url = _official_stream_url(match)
-        if official_stream_url:
-            embed.add_field(name="Transmissão oficial", value=f"[Assistir]({official_stream_url})", inline=False)
+        _add_stream_field(embed, match)
+        return embed
+
+    @staticmethod
+    def _build_game_update_embed(
+        match: PandaScoreMatch,
+        game: PandaScoreGame,
+        config: EsportsGameConfig,
+    ) -> discord.Embed:
+        author_name = _format_match_context(match, config)
+        competition_name = _format_competition_name(match) or "Competição indisponível"
+        label = _game_label(config)
+        embed = discord.Embed(
+            title=f"Início do {label} {game.position}",
+            description=_format_game_update_details(match, game, config),
+            color=_color_for_name(competition_name),
+        )
+        embed.set_author(name=author_name)
+        if game.begin_at is not None:
+            embed.timestamp = game.begin_at
+        _add_stream_field(embed, match)
         return embed
 
 
@@ -496,6 +626,32 @@ def _format_match_update_details(match: PandaScoreMatch) -> str:
     if match.number_of_games is not None:
         lines.append(f"Formato: **{_format_match_format(match)}**")
     return "\n".join(lines)
+
+
+def _format_game_update_details(
+    match: PandaScoreMatch,
+    game: PandaScoreGame,
+    config: EsportsGameConfig,
+) -> str:
+    label = _game_label(config)
+    lines = [
+        f"**{_format_match_title(match)}**",
+        f"{label.capitalize()}: **{game.position}**",
+        f"Status do {label}: **{_format_status(game.status)}**",
+        f"Status da série: **{_format_status(match.status)}**",
+    ]
+    start_at = game.begin_at or match.begin_at or match.scheduled_at
+    if start_at is not None:
+        lines.append(f"Horário: <t:{int(start_at.timestamp())}:f>")
+    if match.number_of_games is not None:
+        lines.append(f"Formato: **{_format_match_format(match)}**")
+    return "\n".join(lines)
+
+
+def _game_label(config: EsportsGameConfig) -> str:
+    if config.key in {"cs2", "valorant"}:
+        return "mapa"
+    return "jogo"
 
 
 def _build_lol_composition_embed(
@@ -602,6 +758,69 @@ def _official_stream_url(match: PandaScoreMatch) -> str | None:
         if keyword in competition_text:
             return url
     return None
+
+
+def _stream_link_for_match(match: PandaScoreMatch) -> tuple[str, str] | None:
+    official_stream_url = _official_stream_url(match)
+    if official_stream_url:
+        return ("Transmissão oficial", official_stream_url)
+    if match.stream_url:
+        return ("Transmissão", match.stream_url)
+    return None
+
+
+def _add_stream_field(embed: discord.Embed, match: PandaScoreMatch) -> None:
+    stream_link = _stream_link_for_match(match)
+    if stream_link is None:
+        return
+    field_name, stream_url = stream_link
+    embed.add_field(name=field_name, value=f"[Assistir]({stream_url})", inline=False)
+
+
+def _new_running_games(
+    live_matches: list[PandaScoreMatch],
+    game_snapshots: dict[str, str],
+) -> list[tuple[PandaScoreMatch, PandaScoreGame]]:
+    new_running_games: list[tuple[PandaScoreMatch, PandaScoreGame]] = []
+    for match in live_matches:
+        for game in match.games:
+            snapshot_key = game_snapshot_key(match.match_id, game.position)
+            previous_status = game_snapshots.get(snapshot_key)
+            if previous_status is None:
+                continue
+            if previous_status != "running" and game.status == "running" and game.position > 1:
+                new_running_games.append((match, game))
+    return new_running_games
+
+
+def _filter_live_matches(
+    live_matches: list[PandaScoreMatch],
+    config: EsportsGameConfig,
+) -> list[PandaScoreMatch]:
+    return [
+        match
+        for match in live_matches
+        if _match_belongs_to_config(match, config)
+    ]
+
+
+def _match_belongs_to_config(match: PandaScoreMatch, config: EsportsGameConfig) -> bool:
+    videogame = match.videogame.lower()
+    if config.api_path == "lol":
+        return "league of legends" in videogame
+    if config.api_path == "csgo":
+        return "counter-strike" in videogame or "cs2" in videogame or "cs:go" in videogame
+    if config.api_path == "valorant":
+        return "valorant" in videogame
+    return False
+
+
+def _snapshot_match_id(snapshot_key: str) -> int | None:
+    match_id_text, _separator, _position = snapshot_key.partition(":")
+    try:
+        return int(match_id_text)
+    except ValueError:
+        return None
 
 
 def _color_for_name(name: str) -> int:

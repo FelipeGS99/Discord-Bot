@@ -15,8 +15,18 @@ PANDASCORE_BASE_URL = "https://api.pandascore.co"
 REQUEST_TIMEOUT_SECONDS = 20
 RUNNING_STATUS = "running"
 FINISHED_STATUS = "finished"
-SUPPORTED_VIDEOGAME_PATHS = ("lol", "csgo")
+SUPPORTED_VIDEOGAME_PATHS = ("lol", "csgo", "valorant")
 APP_TIMEZONE = timezone(timedelta(hours=-3), "America/Sao_Paulo")
+
+
+@dataclass(frozen=True)
+class PandaScoreGame:
+    game_id: int
+    match_id: int
+    position: int
+    status: str
+    begin_at: datetime | None
+    end_at: datetime | None
 
 
 @dataclass(frozen=True)
@@ -37,6 +47,7 @@ class PandaScoreMatch:
     number_of_games: int | None
     match_type: str
     stream_url: str | None
+    games: tuple[PandaScoreGame, ...] = ()
 
     @property
     def is_running(self) -> bool:
@@ -94,6 +105,9 @@ class PandaScoreClient:
     async def fetch_match(self, match_id: int) -> PandaScoreMatch | None:
         return await asyncio.to_thread(self._fetch_match, match_id)
 
+    async def fetch_live_matches(self, videogame_path: str | None = None) -> list[PandaScoreMatch]:
+        return await asyncio.to_thread(self._fetch_live_matches, videogame_path)
+
     async def fetch_lol_match_champion_picks(self, match_id: int) -> list[LolChampionPick]:
         return await asyncio.to_thread(self._fetch_lol_match_champion_picks, match_id)
 
@@ -143,6 +157,19 @@ class PandaScoreClient:
         if not isinstance(payload, dict):
             return None
         return parse_match(payload)
+
+    def _fetch_live_matches(self, videogame_path: str | None = None) -> list[PandaScoreMatch]:
+        payload = self._get_json("/lives", {"per_page": 50})
+        if not isinstance(payload, list):
+            return []
+        matches = parse_live_matches(payload)
+        if videogame_path is None:
+            return matches
+        return [
+            match
+            for match in matches
+            if _match_videogame_path(match) == videogame_path
+        ]
 
     def _fetch_lol_match_champion_picks(self, match_id: int) -> list[LolChampionPick]:
         payload = self._get_json(f"/lol/matches/{match_id}/players/stats", {})
@@ -195,29 +222,39 @@ class PandaScoreStateRepository:
     def load(self) -> dict[str, Any]:
         if not self.state_path.exists():
             return {
-                "channel_id": None,
+                "channel_ids": [],
                 "match_snapshots": {},
+                "game_snapshots": {},
                 "tracked_matches": [],
             }
 
         with self.state_path.open("r", encoding="utf-8") as file:
             data = json.load(file)
 
+        channel_ids = data.get("channel_ids")
+        if not isinstance(channel_ids, list):
+            channel_id = data.get("channel_id")
+            channel_ids = [channel_id] if isinstance(channel_id, int) else []
+        channel_ids = [channel_id for channel_id in channel_ids if isinstance(channel_id, int)]
+
         return {
-            "channel_id": data.get("channel_id") if isinstance(data.get("channel_id"), int) else None,
+            "channel_ids": channel_ids,
             "match_snapshots": data.get("match_snapshots") if isinstance(data.get("match_snapshots"), dict) else {},
+            "game_snapshots": data.get("game_snapshots") if isinstance(data.get("game_snapshots"), dict) else {},
             "tracked_matches": data.get("tracked_matches") if isinstance(data.get("tracked_matches"), list) else [],
         }
 
     def save(
         self,
-        channel_id: int | None,
+        channel_ids: list[int],
         match_snapshots: dict[str, str],
+        game_snapshots: dict[str, str],
         tracked_matches: list[dict[str, Any]],
     ) -> None:
         data = {
-            "channel_id": channel_id,
+            "channel_ids": channel_ids,
             "match_snapshots": match_snapshots,
+            "game_snapshots": game_snapshots,
             "tracked_matches": tracked_matches,
         }
         with self.state_path.open("w", encoding="utf-8") as file:
@@ -228,6 +265,20 @@ def parse_matches(payload: list[dict[str, Any]]) -> list[PandaScoreMatch]:
     matches: list[PandaScoreMatch] = []
     for entry in payload:
         match = parse_match(entry)
+        if match is not None:
+            matches.append(match)
+    return sorted(matches, key=lambda match: match.begin_at or match.scheduled_at or datetime.max.replace(tzinfo=timezone.utc))
+
+
+def parse_live_matches(payload: list[dict[str, Any]]) -> list[PandaScoreMatch]:
+    matches: list[PandaScoreMatch] = []
+    for entry in payload:
+        if not isinstance(entry, dict):
+            continue
+        match_payload = entry.get("match")
+        if not isinstance(match_payload, dict):
+            continue
+        match = parse_match(match_payload)
         if match is not None:
             matches.append(match)
     return sorted(matches, key=lambda match: match.begin_at or match.scheduled_at or datetime.max.replace(tzinfo=timezone.utc))
@@ -278,7 +329,33 @@ def parse_match(entry: dict[str, Any]) -> PandaScoreMatch | None:
         number_of_games=_optional_int(entry.get("number_of_games")),
         match_type=str(entry.get("match_type") or ""),
         stream_url=_first_stream_url(streams),
+        games=tuple(parse_games(entry.get("games"), match_id)),
     )
+
+
+def parse_games(payload: Any, match_id: int) -> list[PandaScoreGame]:
+    if not isinstance(payload, list):
+        return []
+
+    games: list[PandaScoreGame] = []
+    for entry in payload:
+        if not isinstance(entry, dict):
+            continue
+        game_id = _optional_int(entry.get("id"))
+        position = _optional_int(entry.get("position"))
+        if game_id is None or position is None:
+            continue
+        games.append(
+            PandaScoreGame(
+                game_id=game_id,
+                match_id=_optional_int(entry.get("match_id")) or match_id,
+                position=position,
+                status=str(entry.get("status") or "unknown"),
+                begin_at=_parse_datetime(entry.get("begin_at")),
+                end_at=_parse_datetime(entry.get("end_at")),
+            )
+        )
+    return sorted(games, key=lambda game: game.position)
 
 
 def describe_match_update(match: PandaScoreMatch, previous_snapshot: str | None) -> str:
@@ -321,6 +398,17 @@ def serialize_matches(matches: list[PandaScoreMatch]) -> list[dict[str, Any]]:
             "number_of_games": match.number_of_games,
             "match_type": match.match_type,
             "stream_url": match.stream_url,
+            "games": [
+                {
+                    "game_id": game.game_id,
+                    "match_id": game.match_id,
+                    "position": game.position,
+                    "status": game.status,
+                    "begin_at": game.begin_at.isoformat() if game.begin_at else None,
+                    "end_at": game.end_at.isoformat() if game.end_at else None,
+                }
+                for game in match.games
+            ],
         }
         for match in matches
     ]
@@ -348,6 +436,7 @@ def deserialize_matches(data: list[dict[str, Any]]) -> list[PandaScoreMatch]:
                     number_of_games=_optional_int(item.get("number_of_games")),
                     match_type=str(item.get("match_type") or ""),
                     stream_url=str(item.get("stream_url")) if item.get("stream_url") else None,
+                    games=tuple(parse_games(item.get("games"), int(item["match_id"]))),
                 )
             )
         except (KeyError, TypeError, ValueError, IndexError):
@@ -365,6 +454,21 @@ def select_missing_running_match_ids(
         for match in previous_matches
         if match.is_running and match.match_id not in current_running_ids
     }
+
+
+def game_snapshot_key(match_id: int, position: int) -> str:
+    return f"{match_id}:{position}"
+
+
+def _match_videogame_path(match: PandaScoreMatch) -> str | None:
+    videogame = match.videogame.lower()
+    if "league of legends" in videogame:
+        return "lol"
+    if "counter-strike" in videogame or "cs2" in videogame or "cs:go" in videogame:
+        return "csgo"
+    if "valorant" in videogame:
+        return "valorant"
+    return None
 
 
 def _parse_opponents(entry: dict[str, Any]) -> tuple[str, str]:

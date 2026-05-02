@@ -4,12 +4,18 @@ import unittest
 from datetime import date
 from pathlib import Path
 
-from cogs.esports import _official_stream_url
+from cogs.esports import (
+    _new_running_games,
+    _official_stream_url,
+    _stream_link_for_match,
+)
 from services.pandascore_service import (
     PandaScoreClient,
     PandaScoreStateRepository,
     describe_match_update,
+    game_snapshot_key,
     parse_lol_champion_picks,
+    parse_live_matches,
     parse_match,
     parse_matches,
     select_missing_running_match_ids,
@@ -38,6 +44,11 @@ MATCH_SAMPLE = {
     "number_of_games": 3,
     "match_type": "best_of",
     "streams_list": [{"raw_url": "https://example.com/live"}],
+    "games": [
+        {"id": 1, "match_id": 123, "position": 1, "status": "finished"},
+        {"id": 2, "match_id": 123, "position": 2, "status": "running"},
+        {"id": 3, "match_id": 123, "position": 3, "status": "not_started"},
+    ],
 }
 
 
@@ -54,6 +65,9 @@ class PandaScoreServiceTests(unittest.TestCase):
         self.assertEqual(match.score_text, "1 x 0")
         self.assertTrue(match.is_running)
         self.assertEqual(match.stream_url, "https://example.com/live")
+        self.assertEqual(len(match.games), 3)
+        self.assertEqual(match.games[1].position, 2)
+        self.assertEqual(match.games[1].status, "running")
 
     def test_describe_match_update_finished(self) -> None:
         finished_payload = {
@@ -96,20 +110,45 @@ class PandaScoreServiceTests(unittest.TestCase):
             repository = PandaScoreStateRepository(state_path)
             self.assertEqual(
                 repository.load(),
-                {"channel_id": None, "match_snapshots": {}, "tracked_matches": []},
+                {"channel_ids": [], "match_snapshots": {}, "game_snapshots": {}, "tracked_matches": []},
             )
 
-            repository.save(123, {"1": "running|1|0|None"}, [])
+            repository.save([123, 456], {"1": "running|1|0|None"}, {"1:2": "running"}, [])
 
             self.assertEqual(
                 repository.load(),
-                {"channel_id": 123, "match_snapshots": {"1": "running|1|0|None"}, "tracked_matches": []},
+                {
+                    "channel_ids": [123, 456],
+                    "match_snapshots": {"1": "running|1|0|None"},
+                    "game_snapshots": {"1:2": "running"},
+                    "tracked_matches": [],
+                },
             )
         finally:
             if state_path.exists():
                 state_path.unlink()
 
-    def test_client_fetches_only_lol_and_counter_strike_matches(self) -> None:
+    def test_state_repository_loads_legacy_single_channel_id(self) -> None:
+        state_path = Path(__file__).resolve().parent / "_tmp_esports_state.json"
+        if state_path.exists():
+            state_path.unlink()
+
+        try:
+            state_path.write_text(
+                '{"channel_id": 123, "match_snapshots": {}, "tracked_matches": []}',
+                encoding="utf-8",
+            )
+            repository = PandaScoreStateRepository(state_path)
+
+            self.assertEqual(
+                repository.load(),
+                {"channel_ids": [123], "match_snapshots": {}, "game_snapshots": {}, "tracked_matches": []},
+            )
+        finally:
+            if state_path.exists():
+                state_path.unlink()
+
+    def test_client_fetches_supported_videogame_matches(self) -> None:
         class FakeClient(PandaScoreClient):
             def __init__(self) -> None:
                 super().__init__("token")
@@ -121,6 +160,8 @@ class PandaScoreServiceTests(unittest.TestCase):
                     return [MATCH_SAMPLE]
                 if path.startswith("/csgo/"):
                     return [{**MATCH_SAMPLE, "id": 456, "videogame": {"name": "Counter-Strike"}}]
+                if path.startswith("/valorant/"):
+                    return [{**MATCH_SAMPLE, "id": 789, "videogame": {"name": "Valorant"}}]
                 return []
 
         client = FakeClient()
@@ -128,15 +169,17 @@ class PandaScoreServiceTests(unittest.TestCase):
         running_matches = client._fetch_running_matches()
         upcoming_matches = client._fetch_upcoming_matches(10)
 
-        self.assertEqual([match.videogame for match in running_matches], ["League of Legends", "Counter-Strike"])
-        self.assertEqual([match.match_id for match in upcoming_matches], [123, 456])
+        self.assertEqual([match.videogame for match in running_matches], ["League of Legends", "Counter-Strike", "Valorant"])
+        self.assertEqual([match.match_id for match in upcoming_matches], [123, 456, 789])
         self.assertEqual(
             client.paths,
             [
                 "/lol/matches/running",
                 "/csgo/matches/running",
+                "/valorant/matches/running",
                 "/lol/matches/upcoming",
                 "/csgo/matches/upcoming",
+                "/valorant/matches/upcoming",
             ],
         )
 
@@ -207,6 +250,42 @@ class PandaScoreServiceTests(unittest.TestCase):
             ],
         )
 
+    def test_parse_live_matches_extracts_games(self) -> None:
+        matches = parse_live_matches([{"match": MATCH_SAMPLE}])
+
+        self.assertEqual(len(matches), 1)
+        self.assertEqual(matches[0].match_id, 123)
+        self.assertEqual(
+            [(game.position, game.status) for game in matches[0].games],
+            [(1, "finished"), (2, "running"), (3, "not_started")],
+        )
+
+    def test_client_fetches_live_matches_for_single_videogame(self) -> None:
+        class FakeClient(PandaScoreClient):
+            def __init__(self) -> None:
+                super().__init__("token")
+                self.paths: list[str] = []
+
+            def _get_json(self, path: str, params: dict[str, object]) -> object:
+                self.paths.append(path)
+                return [
+                    {"match": MATCH_SAMPLE},
+                    {"match": {**MATCH_SAMPLE, "id": 456, "videogame": {"name": "Counter-Strike"}}},
+                    {"match": {**MATCH_SAMPLE, "id": 789, "videogame": {"name": "Valorant"}}},
+                ]
+
+        client = FakeClient()
+
+        matches = client._fetch_live_matches("lol")
+
+        self.assertEqual([match.match_id for match in matches], [123])
+        self.assertEqual(client.paths, ["/lives"])
+
+        valorant_matches = client._fetch_live_matches("valorant")
+
+        self.assertEqual([match.match_id for match in valorant_matches], [789])
+        self.assertEqual(client.paths, ["/lives", "/lives"])
+
     def test_official_stream_url_uses_local_competition_map(self) -> None:
         match = parse_match(MATCH_SAMPLE)
 
@@ -227,6 +306,44 @@ class PandaScoreServiceTests(unittest.TestCase):
         self.assertIsNotNone(match)
         assert match is not None
         self.assertIsNone(_official_stream_url(match))
+
+    def test_stream_link_for_match_falls_back_to_pandascore_stream(self) -> None:
+        match = parse_match(
+            {
+                **MATCH_SAMPLE,
+                "league": {"name": "Unknown League"},
+                "serie": {"full_name": "Unknown Serie"},
+                "tournament": {"name": "Unknown Tournament"},
+            }
+        )
+
+        self.assertIsNotNone(match)
+        assert match is not None
+        self.assertEqual(_stream_link_for_match(match), ("Transmissão", "https://example.com/live"))
+
+    def test_new_running_games_requires_real_status_transition(self) -> None:
+        match = parse_match(MATCH_SAMPLE)
+
+        self.assertIsNotNone(match)
+        assert match is not None
+        snapshots = {
+            game_snapshot_key(match.match_id, 1): "finished",
+            game_snapshot_key(match.match_id, 2): "not_started",
+            game_snapshot_key(match.match_id, 3): "not_started",
+        }
+
+        new_running_games = _new_running_games([match], snapshots)
+
+        self.assertEqual(len(new_running_games), 1)
+        self.assertEqual(new_running_games[0][1].position, 2)
+
+    def test_new_running_games_ignores_unknown_status_to_avoid_startup_spam(self) -> None:
+        match = parse_match(MATCH_SAMPLE)
+
+        self.assertIsNotNone(match)
+        assert match is not None
+
+        self.assertEqual(_new_running_games([match], {}), [])
 
     def test_parse_lol_champion_picks(self) -> None:
         picks = parse_lol_champion_picks(
