@@ -64,7 +64,7 @@ GAME_CONFIGS = {
 OFFICIAL_STREAMS = {
     "cblol": "https://www.twitch.tv/cblol",
     "lck": "https://www.twitch.tv/lck",
-    "lpl": "https://www.twitch.tv/lpl",
+    "lpl": "https://www.twitch.tv/lplenglish",
     "lec": "https://www.twitch.tv/lec",
     "lcs": "https://www.twitch.tv/lcs",
     "lcp": "https://www.twitch.tv/lolesportspacific",
