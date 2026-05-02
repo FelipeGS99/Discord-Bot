@@ -17,6 +17,7 @@ COGS = (
     "cogs.copadobrasil",
     "cogs.futebol",
     "cogs.esports",
+    "cogs.telegram_alerts",
 )
 
 
