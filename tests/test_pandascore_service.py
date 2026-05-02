@@ -291,7 +291,7 @@ class PandaScoreServiceTests(unittest.TestCase):
 
         self.assertIsNotNone(match)
         assert match is not None
-        self.assertEqual(_official_stream_url(match), "https://www.youtube.com/@LCS")
+        self.assertEqual(_official_stream_url(match), "https://www.twitch.tv/lcs")
 
     def test_official_stream_url_returns_none_for_unknown_competition(self) -> None:
         match = parse_match(
