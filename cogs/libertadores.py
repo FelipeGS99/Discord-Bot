@@ -50,10 +50,11 @@ class Libertadores(commands.Cog):
             "\n".join(
                 [
                     "**Libertadores**",
-                    f"`{prefix}libertadores canal #canal` - Ativa placares ao vivo neste canal.",
-                    f"`{prefix}libertadores hoje` - Mostra os jogos de hoje.",
-                    f"`{prefix}libertadores status` - Mostra a configuracao atual.",
-                    f"`{prefix}libertadores parar` - Desativa os placares automaticos.",
+                    "Use para consultar jogos e configurar alertas automaticos da Libertadores.",
+                    f"`{prefix}libertadores hoje` - Mostra jogos de hoje com horario, placar, status e gols quando disponivel.",
+                    f"`{prefix}libertadores canal #canal` - Ativa alertas de inicio, gol, intervalo, volta de status e fim de jogo. Exemplo: `{prefix}libertadores canal #placares`.",
+                    f"`{prefix}libertadores status` - Mostra canal configurado, API, liga e cache atual.",
+                    f"`{prefix}libertadores parar` - Desativa os alertas automaticos da Libertadores.",
                 ]
             )
         )

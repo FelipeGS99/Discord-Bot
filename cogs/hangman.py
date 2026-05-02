@@ -22,11 +22,13 @@ class Hangman(commands.Cog):
             "\n".join(
                 [
                     "**Jogo da Forca**",
-                    f"`{prefix}forca iniciar <facil|medio|dificil>` - Inicia uma nova partida.",
-                    f"`{prefix}forca letra <letra>` - Tenta uma letra.",
-                    f"`{prefix}forca palavra <palpite>` - Chuta a palavra inteira.",
-                    f"`{prefix}forca status` - Mostra o estado atual da partida.",
-                    f"`{prefix}forca parar` - Encerra a partida atual.",
+                    "Use para jogar forca com o pessoal do canal. Cada canal pode ter uma partida ativa.",
+                    f"`{prefix}forca iniciar <facil|medio|dificil>` - Comeca uma partida. Exemplo: `{prefix}forca iniciar medio`.",
+                    f"`{prefix}forca letra <letra>` - Tenta uma letra. Exemplo: `{prefix}forca letra a`.",
+                    f"`{prefix}forca palavra <palpite>` - Chuta a palavra inteira. Exemplo: `{prefix}forca palavra futebol`.",
+                    f"`{prefix}forca status` - Mostra palavra parcial, erros e tentativas ja feitas.",
+                    f"`{prefix}forca parar` - Encerra a partida atual e mostra a resposta.",
+                    "Durante a partida, tambem da para mandar uma letra ou palavra direto no chat.",
                 ]
             )
         )

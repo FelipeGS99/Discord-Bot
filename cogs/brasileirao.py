@@ -53,13 +53,14 @@ class Brasileirao(commands.Cog):
             "\n".join(
                 [
                     "**Brasileirao Serie A**",
-                    f"`{prefix}brasileirao canal #canal` - Ativa placares ao vivo neste canal.",
-                    f"`{prefix}brasileirao hoje` - Mostra os jogos de hoje.",
-                    f"`{prefix}brasileirao passada` - Mostra a rodada passada.",
-                    f"`{prefix}brasileirao atual` - Mostra a rodada atual.",
+                    "Use para consultar jogos e configurar alertas automaticos do Brasileirao.",
+                    f"`{prefix}brasileirao hoje` - Mostra jogos de hoje com horario, placar, status e gols quando disponivel.",
+                    f"`{prefix}brasileirao atual` - Mostra a rodada atual do campeonato.",
                     f"`{prefix}brasileirao proxima` - Mostra a proxima rodada.",
-                    f"`{prefix}brasileirao status` - Mostra a configuracao atual.",
-                    f"`{prefix}brasileirao parar` - Desativa os placares automaticos.",
+                    f"`{prefix}brasileirao passada` - Mostra a rodada anterior.",
+                    f"`{prefix}brasileirao canal #canal` - Ativa alertas de inicio, gol, intervalo, volta de status e fim de jogo. Exemplo: `{prefix}brasileirao canal #placares`.",
+                    f"`{prefix}brasileirao status` - Mostra canal configurado, API, liga e cache atual.",
+                    f"`{prefix}brasileirao parar` - Desativa os alertas automaticos do Brasileirao.",
                 ]
             )
         )

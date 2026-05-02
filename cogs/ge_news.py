@@ -41,9 +41,11 @@ class GeNews(commands.Cog):
             "\n".join(
                 [
                     "**Noticias do GE**",
-                    f"`{prefix}genoticias canal #canal` - Envia novas noticias de futebol neste canal.",
-                    f"`{prefix}genoticias status` - Mostra a configuracao atual.",
-                    f"`{prefix}genoticias parar` - Desativa o envio automatico.",
+                    "Use para receber novas noticias de futebol do GE automaticamente.",
+                    f"`{prefix}genoticias canal #canal` - Ativa noticias no canal marcado. Exemplo: `{prefix}genoticias canal #noticias`.",
+                    f"`{prefix}genoticias status` - Mostra se as noticias estao ativas, qual canal recebe e quantas noticias ja foram vistas.",
+                    f"`{prefix}genoticias parar` - Desativa o envio automatico de noticias.",
+                    "Ao ativar, as noticias atuais sao marcadas como vistas para evitar spam; o bot envia apenas novidades futuras.",
                 ]
             )
         )

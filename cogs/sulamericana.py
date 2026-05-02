@@ -50,10 +50,11 @@ class Sulamericana(commands.Cog):
             "\n".join(
                 [
                     "**Sul-Americana**",
-                    f"`{prefix}sulamericana canal #canal` - Ativa placares ao vivo neste canal.",
-                    f"`{prefix}sulamericana hoje` - Mostra os jogos de hoje.",
-                    f"`{prefix}sulamericana status` - Mostra a configuracao atual.",
-                    f"`{prefix}sulamericana parar` - Desativa os placares automaticos.",
+                    "Use para consultar jogos e configurar alertas automaticos da Sul-Americana.",
+                    f"`{prefix}sulamericana hoje` - Mostra jogos de hoje com horario, placar, status e gols quando disponivel.",
+                    f"`{prefix}sulamericana canal #canal` - Ativa alertas de inicio, gol, intervalo, volta de status e fim de jogo. Exemplo: `{prefix}sulamericana canal #placares`.",
+                    f"`{prefix}sulamericana status` - Mostra canal configurado, API, liga e cache atual.",
+                    f"`{prefix}sulamericana parar` - Desativa os alertas automaticos da Sul-Americana.",
                 ]
             )
         )

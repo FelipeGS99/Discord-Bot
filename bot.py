@@ -15,6 +15,7 @@ COGS = (
     "cogs.libertadores",
     "cogs.sulamericana",
     "cogs.futebol",
+    "cogs.esports",
 )
 
 
@@ -25,7 +26,7 @@ class DiscordBot(commands.Bot):
         intents.guilds = True
         intents.members = True
 
-        super().__init__(command_prefix=settings.command_prefix, intents=intents)
+        super().__init__(command_prefix=settings.command_prefix, intents=intents, help_command=None)
 
     async def setup_hook(self) -> None:
         for cog in COGS:

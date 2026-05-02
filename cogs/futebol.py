@@ -47,8 +47,14 @@ class Futebol(commands.Cog):
             "\n".join(
                 [
                     "**Futebol**",
-                    f"`{prefix}futebol hoje` - Mostra jogos de hoje nas competicoes monitoradas.",
-                    f"`{prefix}futebol amanha` - Mostra jogos de amanha nas competicoes monitoradas.",
+                    "Use para ver uma lista geral dos jogos monitorados no Brasileirao, Libertadores e Sul-Americana.",
+                    f"`{prefix}futebol hoje` - Mostra os jogos de hoje com placar, status, horario e gols quando disponivel.",
+                    f"`{prefix}futebol amanha` - Mostra os jogos de amanha nas competicoes monitoradas.",
+                    "",
+                    "**Alertas por competicao**",
+                    f"`{prefix}brasileirao canal #canal` - Ativa alertas do Brasileirao.",
+                    f"`{prefix}libertadores canal #canal` - Ativa alertas da Libertadores.",
+                    f"`{prefix}sulamericana canal #canal` - Ativa alertas da Sul-Americana.",
                 ]
             )
         )
@@ -82,7 +88,10 @@ class Futebol(commands.Cog):
             await ctx.send(f"Nao encontrei jogos para {label} nas competicoes monitoradas.")
             return
 
-        await ctx.send(embed=self._build_matches_embed(grouped_fixtures, scorers_by_fixture, fixture_date, label))
+        await _send_embeds(
+            ctx,
+            self._build_matches_embeds(grouped_fixtures, scorers_by_fixture, fixture_date, label),
+        )
 
     async def _fetch_grouped_fixtures(self, fixture_date: date) -> dict[str, list[BrasileiraoFixture]]:
         grouped_fixtures: dict[str, list[BrasileiraoFixture]] = {}
@@ -252,18 +261,13 @@ class Futebol(commands.Cog):
         return scorers_by_fixture
 
     @staticmethod
-    def _build_matches_embed(
+    def _build_matches_embeds(
         grouped_fixtures: dict[str, list[BrasileiraoFixture]],
         scorers_by_fixture: dict[int, list[str]],
         fixture_date: date,
         label: str,
-    ) -> discord.Embed:
-        embed = discord.Embed(
-            title=f"Futebol - {label}",
-            description=f"Data: `{fixture_date.isoformat()}`",
-            color=EMBED_COLOR,
-        )
-
+    ) -> list[discord.Embed]:
+        embeds: list[discord.Embed] = []
         for competition_name, fixtures in grouped_fixtures.items():
             if not fixtures:
                 continue
@@ -271,9 +275,14 @@ class Futebol(commands.Cog):
                 _format_fixture(fixture, scorers_by_fixture.get(fixture.fixture_id))
                 for fixture in fixtures
             )
-            embed.add_field(name=competition_name, value=value[:1024], inline=False)
+            embed = discord.Embed(
+                title=f"{competition_name} - {label}",
+                description=f"Data: `{fixture_date.isoformat()}`\n\n{value[:3800]}",
+                color=EMBED_COLOR,
+            )
+            embeds.append(embed)
 
-        return embed
+        return embeds
 
     @staticmethod
     def _build_score_embed(
@@ -302,6 +311,11 @@ def _format_fixture(fixture: BrasileiraoFixture, scorers: list[str] | None = Non
     kickoff = f"\nData: <t:{int(fixture.kickoff_at.timestamp())}:f>" if fixture.kickoff_at is not None else ""
     scorers_line = f"\nGols:\n**{chr(10).join(scorers)}**" if scorers else ""
     return f"**{fixture.home_team} {fixture.score_text} {fixture.away_team}**\nStatus: **{status}{elapsed}**{kickoff}{scorers_line}"
+
+
+async def _send_embeds(ctx: commands.Context, embeds: list[discord.Embed]) -> None:
+    for index in range(0, len(embeds), 10):
+        await ctx.send(embeds=embeds[index:index + 10])
 
 
 async def setup(bot: commands.Bot) -> None:

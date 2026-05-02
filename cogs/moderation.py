@@ -34,19 +34,29 @@ class Moderation(commands.Cog):
             )
         )
 
-    @commands.command(name="commands")
+    @commands.command(name="help", aliases=["commands"])
     async def commands_list(self, ctx: commands.Context) -> None:
         prefix = ctx.prefix or "?"
         message = "\n".join(
             [
-                "**Comandos disponiveis:**",
-                f"`{prefix}commands` - Mostra esta lista de comandos.",
-                f"`{prefix}clear <amount>` - Apaga a quantidade informada de mensagens do canal.",
-                f"`{prefix}mover <membro> <canal_destino> <quantidade>` - Move um membro entre canais de voz varias vezes.",
+                "**Ajuda do bot**",
+                "Use estes comandos para abrir a ajuda detalhada de cada area:",
+                f"`{prefix}help` - Mostra esta ajuda geral.",
+                f"`{prefix}futebol` - Ver jogos de futebol do dia e de amanha.",
+                f"`{prefix}brasileirao` - Jogos, rodadas e alertas do Brasileirao Serie A.",
+                f"`{prefix}libertadores` - Jogos e alertas da Libertadores.",
+                f"`{prefix}sulamericana` - Jogos e alertas da Sul-Americana.",
+                f"`{prefix}lol` - Partidas e alertas de League of Legends.",
+                f"`{prefix}cs2` - Partidas e alertas de CS2.",
+                f"`{prefix}genoticias` - Noticias de futebol do GE.",
+                f"`{prefix}forca` - Jogo da forca no canal.",
                 "",
-                "**Exemplos:**",
-                f"`{prefix}clear 10`",
-                f"`{prefix}mover @Usuario Geral 3`",
+                "**Moderacao**",
+                f"`{prefix}clear <quantidade>` - Apaga mensagens recentes do canal. Exemplo: `{prefix}clear 10`.",
+                f"`{prefix}mover <membro> <canal_de_voz> <vezes>` - Move alguem entre canais de voz. Exemplo: `{prefix}mover @Usuario Geral 3`.",
+                "",
+                "**Dica**",
+                "Use `#canal` quando um comando pedir canal de texto, por exemplo `#placares`.",
             ]
         )
         await ctx.send(message)
