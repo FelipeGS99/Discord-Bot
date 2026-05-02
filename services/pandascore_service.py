@@ -64,6 +64,14 @@ class PandaScoreMatch:
         )
 
 
+@dataclass(frozen=True)
+class LolChampionPick:
+    team_name: str
+    player_name: str
+    role: str
+    champion_name: str
+
+
 class PandaScoreClient:
     def __init__(self, api_token: str, base_url: str = PANDASCORE_BASE_URL) -> None:
         self.api_token = api_token
@@ -85,6 +93,9 @@ class PandaScoreClient:
 
     async def fetch_match(self, match_id: int) -> PandaScoreMatch | None:
         return await asyncio.to_thread(self._fetch_match, match_id)
+
+    async def fetch_lol_match_champion_picks(self, match_id: int) -> list[LolChampionPick]:
+        return await asyncio.to_thread(self._fetch_lol_match_champion_picks, match_id)
 
     def _fetch_running_matches(self, videogame_path: str | None = None) -> list[PandaScoreMatch]:
         if videogame_path:
@@ -133,6 +144,12 @@ class PandaScoreClient:
             return None
         return parse_match(payload)
 
+    def _fetch_lol_match_champion_picks(self, match_id: int) -> list[LolChampionPick]:
+        payload = self._get_json(f"/lol/matches/{match_id}/players/stats", {})
+        if not isinstance(payload, list):
+            return []
+        return parse_lol_champion_picks(payload)
+
     def _get_matches(self, path: str, params: dict[str, Any]) -> list[PandaScoreMatch]:
         payload = self._get_json(path, params)
         if not isinstance(payload, list):
@@ -165,7 +182,7 @@ class PandaScoreClient:
             if exc.code == 401:
                 raise RuntimeError("PandaScore recusou o token. Verifique PANDASCORE_API_TOKEN no .env.") from exc
             if exc.code == 403:
-                raise RuntimeError("Seu plano da PandaScore nao permite acessar esse endpoint.") from exc
+                raise RuntimeError("Seu plano da PandaScore não permite acessar esse endpoint.") from exc
             if exc.code == 429:
                 raise RuntimeError("Limite de requisicoes da PandaScore atingido. Tente novamente mais tarde.") from exc
             raise
@@ -216,6 +233,25 @@ def parse_matches(payload: list[dict[str, Any]]) -> list[PandaScoreMatch]:
     return sorted(matches, key=lambda match: match.begin_at or match.scheduled_at or datetime.max.replace(tzinfo=timezone.utc))
 
 
+def parse_lol_champion_picks(payload: list[dict[str, Any]]) -> list[LolChampionPick]:
+    picks: list[LolChampionPick] = []
+    for entry in payload:
+        if not isinstance(entry, dict):
+            continue
+        champion_name = _nested_name(entry.get("champion")) or str(entry.get("champion_name") or "").strip()
+        if not champion_name:
+            continue
+        picks.append(
+            LolChampionPick(
+                team_name=_nested_name(entry.get("team")) or str(entry.get("team_name") or "Time").strip(),
+                player_name=_nested_name(entry.get("player")) or str(entry.get("player_name") or "Jogador").strip(),
+                role=str(entry.get("role") or entry.get("position") or "").strip(),
+                champion_name=champion_name,
+            )
+        )
+    return picks
+
+
 def parse_match(entry: dict[str, Any]) -> PandaScoreMatch | None:
     match_id = _optional_int(entry.get("id"))
     if match_id is None:
@@ -248,22 +284,22 @@ def parse_match(entry: dict[str, Any]) -> PandaScoreMatch | None:
 def describe_match_update(match: PandaScoreMatch, previous_snapshot: str | None) -> str:
     if not previous_snapshot:
         if match.is_running:
-            return "Inicio de partida"
+            return "Início de partida"
         if match.is_finished:
             return "Fim de partida"
-        return "Atualizacao de partida"
+        return "Atualização de partida"
 
     previous_status, previous_first_score, previous_second_score, _previous_winner_id = _parse_snapshot(previous_snapshot)
     if match.is_finished and previous_status != FINISHED_STATUS:
         return "Fim de partida"
     if match.is_running and previous_status != RUNNING_STATUS:
-        return "Inicio de partida"
+        return "Início de partida"
     if (
         str(match.scores[0]) != previous_first_score
         or str(match.scores[1]) != previous_second_score
     ):
-        return "Atualizacao de placar"
-    return "Atualizacao de status"
+        return "Atualização de placar"
+    return "Atualização de status"
 
 
 def serialize_matches(matches: list[PandaScoreMatch]) -> list[dict[str, Any]]:

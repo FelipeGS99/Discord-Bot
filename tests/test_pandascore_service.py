@@ -4,10 +4,12 @@ import unittest
 from datetime import date
 from pathlib import Path
 
+from cogs.esports import _official_stream_url
 from services.pandascore_service import (
     PandaScoreClient,
     PandaScoreStateRepository,
     describe_match_update,
+    parse_lol_champion_picks,
     parse_match,
     parse_matches,
     select_missing_running_match_ids,
@@ -204,6 +206,69 @@ class PandaScoreServiceTests(unittest.TestCase):
                 )
             ],
         )
+
+    def test_official_stream_url_uses_local_competition_map(self) -> None:
+        match = parse_match(MATCH_SAMPLE)
+
+        self.assertIsNotNone(match)
+        assert match is not None
+        self.assertEqual(_official_stream_url(match), "https://www.youtube.com/@LCS")
+
+    def test_official_stream_url_returns_none_for_unknown_competition(self) -> None:
+        match = parse_match(
+            {
+                **MATCH_SAMPLE,
+                "league": {"name": "Unknown League"},
+                "serie": {"full_name": "Unknown Serie"},
+                "tournament": {"name": "Unknown Tournament"},
+            }
+        )
+
+        self.assertIsNotNone(match)
+        assert match is not None
+        self.assertIsNone(_official_stream_url(match))
+
+    def test_parse_lol_champion_picks(self) -> None:
+        picks = parse_lol_champion_picks(
+            [
+                {
+                    "team": {"name": "Team A"},
+                    "player": {"name": "Midlaner"},
+                    "role": "mid",
+                    "champion": {"name": "Ahri"},
+                }
+            ]
+        )
+
+        self.assertEqual(len(picks), 1)
+        self.assertEqual(picks[0].team_name, "Team A")
+        self.assertEqual(picks[0].player_name, "Midlaner")
+        self.assertEqual(picks[0].role, "mid")
+        self.assertEqual(picks[0].champion_name, "Ahri")
+
+    def test_client_fetches_lol_match_champion_picks(self) -> None:
+        class FakeClient(PandaScoreClient):
+            def __init__(self) -> None:
+                super().__init__("token")
+                self.paths: list[str] = []
+
+            def _get_json(self, path: str, params: dict[str, object]) -> object:
+                self.paths.append(path)
+                return [
+                    {
+                        "team_name": "Team A",
+                        "player_name": "Midlaner",
+                        "role": "mid",
+                        "champion_name": "Ahri",
+                    }
+                ]
+
+        client = FakeClient()
+
+        picks = client._fetch_lol_match_champion_picks(123)
+
+        self.assertEqual([pick.champion_name for pick in picks], ["Ahri"])
+        self.assertEqual(client.paths, ["/lol/matches/123/players/stats"])
 
 
 if __name__ == "__main__":

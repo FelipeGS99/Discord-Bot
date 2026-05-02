@@ -52,15 +52,15 @@ class Brasileirao(commands.Cog):
         await ctx.send(
             "\n".join(
                 [
-                    "**Brasileirao Serie A**",
-                    "Use para consultar jogos e configurar alertas automaticos do Brasileirao.",
-                    f"`{prefix}brasileirao hoje` - Mostra jogos de hoje com horario, placar, status e gols quando disponivel.",
+                    "**Brasileirão Série A**",
+                    "Use para consultar jogos e configurar alertas automáticos do Brasileirão.",
+                    f"`{prefix}brasileirao hoje` - Mostra jogos de hoje com horário, placar, status e gols quando disponível.",
                     f"`{prefix}brasileirao atual` - Mostra a rodada atual do campeonato.",
-                    f"`{prefix}brasileirao proxima` - Mostra a proxima rodada.",
+                    f"`{prefix}brasileirao proxima` - Mostra a próxima rodada.",
                     f"`{prefix}brasileirao passada` - Mostra a rodada anterior.",
-                    f"`{prefix}brasileirao canal #canal` - Ativa alertas de inicio, gol, intervalo, volta de status e fim de jogo. Exemplo: `{prefix}brasileirao canal #placares`.",
+                    f"`{prefix}brasileirao canal #canal` - Ativa alertas de início, gol, intervalo, volta de status e fim de jogo. Exemplo: `{prefix}brasileirao canal #placares`.",
                     f"`{prefix}brasileirao status` - Mostra canal configurado, API, liga e cache atual.",
-                    f"`{prefix}brasileirao parar` - Desativa os alertas automaticos do Brasileirao.",
+                    f"`{prefix}brasileirao parar` - Desativa os alertas automáticos do Brasileirão.",
                 ]
             )
         )
@@ -348,7 +348,7 @@ class Brasileirao(commands.Cog):
         scorers_by_fixture: dict[int, list[str]] | None = None,
     ) -> discord.Embed:
         embed = discord.Embed(
-            title="Brasileirao Serie A - jogos de hoje",
+            title="Brasileirão Série A - jogos de hoje",
             color=EMBED_COLOR,
         )
         for fixture in fixtures:
@@ -363,7 +363,7 @@ class Brasileirao(commands.Cog):
     @staticmethod
     def _build_round_embed(fixtures: list[BrasileiraoFixture], label: str) -> discord.Embed:
         round_number = fixtures[0].round_number
-        title = f"Brasileirao Serie A - {label}"
+        title = f"Brasileirão Série A - {label}"
         if round_number is not None:
             title = f"{title} {round_number}"
 
@@ -387,7 +387,7 @@ class Brasileirao(commands.Cog):
             description=_format_fixture_line(fixture),
             color=EMBED_COLOR,
         )
-        embed.set_author(name="Brasileirao Serie A")
+        embed.set_author(name="Brasileirão Série A")
         if scorers:
             embed.add_field(name="Gols", value="\n".join(scorers), inline=False)
         if fixture.kickoff_at is not None:
@@ -405,7 +405,7 @@ def _format_fixture_title(fixture: BrasileiraoFixture) -> str:
 
 
 def _format_fixture_details(fixture: BrasileiraoFixture, scorers: list[str] | None = None) -> str:
-    status = fixture.status_long or fixture.status_short or "Status indisponivel"
+    status = fixture.status_long or fixture.status_short or "Status indisponível"
     elapsed = f" - {fixture.elapsed}'" if fixture.elapsed is not None else ""
     kickoff = f"\nData: <t:{int(fixture.kickoff_at.timestamp())}:f>" if fixture.kickoff_at is not None else ""
     scorers_line = f"\nGols:\n**{chr(10).join(scorers)}**" if scorers else ""

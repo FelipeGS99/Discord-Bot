@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass
 from datetime import date, timedelta
 from pathlib import Path
@@ -9,6 +10,7 @@ from discord.ext import commands, tasks
 
 from config import settings
 from services.pandascore_service import (
+    LolChampionPick,
     PandaScoreClient,
     PandaScoreMatch,
     PandaScoreStateRepository,
@@ -47,6 +49,24 @@ GAME_CONFIGS = {
         state_file="cs2_state.json",
         color=0xF0A202,
     ),
+}
+
+
+OFFICIAL_STREAMS = {
+    "cblol": "https://www.youtube.com/@CBLOL",
+    "lck": "https://www.youtube.com/@LCK",
+    "lpl": "https://www.youtube.com/@lpl",
+    "lec": "https://www.youtube.com/@LEC",
+    "lcs": "https://www.youtube.com/@LCS",
+    "lcp": "https://www.youtube.com/@lolesportspacific",
+    "msi": "https://www.youtube.com/@lolesports",
+    "worlds": "https://www.youtube.com/@lolesports",
+    "first stand": "https://www.youtube.com/@lolesports",
+    "esl": "https://www.twitch.tv/eslcs",
+    "iem": "https://www.twitch.tv/eslcs",
+    "blast": "https://www.twitch.tv/blastpremier",
+    "pgl": "https://www.twitch.tv/pgl",
+    "starladder": "https://www.twitch.tv/starladder_cs_en",
 }
 
 
@@ -92,7 +112,7 @@ class Esports(commands.Cog):
             "\n".join(
                 [
                     "**E-sports**",
-                    "Use `lol` e `cs2` separadamente para consultar partidas e ativar notificacoes em canais diferentes.",
+                    "Use `lol` e `cs2` separadamente para consultar partidas e ativar notificações em canais diferentes.",
                     f"`{prefix}lol` - Ajuda completa dos comandos de League of Legends.",
                     f"`{prefix}cs2` - Ajuda completa dos comandos de CS2.",
                     f"`{prefix}lol hoje` - Mostra partidas de LoL de hoje.",
@@ -176,14 +196,14 @@ class Esports(commands.Cog):
             "\n".join(
                 [
                     f"**{config.title}**",
-                    "Use para consultar partidas e receber alertas automaticos desse jogo.",
-                    f"`{prefix}{config.key} aovivo` - Mostra partidas ao vivo com placar, status e competicao.",
-                    f"`{prefix}{config.key} hoje` - Mostra partidas de hoje com horario, placar, status e competicao.",
-                    f"`{prefix}{config.key} amanha` - Mostra partidas de amanha.",
+                    "Use para consultar partidas e receber alertas automáticos desse jogo.",
+                    f"`{prefix}{config.key} aovivo` - Mostra partidas ao vivo com placar, status e competição.",
+                    f"`{prefix}{config.key} hoje` - Mostra partidas de hoje com horário, placar, status e competição.",
+                    f"`{prefix}{config.key} amanha` - Mostra partidas de amanhã.",
                     f"`{prefix}{config.key} canal #canal` - Ativa alertas neste canal. Exemplo: `{prefix}{config.key} canal #placares`.",
                     f"`{prefix}{config.key} status` - Mostra canal configurado, API e partidas sendo monitoradas.",
-                    f"`{prefix}{config.key} parar` - Desativa os alertas automaticos desse jogo.",
-                    "Os alertas avisam inicio de partida, mudanca de placar/status e fim de partida.",
+                    f"`{prefix}{config.key} parar` - Desativa os alertas automáticos desse jogo.",
+                    "Os alertas avisam início de partida, mudança de placar/status e fim de partida.",
                 ]
             )
         )
@@ -217,7 +237,7 @@ class Esports(commands.Cog):
 
         await ctx.send(
             f"Alertas de {config.title} ativados em {channel.mention}. "
-            "Vou avisar quando partidas comecarem, terminarem ou mudarem de placar."
+            "Vou avisar quando partidas começarem, terminarem ou mudarem de placar."
         )
 
     async def _send_running_matches(self, ctx: commands.Context, config: EsportsGameConfig) -> None:
@@ -331,9 +351,15 @@ class Esports(commands.Cog):
         ]
 
         for match in changed_matches:
+            previous_snapshot = game_state.match_snapshots.get(str(match.match_id))
+            is_match_start = match.is_running and (
+                not previous_snapshot or not previous_snapshot.startswith("running|")
+            )
             reason = describe_match_update(match, game_state.match_snapshots.get(str(match.match_id)))
             try:
                 await channel.send(embed=self._build_match_update_embed(match, reason, config))
+                if config.key == "lol" and is_match_start:
+                    await self._send_lol_composition_if_available(channel, match, config)
             except discord.Forbidden:
                 print(f"Sem permissao para enviar alertas de {config.title} no canal {channel.id}.")
                 return
@@ -353,6 +379,35 @@ class Esports(commands.Cog):
             if match_id in tracked_match_ids
         }
         game_state.save()
+
+    async def _send_lol_composition_if_available(
+        self,
+        channel: discord.TextChannel,
+        match: PandaScoreMatch,
+        config: EsportsGameConfig,
+    ) -> None:
+        if self.api_client is None:
+            return
+
+        try:
+            champion_picks = await self.api_client.fetch_lol_match_champion_picks(match.match_id)
+        except RuntimeError as exc:
+            if "plano da PandaScore" not in str(exc):
+                print(f"Erro ao buscar composição de LoL: {exc}")
+            return
+        except Exception as exc:
+            print(f"Erro ao buscar composição de LoL: {exc}")
+            return
+
+        if not champion_picks:
+            return
+
+        try:
+            await channel.send(embed=_build_lol_composition_embed(match, champion_picks, config))
+        except discord.Forbidden:
+            print(f"Sem permissão para enviar composição de LoL no canal {channel.id}.")
+        except discord.HTTPException as exc:
+            print(f"Erro ao enviar composição de LoL no Discord: {exc}")
 
     @check_esports_matches.before_loop
     async def before_check_esports_matches(self) -> None:
@@ -386,7 +441,7 @@ class Esports(commands.Cog):
             embed = discord.Embed(
                 title=competition_name[:256],
                 description=value[:3800],
-                color=config.color,
+                color=_color_for_name(competition_name),
             )
             embed.set_author(name=title)
             embeds.append(embed)
@@ -398,54 +453,119 @@ class Esports(commands.Cog):
         reason: str,
         config: EsportsGameConfig,
     ) -> discord.Embed:
+        author_name = _format_match_context(match, config)
+        competition_name = _format_competition_name(match) or "Competição indisponível"
         embed = discord.Embed(
-            title=f"{reason}: {_format_match_title(match)}",
-            description=_format_match_details(match),
-            color=config.color,
+            title=reason,
+            description=_format_match_update_details(match),
+            color=_color_for_name(competition_name),
         )
-        embed.set_author(name=f"PandaScore - {config.title}")
+        embed.set_author(name=author_name)
         if match.begin_at is not None:
             embed.timestamp = match.begin_at
-        if match.stream_url:
-            embed.add_field(name="Transmissao", value=f"[Assistir]({match.stream_url})", inline=False)
+        official_stream_url = _official_stream_url(match)
+        if official_stream_url:
+            embed.add_field(name="Transmissão oficial", value=f"[Assistir]({official_stream_url})", inline=False)
         return embed
 
 
 def _format_match_title(match: PandaScoreMatch) -> str:
     first, second = match.opponents
-    return f"{match.videogame or 'E-sports'}: {first} {match.score_text} {second}"
+    return f"{first} {match.score_text} {second}"
+
+
+def _format_match_context(match: PandaScoreMatch, config: EsportsGameConfig) -> str:
+    competition_name = _format_competition_name(match) or "Competição indisponível"
+    if competition_name:
+        return f"{config.title} - {competition_name}"
+    return config.title
+
+
+def _format_competition_name(match: PandaScoreMatch) -> str:
+    return _join_nonempty([match.league, match.serie, match.tournament])
+
+
+def _format_match_update_details(match: PandaScoreMatch) -> str:
+    lines = [
+        f"**{_format_match_title(match)}**",
+        f"Status: **{_format_status(match.status)}**",
+    ]
+    start_at = match.begin_at or match.scheduled_at
+    if start_at is not None:
+        lines.append(f"Horário: <t:{int(start_at.timestamp())}:f>")
+    if match.number_of_games is not None:
+        lines.append(f"Formato: **{_format_match_format(match)}**")
+    return "\n".join(lines)
+
+
+def _build_lol_composition_embed(
+    match: PandaScoreMatch,
+    champion_picks: list[LolChampionPick],
+    config: EsportsGameConfig,
+) -> discord.Embed:
+    author_name = _format_match_context(match, config)
+    competition_name = _format_competition_name(match)
+    grouped_picks: dict[str, list[LolChampionPick]] = {}
+    for pick in champion_picks:
+        grouped_picks.setdefault(pick.team_name, []).append(pick)
+
+    embed = discord.Embed(
+        title="Composição dos times",
+        color=_color_for_name(competition_name),
+    )
+    embed.set_author(name=author_name)
+    for team_name, picks in grouped_picks.items():
+        lines = [
+            _format_champion_pick(pick)
+            for pick in picks
+        ]
+        embed.add_field(name=team_name[:256], value="\n".join(lines)[:1024], inline=False)
+    return embed
+
+
+def _format_champion_pick(pick: LolChampionPick) -> str:
+    role = f"{pick.role}: " if pick.role else ""
+    return f"**{role}{pick.player_name}** - {pick.champion_name}"
 
 
 def _format_match_details(match: PandaScoreMatch) -> str:
     lines = [
         f"Status: **{_format_status(match.status)}**",
-        f"Competicao: **{_join_nonempty([match.league, match.serie, match.tournament]) or 'Indisponivel'}**",
+        f"Competição: **{_join_nonempty([match.league, match.serie, match.tournament]) or 'Indisponível'}**",
     ]
     start_at = match.begin_at or match.scheduled_at
     if start_at is not None:
-        lines.append(f"Horario: <t:{int(start_at.timestamp())}:f>")
+        lines.append(f"Horário: <t:{int(start_at.timestamp())}:f>")
     if match.number_of_games is not None:
-        lines.append(f"Formato: **{match.match_type or 'match'} {match.number_of_games}**")
+        lines.append(f"Formato: **{_format_match_format(match)}**")
     return "\n".join(lines)
 
 
 def _format_grouped_match(match: PandaScoreMatch) -> str:
     start_at = match.begin_at or match.scheduled_at
-    time_text = f"<t:{int(start_at.timestamp())}:t>" if start_at is not None else "Horario indefinido"
+    time_text = f"<t:{int(start_at.timestamp())}:t>" if start_at is not None else "Horário indefinido"
     first, second = match.opponents
     lines = [
         f"{time_text} **{first} {match.score_text} {second}**",
         f"Status: {_format_status(match.status)}",
     ]
     if match.number_of_games is not None:
-        lines.append(f"Formato: {match.match_type or 'match'} {match.number_of_games}")
+        lines.append(f"Formato: {_format_match_format(match)}")
     return "\n".join(lines)
+
+
+def _format_match_format(match: PandaScoreMatch) -> str:
+    if match.match_type == "best_of":
+        return f"Melhor de {match.number_of_games}"
+    if match.match_type == "first_to":
+        return f"Primeiro a {match.number_of_games}"
+    return f"{match.match_type or 'partida'} {match.number_of_games}"
 
 
 def _group_matches_by_competition(matches: list[PandaScoreMatch]) -> dict[str, list[PandaScoreMatch]]:
     grouped_matches: dict[str, list[PandaScoreMatch]] = {}
     for match in matches:
-        competition_name = _join_nonempty([match.league, match.serie, match.tournament]) or "Competicao indisponivel"
+        competition_name = _format_competition_name(match) or "Competição indisponível"
         grouped_matches.setdefault(competition_name, []).append(match)
 
     return {
@@ -459,17 +579,46 @@ def _group_matches_by_competition(matches: list[PandaScoreMatch]) -> dict[str, l
 
 def _format_status(status: str) -> str:
     labels = {
-        "not_started": "Nao iniciada",
+        "not_started": "Não iniciada",
         "running": "Ao vivo",
         "finished": "Encerrada",
         "canceled": "Cancelada",
         "postponed": "Adiada",
     }
-    return labels.get(status, status or "Indisponivel")
+    return labels.get(status, status or "Indisponível")
 
 
 def _join_nonempty(values: list[str]) -> str:
     return " - ".join(value for value in values if value)
+
+
+def _official_stream_url(match: PandaScoreMatch) -> str | None:
+    competition_text = " ".join(
+        value.lower()
+        for value in (match.league, match.serie, match.tournament)
+        if value
+    )
+    for keyword, url in OFFICIAL_STREAMS.items():
+        if keyword in competition_text:
+            return url
+    return None
+
+
+def _color_for_name(name: str) -> int:
+    palette = (
+        0x00B8A9,
+        0xF6416C,
+        0xFFDE7D,
+        0x6A67CE,
+        0x43D9AD,
+        0xFF9F1C,
+        0x2F80ED,
+        0xEB5757,
+        0x27AE60,
+        0xBB6BD9,
+    )
+    digest = hashlib.sha256(name.encode("utf-8")).digest()
+    return palette[int.from_bytes(digest[:2], "big") % len(palette)]
 
 
 async def _send_embeds(ctx: commands.Context, embeds: list[discord.Embed]) -> None:

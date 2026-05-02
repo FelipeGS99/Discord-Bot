@@ -50,11 +50,11 @@ class Libertadores(commands.Cog):
             "\n".join(
                 [
                     "**Libertadores**",
-                    "Use para consultar jogos e configurar alertas automaticos da Libertadores.",
-                    f"`{prefix}libertadores hoje` - Mostra jogos de hoje com horario, placar, status e gols quando disponivel.",
-                    f"`{prefix}libertadores canal #canal` - Ativa alertas de inicio, gol, intervalo, volta de status e fim de jogo. Exemplo: `{prefix}libertadores canal #placares`.",
+                    "Use para consultar jogos e configurar alertas automáticos da Libertadores.",
+                    f"`{prefix}libertadores hoje` - Mostra jogos de hoje com horário, placar, status e gols quando disponível.",
+                    f"`{prefix}libertadores canal #canal` - Ativa alertas de início, gol, intervalo, volta de status e fim de jogo. Exemplo: `{prefix}libertadores canal #placares`.",
                     f"`{prefix}libertadores status` - Mostra canal configurado, API, liga e cache atual.",
-                    f"`{prefix}libertadores parar` - Desativa os alertas automaticos da Libertadores.",
+                    f"`{prefix}libertadores parar` - Desativa os alertas automáticos da Libertadores.",
                 ]
             )
         )
@@ -326,11 +326,11 @@ def _format_fixture_title(fixture: BrasileiraoFixture) -> str:
 
 
 def _format_fixture_details(fixture: BrasileiraoFixture, scorers: list[str] | None = None) -> str:
-    status = fixture.status_long or fixture.status_short or "Status indisponivel"
+    status = fixture.status_long or fixture.status_short or "Status indisponível"
     elapsed = f" - {fixture.elapsed}'" if fixture.elapsed is not None else ""
     kickoff = ""
     if fixture.kickoff_at is not None and fixture.status_short == "NS":
-        kickoff = f"\nInicio: <t:{int(fixture.kickoff_at.timestamp())}:t>"
+        kickoff = f"\nInício: <t:{int(fixture.kickoff_at.timestamp())}:t>"
     scorers_line = f"\nGols:\n**{chr(10).join(scorers)}**" if scorers else ""
     return f"Status: **{status}{elapsed}**{kickoff}{scorers_line}"
 

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 from datetime import date, timedelta
 from pathlib import Path
 
@@ -24,7 +25,7 @@ POLL_INTERVAL_MINUTES = 1
 
 
 COMPETITIONS = (
-    ("Brasileirao Serie A", "Brasileirao Serie A", "brasileirao_league_id", "brasileirao_state.json", 0x009C3B),
+    ("Brasileirão Série A", "Brasileirão Série A", "brasileirao_league_id", "brasileirao_state.json", 0x009C3B),
     ("Libertadores", "Libertadores", "libertadores_league_id", "libertadores_state.json", 0x003B7A),
     ("Sul-Americana", "Sul-Americana", "sulamericana_league_id", "sulamericana_state.json", 0xF28C28),
 )
@@ -47,12 +48,12 @@ class Futebol(commands.Cog):
             "\n".join(
                 [
                     "**Futebol**",
-                    "Use para ver uma lista geral dos jogos monitorados no Brasileirao, Libertadores e Sul-Americana.",
+                    "Use para ver uma lista geral dos jogos monitorados no Brasileirão, Libertadores e Sul-Americana.",
                     f"`{prefix}futebol hoje` - Mostra os jogos de hoje com placar, status, horario e gols quando disponivel.",
-                    f"`{prefix}futebol amanha` - Mostra os jogos de amanha nas competicoes monitoradas.",
+                    f"`{prefix}futebol amanha` - Mostra os jogos de amanhã nas competições monitoradas.",
                     "",
                     "**Alertas por competicao**",
-                    f"`{prefix}brasileirao canal #canal` - Ativa alertas do Brasileirao.",
+                    f"`{prefix}brasileirao canal #canal` - Ativa alertas do Brasileirão.",
                     f"`{prefix}libertadores canal #canal` - Ativa alertas da Libertadores.",
                     f"`{prefix}sulamericana canal #canal` - Ativa alertas da Sul-Americana.",
                 ]
@@ -278,7 +279,7 @@ class Futebol(commands.Cog):
             embed = discord.Embed(
                 title=f"{competition_name} - {label}",
                 description=f"Data: `{fixture_date.isoformat()}`\n\n{value[:3800]}",
-                color=EMBED_COLOR,
+                color=_color_for_name(competition_name),
             )
             embeds.append(embed)
 
@@ -306,11 +307,26 @@ class Futebol(commands.Cog):
 
 
 def _format_fixture(fixture: BrasileiraoFixture, scorers: list[str] | None = None) -> str:
-    status = fixture.status_long or fixture.status_short or "Status indisponivel"
+    status = fixture.status_long or fixture.status_short or "Status indisponível"
     elapsed = f" - {fixture.elapsed}'" if fixture.elapsed is not None else ""
     kickoff = f"\nData: <t:{int(fixture.kickoff_at.timestamp())}:f>" if fixture.kickoff_at is not None else ""
     scorers_line = f"\nGols:\n**{chr(10).join(scorers)}**" if scorers else ""
     return f"**{fixture.home_team} {fixture.score_text} {fixture.away_team}**\nStatus: **{status}{elapsed}**{kickoff}{scorers_line}"
+
+
+def _color_for_name(name: str) -> int:
+    palette = (
+        0x009C3B,
+        0x003B7A,
+        0xF28C28,
+        0x2F80ED,
+        0xEB5757,
+        0x27AE60,
+        0xBB6BD9,
+        0x00B8A9,
+    )
+    digest = hashlib.sha256(name.encode("utf-8")).digest()
+    return palette[int.from_bytes(digest[:2], "big") % len(palette)]
 
 
 async def _send_embeds(ctx: commands.Context, embeds: list[discord.Embed]) -> None:

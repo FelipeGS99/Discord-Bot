@@ -260,8 +260,8 @@ def describe_fixture_update(
 ) -> str:
     if not previous_snapshot:
         if fixture.is_live:
-            return "Inicio de jogo"
-        return "Atualizacao de placar"
+            return "Início de jogo"
+        return "Atualização de placar"
 
     previous_home_goals, previous_away_goals, previous_status = _parse_snapshot(previous_snapshot)
     current_home_goals = fixture.home_goals
@@ -281,9 +281,9 @@ def describe_fixture_update(
     if fixture.status_short == "finished" and previous_status != "finished":
         return "Fim de jogo"
     if fixture.is_live and previous_status == NOT_STARTED_STATUS_CODE:
-        return "Inicio de jogo"
+        return "Início de jogo"
 
-    return "Atualizacao de status"
+    return "Atualização de status"
 
 
 def _parse_snapshot(snapshot: str) -> tuple[int | None, int | None, str]:
@@ -395,7 +395,7 @@ def _parse_bsd_fixture(entry: dict[str, Any]) -> BrasileiraoFixture | None:
 
 def _format_status(status: str) -> str:
     labels = {
-        "notstarted": "Nao iniciado",
+        "notstarted": "Não iniciado",
         "inprogress": "Em andamento",
         "1st_half": "Primeiro tempo",
         "halftime": "Intervalo",
@@ -404,7 +404,7 @@ def _format_status(status: str) -> str:
         "postponed": "Adiado",
         "cancelled": "Cancelado",
     }
-    return labels.get(status, status or "Status indisponivel")
+    return labels.get(status, status or "Status indisponível")
 
 
 def select_current_round_fixtures(

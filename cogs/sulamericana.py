@@ -50,11 +50,11 @@ class Sulamericana(commands.Cog):
             "\n".join(
                 [
                     "**Sul-Americana**",
-                    "Use para consultar jogos e configurar alertas automaticos da Sul-Americana.",
-                    f"`{prefix}sulamericana hoje` - Mostra jogos de hoje com horario, placar, status e gols quando disponivel.",
-                    f"`{prefix}sulamericana canal #canal` - Ativa alertas de inicio, gol, intervalo, volta de status e fim de jogo. Exemplo: `{prefix}sulamericana canal #placares`.",
+                    "Use para consultar jogos e configurar alertas automáticos da Sul-Americana.",
+                    f"`{prefix}sulamericana hoje` - Mostra jogos de hoje com horário, placar, status e gols quando disponível.",
+                    f"`{prefix}sulamericana canal #canal` - Ativa alertas de início, gol, intervalo, volta de status e fim de jogo. Exemplo: `{prefix}sulamericana canal #placares`.",
                     f"`{prefix}sulamericana status` - Mostra canal configurado, API, liga e cache atual.",
-                    f"`{prefix}sulamericana parar` - Desativa os alertas automaticos da Sul-Americana.",
+                    f"`{prefix}sulamericana parar` - Desativa os alertas automáticos da Sul-Americana.",
                 ]
             )
         )
@@ -316,7 +316,7 @@ def _format_fixture_title(fixture: BrasileiraoFixture) -> str:
 
 
 def _format_fixture_details(fixture: BrasileiraoFixture, scorers: list[str] | None = None) -> str:
-    status = fixture.status_long or fixture.status_short or "Status indisponivel"
+    status = fixture.status_long or fixture.status_short or "Status indisponível"
     elapsed = f" - {fixture.elapsed}'" if fixture.elapsed is not None else ""
     kickoff = f"\nData: <t:{int(fixture.kickoff_at.timestamp())}:f>" if fixture.kickoff_at is not None else ""
     scorers_line = f"\nGols:\n**{chr(10).join(scorers)}**" if scorers else ""
