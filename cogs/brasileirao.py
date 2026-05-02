@@ -405,8 +405,6 @@ class Brasileirao(commands.Cog):
         embed.set_author(name="BrasileirÃ£o SÃ©rie A")
         if scorers:
             embed.add_field(name="Gols", value="\n".join(scorers), inline=False)
-        if fixture.kickoff_at is not None:
-            embed.timestamp = fixture.kickoff_at
         return embed
 
 

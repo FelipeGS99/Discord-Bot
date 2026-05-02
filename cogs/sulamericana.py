@@ -320,8 +320,6 @@ class Sulamericana(commands.Cog):
         embed.set_author(name="Sul-Americana")
         if scorers:
             embed.add_field(name="Gols", value="\n".join(scorers), inline=False)
-        if fixture.kickoff_at is not None:
-            embed.timestamp = fixture.kickoff_at
         return embed
 
 

@@ -573,8 +573,6 @@ class Esports(commands.Cog):
             color=_color_for_name(competition_name),
         )
         embed.set_author(name=author_name)
-        if match.begin_at is not None:
-            embed.timestamp = match.begin_at
         _add_stream_field(embed, match)
         return embed
 
@@ -593,8 +591,6 @@ class Esports(commands.Cog):
             color=_color_for_name(competition_name),
         )
         embed.set_author(name=author_name)
-        if game.begin_at is not None:
-            embed.timestamp = game.begin_at
         _add_stream_field(embed, match)
         return embed
 
