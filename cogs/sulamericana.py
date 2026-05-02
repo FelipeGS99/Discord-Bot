@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from datetime import date
 from pathlib import Path
@@ -31,7 +31,7 @@ class Sulamericana(commands.Cog):
         self.league_id = settings.sulamericana_league_id
 
         state = self.state_repository.load()
-        self.channel_id: int | None = state["channel_id"]
+        self.channel_ids: list[int] = state["channel_ids"]
         self.checked_date: str | None = state["checked_date"]
         self.fixture_snapshots: dict[str, str] = {
             str(key): str(value) for key, value in state["fixture_snapshots"].items()
@@ -50,11 +50,11 @@ class Sulamericana(commands.Cog):
             "\n".join(
                 [
                     "**Sul-Americana**",
-                    "Use para consultar jogos e configurar alertas automáticos da Sul-Americana.",
-                    f"`{prefix}sulamericana hoje` - Mostra jogos de hoje com horário, placar, status e gols quando disponível.",
-                    f"`{prefix}sulamericana canal #canal` - Ativa alertas de início, gol, intervalo, volta de status e fim de jogo. Exemplo: `{prefix}sulamericana canal #placares`.",
+                    "Use para consultar jogos e configurar alertas automÃ¡ticos da Sul-Americana.",
+                    f"`{prefix}sulamericana hoje` - Mostra jogos de hoje com horÃ¡rio, placar, status e gols quando disponÃ­vel.",
+                    f"`{prefix}sulamericana canal #canal` - Ativa alertas de inÃ­cio, gol, intervalo, volta de status e fim de jogo. Exemplo: `{prefix}sulamericana canal #placares`.",
                     f"`{prefix}sulamericana status` - Mostra canal configurado, API, liga e cache atual.",
-                    f"`{prefix}sulamericana parar` - Desativa os alertas automáticos da Sul-Americana.",
+                    f"`{prefix}sulamericana parar` - Desativa os alertas automÃ¡ticos da Sul-Americana.",
                 ]
             )
         )
@@ -68,7 +68,8 @@ class Sulamericana(commands.Cog):
             await ctx.send("A variavel BSD_API_KEY nao foi definida no .env.")
             return
 
-        self.channel_id = channel.id
+        if channel.id not in self.channel_ids:
+            self.channel_ids.append(channel.id)
         await self._refresh_today_fixtures(force=True)
         self.fixture_snapshots = {
             str(fixture.fixture_id): fixture.snapshot_key for fixture in self.fixtures_today
@@ -102,9 +103,12 @@ class Sulamericana(commands.Cog):
     @sulamericana_group.command(name="status")
     async def status(self, ctx: commands.Context) -> None:
         channel_text = "desativado"
-        if self.channel_id is not None:
-            channel = self.bot.get_channel(self.channel_id)
-            channel_text = channel.mention if isinstance(channel, discord.TextChannel) else f"`{self.channel_id}`"
+        if self.channel_ids:
+            channel_mentions = []
+            for channel_id in self.channel_ids:
+                channel = self.bot.get_channel(channel_id)
+                channel_mentions.append(channel.mention if isinstance(channel, discord.TextChannel) else f"`{channel_id}`")
+            channel_text = ", ".join(channel_mentions)
 
         await ctx.send(
             "\n".join(
@@ -126,9 +130,10 @@ class Sulamericana(commands.Cog):
             await ctx.send("Voce nao tem permissao para configurar os placares da Sul-Americana.")
             return
 
-        self.channel_id = None
+        if ctx.channel.id in self.channel_ids:
+            self.channel_ids.remove(ctx.channel.id)
         self._save_state()
-        await ctx.send("Placares da Sul-Americana desativados.")
+        await ctx.send("Placares da Sul-Americana desativados neste canal.")
 
     @set_channel.error
     async def set_channel_error(self, ctx: commands.Context, error: commands.CommandError) -> None:
@@ -142,12 +147,7 @@ class Sulamericana(commands.Cog):
 
     @tasks.loop(minutes=POLL_INTERVAL_MINUTES)
     async def check_sulamericana_scores(self) -> None:
-        if self.channel_id is None or self.api_client is None:
-            return
-
-        channel = self.bot.get_channel(self.channel_id)
-        if not isinstance(channel, discord.TextChannel):
-            print(f"Canal de placares da Sul-Americana nao encontrado: {self.channel_id}")
+        if not self.channel_ids or self.api_client is None:
             return
 
         try:
@@ -186,9 +186,9 @@ class Sulamericana(commands.Cog):
                     fixture,
                     self.fixture_snapshots.get(str(fixture.fixture_id)),
                 )
-                await channel.send(embed=self._build_score_embed(fixture, scorers, reason))
+                await self._send_score_to_channels(self._build_score_embed(fixture, scorers, reason))
             except discord.Forbidden:
-                print(f"Sem permissao para enviar placares no canal {channel.id}.")
+                print("Sem permissao para enviar placares da Sul-Americana.")
                 return
             except discord.HTTPException as exc:
                 print(f"Erro ao enviar placar no Discord: {exc}")
@@ -196,6 +196,21 @@ class Sulamericana(commands.Cog):
 
             self.fixture_snapshots[str(fixture.fixture_id)] = fixture.snapshot_key
             self._save_state()
+
+    async def _send_score_to_channels(self, embed: discord.Embed) -> None:
+        for channel_id in self.channel_ids:
+            channel = self.bot.get_channel(channel_id)
+            if not isinstance(channel, discord.TextChannel):
+                print(f"Canal de placares da Sul-Americana nao encontrado: {channel_id}")
+                continue
+            try:
+                await channel.send(embed=embed)
+            except discord.Forbidden:
+                print(f"Sem permissao para enviar placares no canal {channel.id}.")
+                continue
+            except discord.HTTPException as exc:
+                print(f"Erro ao enviar placar no Discord: {exc}")
+                continue
 
     @check_sulamericana_scores.before_loop
     async def before_check_sulamericana_scores(self) -> None:
@@ -261,7 +276,7 @@ class Sulamericana(commands.Cog):
 
     def _save_state(self) -> None:
         self.state_repository.save(
-            self.channel_id,
+            self.channel_ids,
             self.checked_date,
             self.fixture_snapshots,
             serialize_fixtures(self.fixtures_today),
@@ -316,7 +331,7 @@ def _format_fixture_title(fixture: BrasileiraoFixture) -> str:
 
 
 def _format_fixture_details(fixture: BrasileiraoFixture, scorers: list[str] | None = None) -> str:
-    status = fixture.status_long or fixture.status_short or "Status indisponível"
+    status = fixture.status_long or fixture.status_short or "Status indisponÃ­vel"
     elapsed = f" - {fixture.elapsed}'" if fixture.elapsed is not None else ""
     kickoff = f"\nData: <t:{int(fixture.kickoff_at.timestamp())}:f>" if fixture.kickoff_at is not None else ""
     scorers_line = f"\nGols:\n**{chr(10).join(scorers)}**" if scorers else ""
@@ -325,3 +340,5 @@ def _format_fixture_details(fixture: BrasileiraoFixture, scorers: list[str] | No
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(Sulamericana(bot))
+
+

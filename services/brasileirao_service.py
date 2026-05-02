@@ -173,7 +173,7 @@ class BrasileiraoStateRepository:
     def load(self) -> dict[str, Any]:
         if not self.state_path.exists():
             return {
-                "channel_id": None,
+                "channel_ids": [],
                 "checked_date": None,
                 "fixture_snapshots": {},
                 "fixtures_today": [],
@@ -182,8 +182,14 @@ class BrasileiraoStateRepository:
         with self.state_path.open("r", encoding="utf-8") as file:
             data = json.load(file)
 
+        channel_ids = data.get("channel_ids")
+        if not isinstance(channel_ids, list):
+            channel_id = data.get("channel_id")
+            channel_ids = [channel_id] if isinstance(channel_id, int) else []
+        channel_ids = [channel_id for channel_id in channel_ids if isinstance(channel_id, int)]
+
         return {
-            "channel_id": data.get("channel_id") if isinstance(data.get("channel_id"), int) else None,
+            "channel_ids": channel_ids,
             "checked_date": data.get("checked_date") if isinstance(data.get("checked_date"), str) else None,
             "fixture_snapshots": data.get("fixture_snapshots") if isinstance(data.get("fixture_snapshots"), dict) else {},
             "fixtures_today": data.get("fixtures_today") if isinstance(data.get("fixtures_today"), list) else [],
@@ -191,13 +197,13 @@ class BrasileiraoStateRepository:
 
     def save(
         self,
-        channel_id: int | None,
+        channel_ids: list[int],
         checked_date: str | None,
         fixture_snapshots: dict[str, str],
         fixtures_today: list[dict[str, Any]],
     ) -> None:
         data = {
-            "channel_id": channel_id,
+            "channel_ids": channel_ids,
             "checked_date": checked_date,
             "fixture_snapshots": fixture_snapshots,
             "fixtures_today": fixtures_today,

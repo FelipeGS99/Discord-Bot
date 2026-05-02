@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import unittest
 from datetime import datetime, timezone
+from pathlib import Path
 
 from services.brasileirao_service import (
+    BrasileiraoStateRepository,
     describe_fixture_update,
     parse_goal_scorers,
     parse_fixtures_response,
@@ -270,6 +272,53 @@ class BrasileiraoServiceTests(unittest.TestCase):
 
         self.assertEqual(describe_fixture_update(halftime, "0|0|1st_half"), "Intervalo")
         self.assertEqual(describe_fixture_update(finished, "0|0|2nd_half"), "Fim de jogo")
+
+    def test_state_repository_defaults_and_save_multiple_channels(self) -> None:
+        state_path = Path(__file__).resolve().parent / "_tmp_football_state.json"
+        if state_path.exists():
+            state_path.unlink()
+
+        try:
+            repository = BrasileiraoStateRepository(state_path)
+            self.assertEqual(
+                repository.load(),
+                {"channel_ids": [], "checked_date": None, "fixture_snapshots": {}, "fixtures_today": []},
+            )
+
+            repository.save([123, 456], "2026-05-02", {"1": "0|0|notstarted"}, [])
+
+            self.assertEqual(
+                repository.load(),
+                {
+                    "channel_ids": [123, 456],
+                    "checked_date": "2026-05-02",
+                    "fixture_snapshots": {"1": "0|0|notstarted"},
+                    "fixtures_today": [],
+                },
+            )
+        finally:
+            if state_path.exists():
+                state_path.unlink()
+
+    def test_state_repository_loads_legacy_single_channel_id(self) -> None:
+        state_path = Path(__file__).resolve().parent / "_tmp_football_state.json"
+        if state_path.exists():
+            state_path.unlink()
+
+        try:
+            state_path.write_text(
+                '{"channel_id": 123, "checked_date": null, "fixture_snapshots": {}, "fixtures_today": []}',
+                encoding="utf-8",
+            )
+            repository = BrasileiraoStateRepository(state_path)
+
+            self.assertEqual(
+                repository.load(),
+                {"channel_ids": [123], "checked_date": None, "fixture_snapshots": {}, "fixtures_today": []},
+            )
+        finally:
+            if state_path.exists():
+                state_path.unlink()
 
 
 if __name__ == "__main__":

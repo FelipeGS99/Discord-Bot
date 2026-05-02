@@ -20,6 +20,7 @@ class Settings:
     brasileirao_league_id: int
     libertadores_league_id: int
     sulamericana_league_id: int
+    copadobrasil_league_id: int
 
 
 def _get_required_env(name: str) -> str:
@@ -37,4 +38,5 @@ settings = Settings(
     brasileirao_league_id=int(os.getenv("BRASILEIRAO_LEAGUE_ID", "9")),
     libertadores_league_id=int(os.getenv("LIBERTADORES_LEAGUE_ID", "32")),
     sulamericana_league_id=int(os.getenv("SULAMERICANA_LEAGUE_ID", "33")),
+    copadobrasil_league_id=int(os.getenv("COPADOBRASIL_LEAGUE_ID", "35")),
 )

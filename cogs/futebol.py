@@ -28,6 +28,7 @@ COMPETITIONS = (
     ("Brasileirão Série A", "Brasileirão Série A", "brasileirao_league_id", "brasileirao_state.json", 0x009C3B),
     ("Libertadores", "Libertadores", "libertadores_league_id", "libertadores_state.json", 0x003B7A),
     ("Sul-Americana", "Sul-Americana", "sulamericana_league_id", "sulamericana_state.json", 0xF28C28),
+    ("Copa do Brasil", "Copa do Brasil", "copadobrasil_league_id", "copadobrasil_state.json", 0x2F80ED),
 )
 
 
@@ -48,7 +49,7 @@ class Futebol(commands.Cog):
             "\n".join(
                 [
                     "**Futebol**",
-                    "Use para ver uma lista geral dos jogos monitorados no Brasileirão, Libertadores e Sul-Americana.",
+                    "Use para ver uma lista geral dos jogos monitorados no Brasileirão, Libertadores, Sul-Americana e Copa do Brasil.",
                     f"`{prefix}futebol hoje` - Mostra os jogos de hoje com placar, status, horario e gols quando disponivel.",
                     f"`{prefix}futebol amanha` - Mostra os jogos de amanhã nas competições monitoradas.",
                     "",
@@ -56,6 +57,7 @@ class Futebol(commands.Cog):
                     f"`{prefix}brasileirao canal #canal` - Ativa alertas do Brasileirão.",
                     f"`{prefix}libertadores canal #canal` - Ativa alertas da Libertadores.",
                     f"`{prefix}sulamericana canal #canal` - Ativa alertas da Sul-Americana.",
+                    f"`{prefix}copadobrasil canal #canal` - Ativa alertas da Copa do Brasil.",
                 ]
             )
         )
@@ -141,13 +143,8 @@ class Futebol(commands.Cog):
     ) -> None:
         repository = BrasileiraoStateRepository(self.base_path / state_name)
         state = repository.load()
-        channel_id = state["channel_id"]
-        if channel_id is None:
-            return
-
-        channel = self.bot.get_channel(channel_id)
-        if not isinstance(channel, discord.TextChannel):
-            print(f"Canal de placares de {competition_name} nao encontrado: {channel_id}")
+        channel_ids = state["channel_ids"]
+        if not channel_ids:
             return
 
         checked_date = state["checked_date"]
@@ -187,7 +184,7 @@ class Futebol(commands.Cog):
                     return
                 checked_date = date.today().isoformat()
                 if not should_monitor_fixtures(fixtures_today):
-                    self._save_competition_state(repository, channel_id, checked_date, fixture_snapshots, fixtures_today)
+                    self._save_competition_state(repository, channel_ids, checked_date, fixture_snapshots, fixtures_today)
                     return
             else:
                 try:
@@ -205,24 +202,41 @@ class Futebol(commands.Cog):
             if fixture_snapshots.get(str(fixture.fixture_id)) != fixture.snapshot_key
         ]
         if not changed_fixtures:
-            self._save_competition_state(repository, channel_id, checked_date, fixture_snapshots, fixtures_to_compare)
+            self._save_competition_state(repository, channel_ids, checked_date, fixture_snapshots, fixtures_to_compare)
             return
 
         for fixture in changed_fixtures:
             scorers = await self._fetch_goal_scorers(fixture)
             reason = describe_fixture_update(fixture, fixture_snapshots.get(str(fixture.fixture_id)))
-            try:
-                await channel.send(embed=self._build_score_embed(fixture, author_name, color, scorers, reason))
-            except discord.Forbidden:
-                print(f"Sem permissao para enviar placares no canal {channel.id}.")
-                return
-            except discord.HTTPException as exc:
-                print(f"Erro ao enviar placar no Discord: {exc}")
-                return
+            await self._send_score_to_channels(
+                channel_ids,
+                competition_name,
+                self._build_score_embed(fixture, author_name, color, scorers, reason),
+            )
 
             fixture_snapshots[str(fixture.fixture_id)] = fixture.snapshot_key
 
-        self._save_competition_state(repository, channel_id, checked_date, fixture_snapshots, fixtures_to_compare)
+        self._save_competition_state(repository, channel_ids, checked_date, fixture_snapshots, fixtures_to_compare)
+
+    async def _send_score_to_channels(
+        self,
+        channel_ids: list[int],
+        competition_name: str,
+        embed: discord.Embed,
+    ) -> None:
+        for channel_id in channel_ids:
+            channel = self.bot.get_channel(channel_id)
+            if not isinstance(channel, discord.TextChannel):
+                print(f"Canal de placares de {competition_name} nao encontrado: {channel_id}")
+                continue
+            try:
+                await channel.send(embed=embed)
+            except discord.Forbidden:
+                print(f"Sem permissao para enviar placares no canal {channel.id}.")
+                continue
+            except discord.HTTPException as exc:
+                print(f"Erro ao enviar placar no Discord: {exc}")
+                continue
 
     async def _fetch_goal_scorers(self, fixture: BrasileiraoFixture) -> list[str]:
         if self.api_client is None or fixture.home_goals is None or fixture.away_goals is None:
@@ -238,12 +252,12 @@ class Futebol(commands.Cog):
     @staticmethod
     def _save_competition_state(
         repository: BrasileiraoStateRepository,
-        channel_id: int | None,
+        channel_ids: list[int],
         checked_date: str | None,
         fixture_snapshots: dict[str, str],
         fixtures_today: list[BrasileiraoFixture],
     ) -> None:
-        repository.save(channel_id, checked_date, fixture_snapshots, serialize_fixtures(fixtures_today))
+        repository.save(channel_ids, checked_date, fixture_snapshots, serialize_fixtures(fixtures_today))
 
     async def _fetch_goal_scorers_by_fixture(
         self,

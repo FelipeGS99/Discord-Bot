@@ -14,6 +14,7 @@ COGS = (
     "cogs.brasileirao",
     "cogs.libertadores",
     "cogs.sulamericana",
+    "cogs.copadobrasil",
     "cogs.futebol",
     "cogs.esports",
 )

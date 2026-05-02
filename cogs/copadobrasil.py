@@ -13,25 +13,22 @@ from services.brasileirao_service import (
     BrasileiraoStateRepository,
     describe_fixture_update,
     deserialize_fixtures,
-    select_current_round_fixtures,
-    select_next_round_fixtures,
-    select_previous_round_fixtures,
     serialize_fixtures,
     should_monitor_fixtures,
 )
 
 
 POLL_INTERVAL_MINUTES = 1
-EMBED_COLOR = 0x009C3B
+EMBED_COLOR = 0x2F80ED
 
 
-class Brasileirao(commands.Cog):
+class CopaDoBrasil(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
-        state_path = Path(__file__).resolve().parent.parent / "brasileirao_state.json"
+        state_path = Path(__file__).resolve().parent.parent / "copadobrasil_state.json"
         self.state_repository = BrasileiraoStateRepository(state_path)
         self.api_client = ApiFootballClient(settings.bsd_api_key) if settings.bsd_api_key else None
-        self.league_id = settings.brasileirao_league_id
+        self.league_id = settings.copadobrasil_league_id
 
         state = self.state_repository.load()
         self.channel_ids: list[int] = state["channel_ids"]
@@ -44,31 +41,28 @@ class Brasileirao(commands.Cog):
         # Periodic polling is centralized in cogs.futebol to avoid duplicate API calls.
 
     async def cog_unload(self) -> None:
-        self.check_brasileirao_scores.cancel()
+        self.check_copadobrasil_scores.cancel()
 
-    @commands.group(name="brasileirao", invoke_without_command=True)
-    async def brasileirao_group(self, ctx: commands.Context) -> None:
+    @commands.group(name="copadobrasil", aliases=["copa"], invoke_without_command=True)
+    async def copadobrasil_group(self, ctx: commands.Context) -> None:
         prefix = ctx.prefix or "?"
         await ctx.send(
             "\n".join(
                 [
-                    "**BrasileirÃ£o SÃ©rie A**",
-                    "Use para consultar jogos e configurar alertas automÃ¡ticos do BrasileirÃ£o.",
-                    f"`{prefix}brasileirao hoje` - Mostra jogos de hoje com horÃ¡rio, placar, status e gols quando disponÃ­vel.",
-                    f"`{prefix}brasileirao atual` - Mostra a rodada atual do campeonato.",
-                    f"`{prefix}brasileirao proxima` - Mostra a prÃ³xima rodada.",
-                    f"`{prefix}brasileirao passada` - Mostra a rodada anterior.",
-                    f"`{prefix}brasileirao canal #canal` - Ativa alertas de inÃ­cio, gol, intervalo, volta de status e fim de jogo. Exemplo: `{prefix}brasileirao canal #placares`.",
-                    f"`{prefix}brasileirao status` - Mostra canal configurado, API, liga e cache atual.",
-                    f"`{prefix}brasileirao parar` - Desativa os alertas automÃ¡ticos do BrasileirÃ£o.",
+                    "**Copa do Brasil**",
+                    "Use para consultar jogos e configurar alertas automÃ¡ticos da Copa do Brasil.",
+                    f"`{prefix}copadobrasil hoje` - Mostra jogos de hoje com horÃ¡rio, placar, status e gols quando disponÃ­vel.",
+                    f"`{prefix}copadobrasil canal #canal` - Ativa alertas de inÃ­cio, gol, intervalo, volta de status e fim de jogo. Exemplo: `{prefix}copadobrasil canal #placares`.",
+                    f"`{prefix}copadobrasil status` - Mostra canal configurado, API, liga e cache atual.",
+                    f"`{prefix}copadobrasil parar` - Desativa os alertas automÃ¡ticos da Copa do Brasil.",
                 ]
             )
         )
 
-    @brasileirao_group.command(name="canal")
+    @copadobrasil_group.command(name="canal")
     async def set_channel(self, ctx: commands.Context, channel: discord.TextChannel) -> None:
         if not self._can_manage_scores(ctx):
-            await ctx.send("Voce nao tem permissao para configurar os placares do Brasileirao.")
+            await ctx.send("Voce nao tem permissao para configurar os placares da Copa do Brasil.")
             return
         if self.api_client is None:
             await ctx.send("A variavel BSD_API_KEY nao foi definida no .env.")
@@ -83,11 +77,11 @@ class Brasileirao(commands.Cog):
         self._save_state()
 
         await ctx.send(
-            f"Placares do Brasileirao ativados em {channel.mention}. "
+            f"Placares da Copa do Brasil ativados em {channel.mention}. "
             "Vou avisar quando houver mudanca de status ou placar."
         )
 
-    @brasileirao_group.command(name="hoje")
+    @copadobrasil_group.command(name="hoje")
     async def today(self, ctx: commands.Context) -> None:
         if self.api_client is None:
             await ctx.send("A variavel BSD_API_KEY nao foi definida no .env.")
@@ -100,70 +94,13 @@ class Brasileirao(commands.Cog):
             return
 
         if not fixtures:
-            await ctx.send("Nao encontrei jogos do Brasileirao Serie A para hoje.")
+            await ctx.send("Nao encontrei jogos da Copa do Brasil para hoje.")
             return
 
         scorers_by_fixture = await self._fetch_goal_scorers_by_fixture(fixtures)
         await ctx.send(embed=self._build_today_embed(fixtures, scorers_by_fixture))
 
-    @brasileirao_group.command(name="atual")
-    async def current_round(self, ctx: commands.Context) -> None:
-        if self.api_client is None:
-            await ctx.send("A variavel BSD_API_KEY nao foi definida no .env.")
-            return
-
-        try:
-            fixtures = await self.api_client.fetch_season_fixtures(self.league_id)
-        except Exception as exc:
-            await ctx.send(f"Nao consegui consultar a BSD agora: {exc}")
-            return
-
-        round_fixtures = select_current_round_fixtures(fixtures)
-        if not round_fixtures:
-            await ctx.send("Nao encontrei a rodada atual do Brasileirao Serie A.")
-            return
-
-        await ctx.send(embed=self._build_round_embed(round_fixtures, "rodada atual"))
-
-    @brasileirao_group.command(name="passada")
-    async def previous_round(self, ctx: commands.Context) -> None:
-        if self.api_client is None:
-            await ctx.send("A variavel BSD_API_KEY nao foi definida no .env.")
-            return
-
-        try:
-            fixtures = await self.api_client.fetch_season_fixtures(self.league_id)
-        except Exception as exc:
-            await ctx.send(f"Nao consegui consultar a BSD agora: {exc}")
-            return
-
-        round_fixtures = select_previous_round_fixtures(fixtures)
-        if not round_fixtures:
-            await ctx.send("Nao encontrei a rodada passada do Brasileirao Serie A.")
-            return
-
-        await ctx.send(embed=self._build_round_embed(round_fixtures, "rodada passada"))
-
-    @brasileirao_group.command(name="proxima")
-    async def next_round(self, ctx: commands.Context) -> None:
-        if self.api_client is None:
-            await ctx.send("A variavel BSD_API_KEY nao foi definida no .env.")
-            return
-
-        try:
-            fixtures = await self.api_client.fetch_season_fixtures(self.league_id)
-        except Exception as exc:
-            await ctx.send(f"Nao consegui consultar a BSD agora: {exc}")
-            return
-
-        round_fixtures = select_next_round_fixtures(fixtures)
-        if not round_fixtures:
-            await ctx.send("Nao encontrei a proxima rodada do Brasileirao Serie A.")
-            return
-
-        await ctx.send(embed=self._build_round_embed(round_fixtures, "proxima rodada"))
-
-    @brasileirao_group.command(name="status")
+    @copadobrasil_group.command(name="status")
     async def status(self, ctx: commands.Context) -> None:
         channel_text = "desativado"
         if self.channel_ids:
@@ -176,7 +113,7 @@ class Brasileirao(commands.Cog):
         await ctx.send(
             "\n".join(
                 [
-                    "**Brasileirao Serie A**",
+                    "**Copa do Brasil**",
                     f"Canal: {channel_text}",
                     f"API key: {'configurada' if self.api_client else 'ausente'}",
                     f"Liga: `{self.league_id}`",
@@ -187,21 +124,21 @@ class Brasileirao(commands.Cog):
             )
         )
 
-    @brasileirao_group.command(name="parar")
+    @copadobrasil_group.command(name="parar")
     async def stop_scores(self, ctx: commands.Context) -> None:
         if not self._can_manage_scores(ctx):
-            await ctx.send("Voce nao tem permissao para configurar os placares do Brasileirao.")
+            await ctx.send("Voce nao tem permissao para configurar os placares da Copa do Brasil.")
             return
 
         if ctx.channel.id in self.channel_ids:
             self.channel_ids.remove(ctx.channel.id)
         self._save_state()
-        await ctx.send("Placares do Brasileirao desativados neste canal.")
+        await ctx.send("Placares da Copa do Brasil desativados neste canal.")
 
     @set_channel.error
     async def set_channel_error(self, ctx: commands.Context, error: commands.CommandError) -> None:
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send("Informe o canal. Exemplo: `brasileirao canal #placares`.")
+            await ctx.send("Informe o canal. Exemplo: `copadobrasil canal #placares`.")
             return
         if isinstance(error, commands.BadArgument):
             await ctx.send("Canal invalido. Marque um canal de texto valido.")
@@ -209,14 +146,14 @@ class Brasileirao(commands.Cog):
         raise error
 
     @tasks.loop(minutes=POLL_INTERVAL_MINUTES)
-    async def check_brasileirao_scores(self) -> None:
+    async def check_copadobrasil_scores(self) -> None:
         if not self.channel_ids or self.api_client is None:
             return
 
         try:
             fixtures = await self._fetch_live_fixtures()
         except Exception as exc:
-            print(f"Erro ao atualizar placares ao vivo do Brasileirao: {exc}")
+            print(f"Erro ao atualizar placares ao vivo da Copa do Brasil: {exc}")
             return
 
         if not fixtures:
@@ -224,14 +161,14 @@ class Brasileirao(commands.Cog):
             try:
                 fixtures = await self._refresh_today_fixtures(force=had_live_snapshot)
             except Exception as exc:
-                print(f"Erro ao consultar placares do Brasileirao: {exc}")
+                print(f"Erro ao consultar placares da Copa do Brasil: {exc}")
                 return
             if not had_live_snapshot and not should_monitor_fixtures(fixtures):
                 return
             try:
                 live_fixtures = await self._fetch_live_fixtures()
             except Exception as exc:
-                print(f"Erro ao atualizar placares ao vivo do Brasileirao: {exc}")
+                print(f"Erro ao atualizar placares ao vivo da Copa do Brasil: {exc}")
                 return
             if live_fixtures:
                 fixtures = live_fixtures
@@ -241,6 +178,7 @@ class Brasileirao(commands.Cog):
         if not changed_fixtures:
             self._save_state()
             return
+
         for fixture in changed_fixtures:
             try:
                 scorers = await self._fetch_goal_scorers(fixture)
@@ -250,7 +188,7 @@ class Brasileirao(commands.Cog):
                 )
                 await self._send_score_to_channels(self._build_score_embed(fixture, scorers, reason))
             except discord.Forbidden:
-                print("Sem permissao para enviar placares do Brasileirao.")
+                print("Sem permissao para enviar placares da Copa do Brasil.")
                 return
             except discord.HTTPException as exc:
                 print(f"Erro ao enviar placar no Discord: {exc}")
@@ -263,7 +201,7 @@ class Brasileirao(commands.Cog):
         for channel_id in self.channel_ids:
             channel = self.bot.get_channel(channel_id)
             if not isinstance(channel, discord.TextChannel):
-                print(f"Canal de placares do Brasileirao nao encontrado: {channel_id}")
+                print(f"Canal de placares da Copa do Brasil nao encontrado: {channel_id}")
                 continue
             try:
                 await channel.send(embed=embed)
@@ -274,8 +212,8 @@ class Brasileirao(commands.Cog):
                 print(f"Erro ao enviar placar no Discord: {exc}")
                 continue
 
-    @check_brasileirao_scores.before_loop
-    async def before_check_brasileirao_scores(self) -> None:
+    @check_copadobrasil_scores.before_loop
+    async def before_check_copadobrasil_scores(self) -> None:
         await self.bot.wait_until_ready()
 
     async def _refresh_today_fixtures(self, force: bool) -> list[BrasileiraoFixture]:
@@ -314,7 +252,7 @@ class Brasileirao(commands.Cog):
         try:
             return await self.api_client.fetch_goal_scorers(fixture.fixture_id)
         except Exception as exc:
-            print(f"Erro ao buscar autores dos gols do Brasileirao: {exc}")
+            print(f"Erro ao buscar autores dos gols da Copa do Brasil: {exc}")
             return []
 
     async def _fetch_goal_scorers_by_fixture(
@@ -362,33 +300,10 @@ class Brasileirao(commands.Cog):
         fixtures: list[BrasileiraoFixture],
         scorers_by_fixture: dict[int, list[str]] | None = None,
     ) -> discord.Embed:
-        embed = discord.Embed(
-            title="BrasileirÃ£o SÃ©rie A - jogos de hoje",
-            color=EMBED_COLOR,
-        )
+        embed = discord.Embed(title="Copa do Brasil - jogos de hoje", color=EMBED_COLOR)
         for fixture in fixtures:
             details = _format_fixture_details(fixture, (scorers_by_fixture or {}).get(fixture.fixture_id))
-            embed.add_field(
-                name=_format_fixture_title(fixture),
-                value=details,
-                inline=False,
-            )
-        return embed
-
-    @staticmethod
-    def _build_round_embed(fixtures: list[BrasileiraoFixture], label: str) -> discord.Embed:
-        round_number = fixtures[0].round_number
-        title = f"BrasileirÃ£o SÃ©rie A - {label}"
-        if round_number is not None:
-            title = f"{title} {round_number}"
-
-        embed = discord.Embed(title=title, color=EMBED_COLOR)
-        for fixture in fixtures:
-            embed.add_field(
-                name=_format_fixture_title(fixture),
-                value=_format_fixture_details(fixture),
-                inline=False,
-            )
+            embed.add_field(name=_format_fixture_title(fixture), value=details, inline=False)
         return embed
 
     @staticmethod
@@ -399,20 +314,16 @@ class Brasileirao(commands.Cog):
     ) -> discord.Embed:
         embed = discord.Embed(
             title=f"{reason + ': ' if reason else ''}{fixture.home_team} {fixture.score_text} {fixture.away_team}",
-            description=_format_fixture_line(fixture),
+            description=_format_fixture_details(fixture),
             color=EMBED_COLOR,
         )
-        embed.set_author(name="BrasileirÃ£o SÃ©rie A")
+        embed.set_author(name="Copa do Brasil")
         if scorers:
             embed.add_field(name="Gols", value="\n".join(scorers), inline=False)
         if fixture.kickoff_at is not None:
             embed.timestamp = fixture.kickoff_at
         return embed
 
-
-
-def _format_fixture_line(fixture: BrasileiraoFixture) -> str:
-    return f"{_format_fixture_title(fixture)}\n{_format_fixture_details(fixture)}"
 
 
 def _format_fixture_title(fixture: BrasileiraoFixture) -> str:
@@ -428,6 +339,6 @@ def _format_fixture_details(fixture: BrasileiraoFixture, scorers: list[str] | No
 
 
 async def setup(bot: commands.Bot) -> None:
-    await bot.add_cog(Brasileirao(bot))
+    await bot.add_cog(CopaDoBrasil(bot))
 
 
