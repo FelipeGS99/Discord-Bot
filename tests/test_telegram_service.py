@@ -79,7 +79,7 @@ class TelegramServiceTests(unittest.TestCase):
         self.assertIn("<b>Fim de jogo</b>", message)
         self.assertIn("Palmeiras &lt;SP&gt; <b>1 x 1</b> Santos &amp; Vila", message)
         self.assertIn("<b>Status:</b> Encerrado - 90&#x27;", message)
-        self.assertIn("<b>Data:</b>", message)
+        self.assertIn("<b>Data:</b> 02/05/2026 18:30", message)
         self.assertIn("<b>Gols:</b> Atacante &amp; Meia", message)
 
     def test_esports_update_uses_html_status_translation_and_clickable_stream(self) -> None:
@@ -108,6 +108,7 @@ class TelegramServiceTests(unittest.TestCase):
         self.assertIn("<b>Fim de partida</b>", message)
         self.assertIn("KRÜ Esports <b>1 x 2</b> 100 Thieves", message)
         self.assertIn("<b>Status:</b> Encerrada", message)
+        self.assertIn("<b>Horário:</b> 02/05/2026 18:05", message)
         self.assertIn("<b>Formato:</b> Melhor de 3", message)
         self.assertIn(">Assistir</a>", message)
         self.assertNotIn("Transmissão oficial: https://example.com/live", message)

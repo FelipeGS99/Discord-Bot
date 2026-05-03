@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime
 from html import escape
 from pathlib import Path
 
@@ -19,6 +19,7 @@ from services.brasileirao_service import (
     should_monitor_fixtures,
 )
 from services.pandascore_service import (
+    APP_TIMEZONE,
     PandaScoreClient,
     PandaScoreGame,
     PandaScoreMatch,
@@ -416,7 +417,7 @@ def _format_football_update(
         f"<b>Status:</b> {_html(status)}",
     ]
     if fixture.kickoff_at is not None:
-        lines.append(f"<b>Data:</b> {_html(fixture.kickoff_at.astimezone().strftime('%d/%m/%Y %H:%M'))}")
+        lines.append(f"<b>Data:</b> {_html(_format_local_datetime(fixture.kickoff_at))}")
     if scorers:
         lines.append(f"<b>Gols:</b> {_html(' | '.join(scorers))}")
     return "\n".join(lines)
@@ -433,7 +434,7 @@ def _format_esports_update(game_title: str, match: PandaScoreMatch, reason: str)
     ]
     start_at = match.begin_at or match.scheduled_at
     if start_at is not None:
-        lines.append(f"<b>Horário:</b> {_html(start_at.astimezone().strftime('%d/%m/%Y %H:%M'))}")
+        lines.append(f"<b>Horário:</b> {_html(_format_local_datetime(start_at))}")
     if match.number_of_games is not None:
         lines.append(f"<b>Formato:</b> Melhor de {match.number_of_games}")
     stream_link = _stream_link_for_match(match)
@@ -451,7 +452,7 @@ def _format_esports_game_start(game_title: str, match: PandaScoreMatch, game: Pa
         _format_score_line(match.opponents[0], match.score_text, match.opponents[1]),
     ]
     if game.begin_at is not None:
-        lines.extend(["", f"<b>Horário:</b> {_html(game.begin_at.astimezone().strftime('%d/%m/%Y %H:%M'))}"])
+        lines.extend(["", f"<b>Horário:</b> {_html(_format_local_datetime(game.begin_at))}"])
     stream_link = _stream_link_for_match(match)
     if stream_link is not None:
         lines.append(_format_telegram_stream_link(stream_link[0], stream_link[1]))
@@ -473,6 +474,10 @@ def _format_esports_status(status: str) -> str:
 
 def _format_telegram_stream_link(label: str, stream_url: str) -> str:
     return f"<b>{_html(label)}:</b> <a href=\"{_html(stream_url)}\">Assistir</a>"
+
+
+def _format_local_datetime(value: datetime) -> str:
+    return value.astimezone(APP_TIMEZONE).strftime("%d/%m/%Y %H:%M")
 
 
 def _html(value: object) -> str:
