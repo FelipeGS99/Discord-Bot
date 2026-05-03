@@ -7,7 +7,7 @@ import discord
 from discord.ext import commands, tasks
 
 from config import settings
-from cogs.football_colors import color_for_fixture
+from cogs.football_colors import color_for_active_fixture
 from services.brasileirao_service import (
     ApiFootballClient,
     BrasileiraoFixture,
@@ -186,7 +186,7 @@ class Libertadores(commands.Cog):
                     fixture,
                     self.fixture_snapshots.get(str(fixture.fixture_id)),
                 )
-                await self._send_score_to_channels(self._build_score_embed(fixture, scorers, reason))
+                await self._send_score_to_channels(self._build_score_embed(fixture, scorers, reason, fixtures))
             except discord.Forbidden:
                 print("Sem permissao para enviar placares da Libertadores.")
                 return
@@ -320,11 +320,12 @@ class Libertadores(commands.Cog):
         fixture: BrasileiraoFixture,
         scorers: list[str] | None = None,
         reason: str | None = None,
+        active_fixtures: list[BrasileiraoFixture] | None = None,
     ) -> discord.Embed:
         embed = discord.Embed(
             title=f"{reason + ': ' if reason else ''}{fixture.home_team} {fixture.score_text} {fixture.away_team}",
             description=_format_fixture_line(fixture),
-            color=color_for_fixture(fixture),
+            color=color_for_active_fixture(fixture, active_fixtures),
         )
         embed.set_author(name="Libertadores")
         if scorers:

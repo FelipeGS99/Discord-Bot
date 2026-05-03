@@ -7,7 +7,7 @@ import discord
 from discord.ext import commands, tasks
 
 from config import settings
-from cogs.football_colors import color_for_fixture
+from cogs.football_colors import color_for_active_fixture
 from services.brasileirao_service import (
     ApiFootballClient,
     BrasileiraoFixture,
@@ -211,7 +211,7 @@ class Futebol(commands.Cog):
             await self._send_score_to_channels(
                 channel_ids,
                 competition_name,
-                self._build_score_embed(fixture, author_name, color, scorers, reason),
+                self._build_score_embed(fixture, author_name, color, scorers, reason, fixtures_to_compare),
             )
 
             fixture_snapshots[str(fixture.fixture_id)] = fixture.snapshot_key
@@ -307,11 +307,12 @@ class Futebol(commands.Cog):
         color: int,
         scorers: list[str] | None,
         reason: str,
+        active_fixtures: list[BrasileiraoFixture] | None = None,
     ) -> discord.Embed:
         embed = discord.Embed(
             title=f"{reason}: {fixture.home_team} {fixture.score_text} {fixture.away_team}",
             description=_format_fixture(fixture),
-            color=color_for_fixture(fixture),
+            color=color_for_active_fixture(fixture, active_fixtures),
         )
         embed.set_author(name=author_name)
         if scorers:

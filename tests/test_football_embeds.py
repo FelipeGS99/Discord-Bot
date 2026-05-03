@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 
 from cogs.brasileirao import EMBED_COLOR as BRASILEIRAO_COLOR
 from cogs.brasileirao import Brasileirao
-from cogs.football_colors import color_for_fixture
+from cogs.football_colors import color_for_active_fixture, color_for_fixture
 from cogs.futebol import COMPETITIONS, Futebol
 from services.brasileirao_service import BrasileiraoFixture
 
@@ -23,6 +23,12 @@ class FootballEmbedTests(unittest.TestCase):
         }
 
         self.assertGreater(len(colors), 1)
+
+    def test_color_for_active_fixture_avoids_active_game_collisions(self) -> None:
+        fixtures = [_fixture(index, f"Time {index}", f"Rival {index}") for index in range(1, 8)]
+        colors = [color_for_active_fixture(fixture, fixtures) for fixture in fixtures]
+
+        self.assertEqual(len(colors), len(set(colors)))
 
     def test_futebol_group_builds_one_embed_per_fixture_using_competition_color(self) -> None:
         fixtures = [_fixture(1, "Sao Paulo", "Bahia"), _fixture(2, "Flamengo", "Vasco da Gama")]
@@ -50,6 +56,16 @@ class FootballEmbedTests(unittest.TestCase):
         embed = Brasileirao._build_score_embed(fixture, reason="Atualizacao de placar")
 
         self.assertEqual(embed.color.value, color_for_fixture(fixture))
+
+    def test_single_match_score_embed_uses_active_fixture_color_when_available(self) -> None:
+        fixtures = [_fixture(1, "Sao Paulo", "Bahia"), _fixture(2, "Flamengo", "Vasco da Gama")]
+
+        first_embed = Brasileirao._build_score_embed(fixtures[0], reason="Gol", active_fixtures=fixtures)
+        second_embed = Brasileirao._build_score_embed(fixtures[1], reason="Gol", active_fixtures=fixtures)
+
+        self.assertEqual(first_embed.color.value, color_for_active_fixture(fixtures[0], fixtures))
+        self.assertEqual(second_embed.color.value, color_for_active_fixture(fixtures[1], fixtures))
+        self.assertNotEqual(first_embed.color.value, second_embed.color.value)
 
 
 def _fixture(fixture_id: int, home_team: str, away_team: str) -> BrasileiraoFixture:
