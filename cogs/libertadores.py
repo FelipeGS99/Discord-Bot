@@ -7,6 +7,7 @@ import discord
 from discord.ext import commands, tasks
 
 from config import settings
+from cogs.football_colors import color_for_fixture
 from services.brasileirao_service import (
     ApiFootballClient,
     BrasileiraoFixture,
@@ -98,7 +99,7 @@ class Libertadores(commands.Cog):
             return
 
         scorers_by_fixture = await self._fetch_goal_scorers_by_fixture(fixtures)
-        await ctx.send(embed=self._build_today_embed(fixtures, scorers_by_fixture))
+        await _send_embeds(ctx, self._build_today_embeds(fixtures, scorers_by_fixture))
 
     @libertadores_group.command(name="status")
     async def status(self, ctx: commands.Context) -> None:
@@ -295,22 +296,24 @@ class Libertadores(commands.Cog):
         )
 
     @staticmethod
-    def _build_today_embed(
+    def _build_today_embeds(
         fixtures: list[BrasileiraoFixture],
         scorers_by_fixture: dict[int, list[str]] | None = None,
-    ) -> discord.Embed:
-        embed = discord.Embed(
-            title="Libertadores - jogos de hoje",
-            color=EMBED_COLOR,
-        )
+    ) -> list[discord.Embed]:
+        embeds: list[discord.Embed] = []
         for fixture in fixtures:
             details = _format_fixture_details(fixture, (scorers_by_fixture or {}).get(fixture.fixture_id))
+            embed = discord.Embed(
+                title="Libertadores - jogos de hoje",
+                color=EMBED_COLOR,
+            )
             embed.add_field(
                 name=_format_fixture_title(fixture),
                 value=details,
                 inline=False,
             )
-        return embed
+            embeds.append(embed)
+        return embeds
 
     @staticmethod
     def _build_score_embed(
@@ -321,7 +324,7 @@ class Libertadores(commands.Cog):
         embed = discord.Embed(
             title=f"{reason + ': ' if reason else ''}{fixture.home_team} {fixture.score_text} {fixture.away_team}",
             description=_format_fixture_line(fixture),
-            color=EMBED_COLOR,
+            color=color_for_fixture(fixture),
         )
         embed.set_author(name="Libertadores")
         if scorers:
@@ -346,6 +349,11 @@ def _format_fixture_details(fixture: BrasileiraoFixture, scorers: list[str] | No
         kickoff = f"\nInÃ­cio: <t:{int(fixture.kickoff_at.timestamp())}:t>"
     scorers_line = f"\nGols:\n**{chr(10).join(scorers)}**" if scorers else ""
     return f"Status: **{status}{elapsed}**{kickoff}{scorers_line}"
+
+
+async def _send_embeds(ctx: commands.Context, embeds: list[discord.Embed]) -> None:
+    for index in range(0, len(embeds), 10):
+        await ctx.send(embeds=embeds[index:index + 10])
 
 
 async def setup(bot: commands.Bot) -> None:

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 from datetime import date, timedelta
 from pathlib import Path
 
@@ -8,6 +7,7 @@ import discord
 from discord.ext import commands, tasks
 
 from config import settings
+from cogs.football_colors import color_for_fixture
 from services.brasileirao_service import (
     ApiFootballClient,
     BrasileiraoFixture,
@@ -283,19 +283,20 @@ class Futebol(commands.Cog):
         label: str,
     ) -> list[discord.Embed]:
         embeds: list[discord.Embed] = []
+        colors_by_competition = {competition_name: color for competition_name, *_rest, color in COMPETITIONS}
         for competition_name, fixtures in grouped_fixtures.items():
             if not fixtures:
                 continue
-            value = "\n\n".join(
-                _format_fixture(fixture, scorers_by_fixture.get(fixture.fixture_id))
-                for fixture in fixtures
-            )
-            embed = discord.Embed(
-                title=f"{competition_name} - {label}",
-                description=f"Data: `{fixture_date.isoformat()}`\n\n{value[:3800]}",
-                color=_color_for_name(competition_name),
-            )
-            embeds.append(embed)
+            for fixture in fixtures:
+                embed = discord.Embed(
+                    title=f"{competition_name} - {label}",
+                    description=(
+                        f"Data: `{fixture_date.isoformat()}`\n\n"
+                        f"{_format_fixture(fixture, scorers_by_fixture.get(fixture.fixture_id))}"
+                    ),
+                    color=colors_by_competition.get(competition_name, EMBED_COLOR),
+                )
+                embeds.append(embed)
 
         return embeds
 
@@ -310,7 +311,7 @@ class Futebol(commands.Cog):
         embed = discord.Embed(
             title=f"{reason}: {fixture.home_team} {fixture.score_text} {fixture.away_team}",
             description=_format_fixture(fixture),
-            color=color,
+            color=color_for_fixture(fixture),
         )
         embed.set_author(name=author_name)
         if scorers:
@@ -324,21 +325,6 @@ def _format_fixture(fixture: BrasileiraoFixture, scorers: list[str] | None = Non
     kickoff = f"\nData: <t:{int(fixture.kickoff_at.timestamp())}:f>" if fixture.kickoff_at is not None else ""
     scorers_line = f"\nGols:\n**{chr(10).join(scorers)}**" if scorers else ""
     return f"**{fixture.home_team} {fixture.score_text} {fixture.away_team}**\nStatus: **{status}{elapsed}**{kickoff}{scorers_line}"
-
-
-def _color_for_name(name: str) -> int:
-    palette = (
-        0x009C3B,
-        0x003B7A,
-        0xF28C28,
-        0x2F80ED,
-        0xEB5757,
-        0x27AE60,
-        0xBB6BD9,
-        0x00B8A9,
-    )
-    digest = hashlib.sha256(name.encode("utf-8")).digest()
-    return palette[int.from_bytes(digest[:2], "big") % len(palette)]
 
 
 async def _send_embeds(ctx: commands.Context, embeds: list[discord.Embed]) -> None:

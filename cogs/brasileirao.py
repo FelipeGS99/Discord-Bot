@@ -7,6 +7,7 @@ import discord
 from discord.ext import commands, tasks
 
 from config import settings
+from cogs.football_colors import color_for_fixture
 from services.brasileirao_service import (
     ApiFootballClient,
     BrasileiraoFixture,
@@ -104,7 +105,7 @@ class Brasileirao(commands.Cog):
             return
 
         scorers_by_fixture = await self._fetch_goal_scorers_by_fixture(fixtures)
-        await ctx.send(embed=self._build_today_embed(fixtures, scorers_by_fixture))
+        await _send_embeds(ctx, self._build_today_embeds(fixtures, scorers_by_fixture))
 
     @brasileirao_group.command(name="atual")
     async def current_round(self, ctx: commands.Context) -> None:
@@ -123,7 +124,7 @@ class Brasileirao(commands.Cog):
             await ctx.send("Nao encontrei a rodada atual do Brasileirao Serie A.")
             return
 
-        await ctx.send(embed=self._build_round_embed(round_fixtures, "rodada atual"))
+        await _send_embeds(ctx, self._build_round_embeds(round_fixtures, "rodada atual"))
 
     @brasileirao_group.command(name="passada")
     async def previous_round(self, ctx: commands.Context) -> None:
@@ -142,7 +143,7 @@ class Brasileirao(commands.Cog):
             await ctx.send("Nao encontrei a rodada passada do Brasileirao Serie A.")
             return
 
-        await ctx.send(embed=self._build_round_embed(round_fixtures, "rodada passada"))
+        await _send_embeds(ctx, self._build_round_embeds(round_fixtures, "rodada passada"))
 
     @brasileirao_group.command(name="proxima")
     async def next_round(self, ctx: commands.Context) -> None:
@@ -161,7 +162,7 @@ class Brasileirao(commands.Cog):
             await ctx.send("Nao encontrei a proxima rodada do Brasileirao Serie A.")
             return
 
-        await ctx.send(embed=self._build_round_embed(round_fixtures, "proxima rodada"))
+        await _send_embeds(ctx, self._build_round_embeds(round_fixtures, "proxima rodada"))
 
     @brasileirao_group.command(name="status")
     async def status(self, ctx: commands.Context) -> None:
@@ -358,38 +359,42 @@ class Brasileirao(commands.Cog):
         )
 
     @staticmethod
-    def _build_today_embed(
+    def _build_today_embeds(
         fixtures: list[BrasileiraoFixture],
         scorers_by_fixture: dict[int, list[str]] | None = None,
-    ) -> discord.Embed:
-        embed = discord.Embed(
-            title="BrasileirÃ£o SÃ©rie A - jogos de hoje",
-            color=EMBED_COLOR,
-        )
+    ) -> list[discord.Embed]:
+        embeds: list[discord.Embed] = []
         for fixture in fixtures:
             details = _format_fixture_details(fixture, (scorers_by_fixture or {}).get(fixture.fixture_id))
+            embed = discord.Embed(
+                title="Brasileirão Série A - jogos de hoje",
+                color=EMBED_COLOR,
+            )
             embed.add_field(
                 name=_format_fixture_title(fixture),
                 value=details,
                 inline=False,
             )
-        return embed
+            embeds.append(embed)
+        return embeds
 
     @staticmethod
-    def _build_round_embed(fixtures: list[BrasileiraoFixture], label: str) -> discord.Embed:
+    def _build_round_embeds(fixtures: list[BrasileiraoFixture], label: str) -> list[discord.Embed]:
         round_number = fixtures[0].round_number
         title = f"BrasileirÃ£o SÃ©rie A - {label}"
         if round_number is not None:
             title = f"{title} {round_number}"
 
-        embed = discord.Embed(title=title, color=EMBED_COLOR)
+        embeds: list[discord.Embed] = []
         for fixture in fixtures:
+            embed = discord.Embed(title=title, color=EMBED_COLOR)
             embed.add_field(
                 name=_format_fixture_title(fixture),
                 value=_format_fixture_details(fixture),
                 inline=False,
             )
-        return embed
+            embeds.append(embed)
+        return embeds
 
     @staticmethod
     def _build_score_embed(
@@ -400,7 +405,7 @@ class Brasileirao(commands.Cog):
         embed = discord.Embed(
             title=f"{reason + ': ' if reason else ''}{fixture.home_team} {fixture.score_text} {fixture.away_team}",
             description=_format_fixture_line(fixture),
-            color=EMBED_COLOR,
+            color=color_for_fixture(fixture),
         )
         embed.set_author(name="BrasileirÃ£o SÃ©rie A")
         if scorers:
@@ -423,6 +428,11 @@ def _format_fixture_details(fixture: BrasileiraoFixture, scorers: list[str] | No
     kickoff = f"\nData: <t:{int(fixture.kickoff_at.timestamp())}:f>" if fixture.kickoff_at is not None else ""
     scorers_line = f"\nGols:\n**{chr(10).join(scorers)}**" if scorers else ""
     return f"Status: **{status}{elapsed}**{kickoff}{scorers_line}"
+
+
+async def _send_embeds(ctx: commands.Context, embeds: list[discord.Embed]) -> None:
+    for index in range(0, len(embeds), 10):
+        await ctx.send(embeds=embeds[index:index + 10])
 
 
 async def setup(bot: commands.Bot) -> None:
