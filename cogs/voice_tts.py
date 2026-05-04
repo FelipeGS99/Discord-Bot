@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 import discord
+from discord.voice_state import VoiceConnectionState
 from discord.ext import commands
 
 
@@ -20,6 +21,9 @@ VOICE_CONNECT_TIMEOUT_SECONDS = 60
 
 
 class DiagnosticVoiceClient(discord.VoiceClient):
+    def create_connection_state(self) -> VoiceConnectionState:
+        return VoiceConnectionState(self, hook=_voice_websocket_hook)
+
     async def on_voice_state_update(self, data: dict[str, Any]) -> None:
         _log(
             "discord_voice_state_update",
@@ -40,6 +44,33 @@ class DiagnosticVoiceClient(discord.VoiceClient):
             has_token=bool(data.get("token")),
         )
         await super().on_voice_server_update(data)
+
+
+async def _voice_websocket_hook(websocket: discord.gateway.DiscordVoiceWebSocket, message: dict[str, Any]) -> None:
+    opcode = message.get("op")
+    data = message.get("d")
+    event_fields: dict[str, object] = {"op": opcode}
+    if opcode == websocket.READY and isinstance(data, dict):
+        event_fields.update(
+            {
+                "ssrc": data.get("ssrc"),
+                "ip": data.get("ip"),
+                "port": data.get("port"),
+                "modes": ",".join(str(mode) for mode in data.get("modes", [])),
+            }
+        )
+    elif opcode == websocket.SESSION_DESCRIPTION and isinstance(data, dict):
+        event_fields.update(
+            {
+                "mode": data.get("mode"),
+                "has_secret_key": bool(data.get("secret_key")),
+            }
+        )
+    elif opcode == websocket.HELLO and isinstance(data, dict):
+        event_fields["heartbeat_interval"] = data.get("heartbeat_interval")
+    elif opcode == websocket.HEARTBEAT_ACK:
+        event_fields["ack"] = True
+    _log("voice_websocket_message", **event_fields)
 
 
 @dataclass(frozen=True)
