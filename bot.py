@@ -18,6 +18,7 @@ COGS = (
     "cogs.futebol",
     "cogs.esports",
     "cogs.telegram_alerts",
+    "cogs.voice_tts",
 )
 
 

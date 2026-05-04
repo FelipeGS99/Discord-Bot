@@ -52,6 +52,8 @@ class Moderation(commands.Cog):
                 f"`{prefix}valorant` - Partidas e alertas de Valorant.",
                 f"`{prefix}genoticias` - Noticias de futebol do GE.",
                 f"`{prefix}forca` - Jogo da forca no canal.",
+                f"`{prefix}falar <mensagem>` - Faz o bot falar no canal de voz em que voce esta.",
+                f"`{prefix}falar <#canal_de_voz> <mensagem>` - Faz o bot falar no canal de voz informado, mesmo que voce nao esteja em voz.",
                 "",
                 "**Moderacao**",
                 f"`{prefix}clear <quantidade>` - Apaga mensagens recentes do canal. Exemplo: `{prefix}clear 10`.",
