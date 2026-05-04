@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import shutil
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
@@ -18,6 +19,8 @@ IDLE_DISCONNECT_SECONDS = 15
 class SpeechRequest:
     channel: discord.VoiceChannel
     text: str
+    text_channel: discord.abc.Messageable | None = None
+    requester_id: int | None = None
 
 
 @dataclass(frozen=True)
@@ -64,61 +67,125 @@ class VoiceTTS(commands.Cog):
             return
 
         queue = self.queues.setdefault(ctx.guild.id, asyncio.Queue())
-        await queue.put(SpeechRequest(channel=parsed.channel, text=parsed.text))
+        _log(
+            "queued",
+            guild_id=ctx.guild.id,
+            channel_id=parsed.channel.id,
+            requester_id=ctx.author.id,
+            explicit_channel=parsed.used_explicit_channel,
+            text_length=len(parsed.text),
+            queue_size=queue.qsize(),
+        )
+        await queue.put(
+            SpeechRequest(
+                channel=parsed.channel,
+                text=parsed.text,
+                text_channel=ctx.channel,
+                requester_id=ctx.author.id,
+            )
+        )
         if ctx.guild.id not in self.queue_tasks or self.queue_tasks[ctx.guild.id].done():
+            _log("starting_queue_worker", guild_id=ctx.guild.id)
             self.queue_tasks[ctx.guild.id] = asyncio.create_task(self._process_queue(ctx.guild.id))
 
         await ctx.send("Mensagem adicionada na fila de voz.", delete_after=5)
 
     async def _process_queue(self, guild_id: int) -> None:
         queue = self.queues[guild_id]
+        _log("queue_worker_started", guild_id=guild_id)
         try:
             while True:
                 try:
                     request = await asyncio.wait_for(queue.get(), timeout=IDLE_DISCONNECT_SECONDS)
                 except asyncio.TimeoutError:
+                    _log("queue_idle_timeout", guild_id=guild_id)
                     await self._disconnect_guild_voice(guild_id)
                     return
 
                 try:
+                    _log(
+                        "processing_request",
+                        guild_id=guild_id,
+                        channel_id=request.channel.id,
+                        requester_id=request.requester_id,
+                        remaining_queue=queue.qsize(),
+                    )
                     await self._speak_request(request)
                 except Exception as exc:
-                    print(f"Erro ao processar TTS: {exc}")
+                    _log("request_failed", guild_id=guild_id, error=repr(exc))
+                    if request.text_channel is not None:
+                        await request.text_channel.send(f"Nao consegui reproduzir o audio: {exc}", delete_after=10)
                 finally:
                     queue.task_done()
         except asyncio.CancelledError:
+            _log("queue_worker_cancelled", guild_id=guild_id)
             await self._disconnect_guild_voice(guild_id)
             raise
 
     async def _speak_request(self, request: SpeechRequest) -> None:
+        _log("connecting_or_moving", guild_id=request.channel.guild.id, channel_id=request.channel.id)
         voice_client = await self._connect_or_move(request.channel)
+        _log(
+            "voice_ready",
+            guild_id=request.channel.guild.id,
+            channel_id=request.channel.id,
+            connected=voice_client.is_connected(),
+            playing=voice_client.is_playing(),
+        )
         audio_path = await synthesize_speech(request.text)
         playback_done = asyncio.Event()
 
         def after_playback(error: Exception | None) -> None:
             if error is not None:
-                print(f"Erro ao reproduzir TTS: {error}")
+                _log("playback_callback_error", guild_id=request.channel.guild.id, error=repr(error))
+            else:
+                _log("playback_callback_done", guild_id=request.channel.guild.id)
             self.bot.loop.call_soon_threadsafe(playback_done.set)
 
         try:
-            source = discord.FFmpegPCMAudio(str(audio_path))
+            ffmpeg_executable = shutil.which("ffmpeg") or "ffmpeg"
+            _log(
+                "starting_playback",
+                guild_id=request.channel.guild.id,
+                channel_id=request.channel.id,
+                audio_path=str(audio_path),
+                audio_exists=audio_path.exists(),
+                audio_size=audio_path.stat().st_size if audio_path.exists() else 0,
+                ffmpeg=ffmpeg_executable,
+            )
+            source = discord.FFmpegPCMAudio(str(audio_path), executable=ffmpeg_executable, options="-vn")
             voice_client.play(source, after=after_playback)
             await playback_done.wait()
+            _log("playback_finished", guild_id=request.channel.guild.id, channel_id=request.channel.id)
         finally:
+            _log("removing_audio_file", audio_path=str(audio_path), exists=audio_path.exists())
             audio_path.unlink(missing_ok=True)
 
     async def _connect_or_move(self, channel: discord.VoiceChannel) -> discord.VoiceClient:
         existing = discord.utils.get(self.bot.voice_clients, guild=channel.guild)
         if existing is not None and existing.is_connected():
             if existing.channel != channel:
+                _log(
+                    "moving_voice_client",
+                    guild_id=channel.guild.id,
+                    from_channel_id=getattr(existing.channel, "id", None),
+                    to_channel_id=channel.id,
+                )
                 await existing.move_to(channel)
             return existing
+        _log("connecting_voice_client", guild_id=channel.guild.id, channel_id=channel.id)
         return await channel.connect()
 
     async def _disconnect_guild_voice(self, guild_id: int) -> None:
-        voice_client = discord.utils.get(self.bot.voice_clients, guild__id=guild_id)
+        voice_client = next(
+            (client for client in self.bot.voice_clients if client.guild and client.guild.id == guild_id),
+            None,
+        )
         if voice_client is not None and voice_client.is_connected():
+            _log("disconnecting_voice_client", guild_id=guild_id, channel_id=getattr(voice_client.channel, "id", None))
             await voice_client.disconnect()
+        else:
+            _log("disconnect_skipped_no_client", guild_id=guild_id)
 
 
 def parse_speech_content(ctx: commands.Context, content: str) -> ParsedSpeech:
@@ -186,12 +253,21 @@ def resolve_voice_channel_prefix(
 async def synthesize_speech(text: str) -> Path:
     import edge_tts
 
+    _log("tts_generation_started", text_length=len(text), voice=TTS_VOICE)
     temporary_file = tempfile.NamedTemporaryFile(prefix="discord_tts_", suffix=".mp3", delete=False)
     audio_path = Path(temporary_file.name)
     temporary_file.close()
 
     communicate = edge_tts.Communicate(text, TTS_VOICE)
     await communicate.save(str(audio_path))
+    _log(
+        "tts_generation_finished",
+        audio_path=str(audio_path),
+        audio_exists=audio_path.exists(),
+        audio_size=audio_path.stat().st_size if audio_path.exists() else 0,
+    )
+    if not audio_path.exists() or audio_path.stat().st_size <= 0:
+        raise RuntimeError("O TTS gerou um arquivo de audio vazio.")
     return audio_path
 
 
@@ -201,6 +277,11 @@ def _channel_id_from_token(token: str) -> int | None:
     if token.isdigit():
         return int(token)
     return None
+
+
+def _log(event: str, **fields: object) -> None:
+    details = " ".join(f"{key}={value}" for key, value in fields.items())
+    print(f"[voice_tts] event={event} {details}".rstrip(), flush=True)
 
 
 async def setup(bot: commands.Bot) -> None:
