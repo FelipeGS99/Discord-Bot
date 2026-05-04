@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 import shutil
+import sys
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 import discord
 from discord.ext import commands
@@ -13,7 +16,30 @@ from discord.ext import commands
 MAX_TTS_CHARACTERS = 250
 TTS_VOICE = "pt-BR-FranciscaNeural"
 IDLE_DISCONNECT_SECONDS = 15
-VOICE_CONNECT_TIMEOUT_SECONDS = 20
+VOICE_CONNECT_TIMEOUT_SECONDS = 60
+
+
+class DiagnosticVoiceClient(discord.VoiceClient):
+    async def on_voice_state_update(self, data: dict[str, Any]) -> None:
+        _log(
+            "discord_voice_state_update",
+            guild_id=data.get("guild_id"),
+            channel_id=data.get("channel_id"),
+            user_id=data.get("user_id"),
+            self_user_id=getattr(self.user, "id", None),
+            is_self=str(data.get("user_id")) == str(getattr(self.user, "id", None)),
+            has_session=bool(data.get("session_id")),
+        )
+        await super().on_voice_state_update(data)
+
+    async def on_voice_server_update(self, data: dict[str, Any]) -> None:
+        _log(
+            "discord_voice_server_update",
+            guild_id=data.get("guild_id"),
+            endpoint=data.get("endpoint"),
+            has_token=bool(data.get("token")),
+        )
+        await super().on_voice_server_update(data)
 
 
 @dataclass(frozen=True)
@@ -37,6 +63,7 @@ class VoiceTTS(commands.Cog):
         self.bot = bot
         self.queues: dict[int, asyncio.Queue[SpeechRequest]] = {}
         self.queue_tasks: dict[int, asyncio.Task[None]] = {}
+        _enable_discord_voice_logging()
 
     async def cog_unload(self) -> None:
         for task in self.queue_tasks.values():
@@ -114,7 +141,7 @@ class VoiceTTS(commands.Cog):
                 except Exception as exc:
                     _log("request_failed", guild_id=guild_id, error=repr(exc))
                     if request.text_channel is not None:
-                        await request.text_channel.send(f"Nao consegui reproduzir o audio: {exc}", delete_after=10)
+                        await request.text_channel.send(f"Nao consegui reproduzir o audio: {_format_error(exc)}", delete_after=10)
                 finally:
                     queue.task_done()
         except asyncio.CancelledError:
@@ -202,7 +229,25 @@ class VoiceTTS(commands.Cog):
             )
             await existing.disconnect(force=True)
         _log("connecting_voice_client", guild_id=channel.guild.id, channel_id=channel.id)
-        return await channel.connect(timeout=VOICE_CONNECT_TIMEOUT_SECONDS, reconnect=True)
+        try:
+            return await channel.connect(
+                timeout=VOICE_CONNECT_TIMEOUT_SECONDS,
+                reconnect=True,
+                self_deaf=True,
+                cls=DiagnosticVoiceClient,
+            )
+        except asyncio.TimeoutError:
+            me_voice = getattr(channel.guild.me, "voice", None)
+            me_channel = getattr(me_voice, "channel", None)
+            _log(
+                "voice_connect_timeout",
+                guild_id=channel.guild.id,
+                requested_channel_id=channel.id,
+                bot_voice_channel_id=getattr(me_channel, "id", None),
+                timeout=VOICE_CONNECT_TIMEOUT_SECONDS,
+            )
+            await self._disconnect_guild_voice(channel.guild.id)
+            raise
 
     async def _wait_until_connected(
         self,
@@ -342,6 +387,26 @@ def _channel_id_from_token(token: str) -> int | None:
 def _log(event: str, **fields: object) -> None:
     details = " ".join(f"{key}={value}" for key, value in fields.items())
     print(f"[voice_tts] event={event} {details}".rstrip(), flush=True)
+
+
+def _format_error(error: Exception) -> str:
+    if isinstance(error, asyncio.TimeoutError):
+        return "tempo limite ao conectar no canal de voz."
+    message = str(error).strip()
+    return message or error.__class__.__name__
+
+
+def _enable_discord_voice_logging() -> None:
+    logger = logging.getLogger("discord.voice_state")
+    logger.setLevel(logging.INFO)
+    logger.propagate = False
+    if any(getattr(handler, "_voice_tts_handler", False) for handler in logger.handlers):
+        return
+
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setFormatter(logging.Formatter("[discord.voice_state] %(levelname)s %(message)s"))
+    handler._voice_tts_handler = True  # type: ignore[attr-defined]
+    logger.addHandler(handler)
 
 
 async def setup(bot: commands.Bot) -> None:
