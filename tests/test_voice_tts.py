@@ -1,13 +1,22 @@
 from __future__ import annotations
 
 import asyncio
+import json
+import tempfile
 import unittest
+from pathlib import Path
 from types import SimpleNamespace
 
 import discord
 
 from bot import COGS
-from cogs.voice_tts import MAX_TTS_CHARACTERS, SpeechRequest, parse_speech_content
+from cogs.voice_tts import (
+    MAX_TTS_CHARACTERS,
+    SpeechRequest,
+    VOICE_TTS_CONFIG,
+    load_voice_tts_config,
+    parse_speech_content,
+)
 
 
 class VoiceTTSTests(unittest.IsolatedAsyncioTestCase):
@@ -81,6 +90,41 @@ class VoiceTTSTests(unittest.IsolatedAsyncioTestCase):
 
     def test_text_limit_constant(self) -> None:
         self.assertEqual(MAX_TTS_CHARACTERS, 250)
+
+    def test_voice_config_uses_antonio_by_default(self) -> None:
+        self.assertEqual(VOICE_TTS_CONFIG.voice, "pt-BR-AntonioNeural")
+
+    def test_load_voice_tts_config_uses_custom_values(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            config_path = Path(temp_dir) / "voice_tts_config.json"
+            config_path.write_text(
+                json.dumps(
+                    {
+                        "voice": "pt-BR-ThalitaMultilingualNeural",
+                        "rate": "+12%",
+                        "volume": "-5%",
+                        "pitch": "+3Hz",
+                        "max_characters": 180,
+                        "idle_disconnect_seconds": 20,
+                        "voice_connect_timeout_seconds": 45,
+                        "ffmpeg_before_options": "-nostdin -hide_banner",
+                        "ffmpeg_options": "-vn -loglevel error",
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            config = load_voice_tts_config(config_path)
+
+        self.assertEqual(config.voice, "pt-BR-ThalitaMultilingualNeural")
+        self.assertEqual(config.rate, "+12%")
+        self.assertEqual(config.volume, "-5%")
+        self.assertEqual(config.pitch, "+3Hz")
+        self.assertEqual(config.max_characters, 180)
+        self.assertEqual(config.idle_disconnect_seconds, 20)
+        self.assertEqual(config.voice_connect_timeout_seconds, 45)
+        self.assertEqual(config.ffmpeg_before_options, "-nostdin -hide_banner")
+        self.assertEqual(config.ffmpeg_options, "-vn -loglevel error")
 
     async def test_queue_preserves_order(self) -> None:
         first_channel = _voice_channel(1, "Um")

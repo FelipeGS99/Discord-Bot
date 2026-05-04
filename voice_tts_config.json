@@ -1,0 +1,11 @@
+{
+  "voice": "pt-BR-AntonioNeural",
+  "rate": "+0%",
+  "volume": "+0%",
+  "pitch": "+0Hz",
+  "max_characters": 250,
+  "idle_disconnect_seconds": 15,
+  "voice_connect_timeout_seconds": 60,
+  "ffmpeg_before_options": "-nostdin",
+  "ffmpeg_options": "-vn"
+}
