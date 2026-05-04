@@ -13,6 +13,7 @@ from discord.ext import commands
 MAX_TTS_CHARACTERS = 250
 TTS_VOICE = "pt-BR-FranciscaNeural"
 IDLE_DISCONNECT_SECONDS = 15
+VOICE_CONNECT_TIMEOUT_SECONDS = 20
 
 
 @dataclass(frozen=True)
@@ -41,8 +42,7 @@ class VoiceTTS(commands.Cog):
         for task in self.queue_tasks.values():
             task.cancel()
         for voice_client in self.bot.voice_clients:
-            if voice_client.is_connected():
-                await voice_client.disconnect(force=True)
+            await voice_client.disconnect(force=True)
 
     @commands.command(name="falar")
     async def speak(self, ctx: commands.Context, *, content: str | None = None) -> None:
@@ -125,6 +125,7 @@ class VoiceTTS(commands.Cog):
     async def _speak_request(self, request: SpeechRequest) -> None:
         _log("connecting_or_moving", guild_id=request.channel.guild.id, channel_id=request.channel.id)
         voice_client = await self._connect_or_move(request.channel)
+        await self._wait_until_connected(voice_client, request.channel)
         _log(
             "voice_ready",
             guild_id=request.channel.guild.id,
@@ -134,6 +135,7 @@ class VoiceTTS(commands.Cog):
         )
         audio_path = await synthesize_speech(request.text)
         playback_done = asyncio.Event()
+        source: discord.AudioSource | None = None
 
         def after_playback(error: Exception | None) -> None:
             if error is not None:
@@ -153,39 +155,97 @@ class VoiceTTS(commands.Cog):
                 audio_size=audio_path.stat().st_size if audio_path.exists() else 0,
                 ffmpeg=ffmpeg_executable,
             )
-            source = discord.FFmpegPCMAudio(str(audio_path), executable=ffmpeg_executable, options="-vn")
+            if not voice_client.is_connected():
+                raise RuntimeError("A conexao de voz nao ficou pronta antes da reproducao.")
+            source = discord.FFmpegOpusAudio(
+                str(audio_path),
+                executable=ffmpeg_executable,
+                before_options="-nostdin",
+                options="-vn",
+            )
+            _log(
+                "audio_source_created",
+                guild_id=request.channel.guild.id,
+                channel_id=request.channel.id,
+                source_type=source.__class__.__name__,
+                source_is_opus=source.is_opus(),
+            )
             voice_client.play(source, after=after_playback)
             await playback_done.wait()
             _log("playback_finished", guild_id=request.channel.guild.id, channel_id=request.channel.id)
+        except Exception:
+            if source is not None:
+                source.cleanup()
+            raise
         finally:
             _log("removing_audio_file", audio_path=str(audio_path), exists=audio_path.exists())
             audio_path.unlink(missing_ok=True)
 
     async def _connect_or_move(self, channel: discord.VoiceChannel) -> discord.VoiceClient:
         existing = discord.utils.get(self.bot.voice_clients, guild=channel.guild)
-        if existing is not None and existing.is_connected():
-            if existing.channel != channel:
-                _log(
-                    "moving_voice_client",
-                    guild_id=channel.guild.id,
-                    from_channel_id=getattr(existing.channel, "id", None),
-                    to_channel_id=channel.id,
-                )
-                await existing.move_to(channel)
-            return existing
+        if existing is not None:
+            if existing.is_connected():
+                if existing.channel != channel:
+                    _log(
+                        "moving_voice_client",
+                        guild_id=channel.guild.id,
+                        from_channel_id=getattr(existing.channel, "id", None),
+                        to_channel_id=channel.id,
+                    )
+                    await existing.move_to(channel, timeout=VOICE_CONNECT_TIMEOUT_SECONDS)
+                return existing
+            _log(
+                "cleaning_stale_voice_client",
+                guild_id=channel.guild.id,
+                channel_id=getattr(existing.channel, "id", None),
+                connected=existing.is_connected(),
+            )
+            await existing.disconnect(force=True)
         _log("connecting_voice_client", guild_id=channel.guild.id, channel_id=channel.id)
-        return await channel.connect()
+        return await channel.connect(timeout=VOICE_CONNECT_TIMEOUT_SECONDS, reconnect=True)
+
+    async def _wait_until_connected(
+        self,
+        voice_client: discord.VoiceClient,
+        channel: discord.VoiceChannel,
+    ) -> None:
+        if voice_client.is_connected():
+            _log("voice_connection_already_ready", guild_id=channel.guild.id, channel_id=channel.id)
+            return
+
+        _log(
+            "voice_connection_wait_started",
+            guild_id=channel.guild.id,
+            channel_id=channel.id,
+            timeout=VOICE_CONNECT_TIMEOUT_SECONDS,
+        )
+        connected = await asyncio.to_thread(voice_client.wait_until_connected, VOICE_CONNECT_TIMEOUT_SECONDS)
+        _log(
+            "voice_connection_wait_finished",
+            guild_id=channel.guild.id,
+            channel_id=channel.id,
+            connected=connected,
+        )
+        if not connected:
+            await voice_client.disconnect(force=True)
+            raise RuntimeError("Nao consegui concluir a conexao de voz com o Discord.")
 
     async def _disconnect_guild_voice(self, guild_id: int) -> None:
         voice_client = next(
             (client for client in self.bot.voice_clients if client.guild and client.guild.id == guild_id),
             None,
         )
-        if voice_client is not None and voice_client.is_connected():
-            _log("disconnecting_voice_client", guild_id=guild_id, channel_id=getattr(voice_client.channel, "id", None))
-            await voice_client.disconnect()
-        else:
+        if voice_client is None:
             _log("disconnect_skipped_no_client", guild_id=guild_id)
+            return
+
+        _log(
+            "disconnecting_voice_client",
+            guild_id=guild_id,
+            channel_id=getattr(voice_client.channel, "id", None),
+            connected=voice_client.is_connected(),
+        )
+        await voice_client.disconnect(force=True)
 
 
 def parse_speech_content(ctx: commands.Context, content: str) -> ParsedSpeech:

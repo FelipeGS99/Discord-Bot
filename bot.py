@@ -28,6 +28,7 @@ class DiscordBot(commands.Bot):
         intents.message_content = True
         intents.guilds = True
         intents.members = True
+        intents.voice_states = True
 
         super().__init__(command_prefix=settings.command_prefix, intents=intents, help_command=None)
 
