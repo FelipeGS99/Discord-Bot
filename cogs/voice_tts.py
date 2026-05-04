@@ -424,6 +424,8 @@ def _format_error(error: Exception) -> str:
     if isinstance(error, asyncio.TimeoutError):
         return "tempo limite ao conectar no canal de voz."
     message = str(error).strip()
+    if "davey library needed" in message.lower():
+        return "biblioteca de voz davey ausente no ambiente."
     return message or error.__class__.__name__
 
 
