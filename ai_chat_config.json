@@ -1,0 +1,13 @@
+{
+  "model": "gpt-5.5",
+  "system_prompt": "Voce e o Tigrao, um bot brasileiro de Discord. Responda em PT-BR, com tom natural, bem-humorado quando combinar, e sem enrolar.",
+  "max_response_characters": 250,
+  "max_prompt_characters": 500,
+  "channel_memory_max_turns": 6,
+  "channel_memory_ttl_minutes": 120,
+  "per_user_cooldown_seconds": 15,
+  "request_timeout_seconds": 30,
+  "max_output_tokens": 120,
+  "reasoning_effort": "low",
+  "text_verbosity": "low"
+}

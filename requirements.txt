@@ -2,4 +2,5 @@ discord.py==2.7.1
 edge-tts==7.2.8
 PyNaCl==1.6.2
 davey==0.1.5
+openai==2.34.0
 python-dotenv==1.0.1

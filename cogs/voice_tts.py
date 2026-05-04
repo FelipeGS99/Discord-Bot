@@ -144,19 +144,33 @@ class VoiceTTS(commands.Cog):
             await ctx.send("Nao tenho permissao para entrar e falar nesse canal de voz.")
             return
 
-        queue = self.queues.setdefault(ctx.guild.id, asyncio.Queue())
+        await self.enqueue_speech(
+            channel=parsed.channel,
+            text=parsed.text,
+            text_channel=ctx.channel,
+            requester_id=ctx.author.id,
+        )
+        await ctx.send("Mensagem adicionada na fila de voz.", delete_after=5)
+
+    async def enqueue_speech(
+        self,
+        channel: discord.VoiceChannel,
+        text: str,
+        text_channel: discord.abc.Messageable | None = None,
+        requester_id: int | None = None,
+    ) -> None:
+        guild_id = channel.guild.id
+        queue = self.queues.setdefault(guild_id, asyncio.Queue())
         await queue.put(
             SpeechRequest(
-                channel=parsed.channel,
-                text=parsed.text,
-                text_channel=ctx.channel,
-                requester_id=ctx.author.id,
+                channel=channel,
+                text=text,
+                text_channel=text_channel,
+                requester_id=requester_id,
             )
         )
-        if ctx.guild.id not in self.queue_tasks or self.queue_tasks[ctx.guild.id].done():
-            self.queue_tasks[ctx.guild.id] = asyncio.create_task(self._process_queue(ctx.guild.id))
-
-        await ctx.send("Mensagem adicionada na fila de voz.", delete_after=5)
+        if guild_id not in self.queue_tasks or self.queue_tasks[guild_id].done():
+            self.queue_tasks[guild_id] = asyncio.create_task(self._process_queue(guild_id))
 
     async def _process_queue(self, guild_id: int) -> None:
         queue = self.queues[guild_id]

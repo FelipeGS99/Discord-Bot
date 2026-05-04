@@ -19,6 +19,7 @@ COGS = (
     "cogs.esports",
     "cogs.telegram_alerts",
     "cogs.voice_tts",
+    "cogs.ai_chat",
 )
 
 

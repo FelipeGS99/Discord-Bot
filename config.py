@@ -18,6 +18,7 @@ class Settings:
     bsd_api_key: str | None
     pandascore_api_token: str | None
     telegram_bot_token: str | None
+    openai_api_key: str | None
     brasileirao_league_id: int
     libertadores_league_id: int
     sulamericana_league_id: int
@@ -37,6 +38,7 @@ settings = Settings(
     bsd_api_key=os.getenv("BSD_API_KEY") or os.getenv("API_FOOTBALL_KEY"),
     pandascore_api_token=os.getenv("PANDASCORE_API_TOKEN"),
     telegram_bot_token=os.getenv("TELEGRAM_BOT_TOKEN") or os.getenv("TELEGRAM_API_KEY"),
+    openai_api_key=os.getenv("OPENAI_API_KEY"),
     brasileirao_league_id=int(os.getenv("BRASILEIRAO_LEAGUE_ID", "9")),
     libertadores_league_id=int(os.getenv("LIBERTADORES_LEAGUE_ID", "32")),
     sulamericana_league_id=int(os.getenv("SULAMERICANA_LEAGUE_ID", "33")),
