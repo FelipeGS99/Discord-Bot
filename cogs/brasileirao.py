@@ -53,15 +53,15 @@ class Brasileirao(commands.Cog):
         await ctx.send(
             "\n".join(
                 [
-                    "**BrasileirÃ£o SÃ©rie A**",
-                    "Use para consultar jogos e configurar alertas automÃ¡ticos do BrasileirÃ£o.",
-                    f"`{prefix}brasileirao hoje` - Mostra jogos de hoje com horÃ¡rio, placar, status e gols quando disponÃ­vel.",
+                    "**Brasileirão Série A**",
+                    "Use para consultar jogos e configurar alertas automáticos do Brasileirão.",
+                    f"`{prefix}brasileirao hoje` - Mostra jogos de hoje com horário, placar, status e gols quando disponível.",
                     f"`{prefix}brasileirao atual` - Mostra a rodada atual do campeonato.",
-                    f"`{prefix}brasileirao proxima` - Mostra a prÃ³xima rodada.",
+                    f"`{prefix}brasileirao proxima` - Mostra a próxima rodada.",
                     f"`{prefix}brasileirao passada` - Mostra a rodada anterior.",
-                    f"`{prefix}brasileirao canal #canal` - Ativa alertas de inÃ­cio, gol, intervalo, volta de status e fim de jogo. Exemplo: `{prefix}brasileirao canal #placares`.",
+                    f"`{prefix}brasileirao canal #canal` - Ativa alertas de início, gol, intervalo, volta de status e fim de jogo. Exemplo: `{prefix}brasileirao canal #placares`.",
                     f"`{prefix}brasileirao status` - Mostra canal configurado, API, liga e cache atual.",
-                    f"`{prefix}brasileirao parar` - Desativa os alertas automÃ¡ticos do BrasileirÃ£o.",
+                    f"`{prefix}brasileirao parar` - Desativa os alertas automáticos do Brasileirão.",
                 ]
             )
         )
@@ -162,7 +162,7 @@ class Brasileirao(commands.Cog):
             await ctx.send("Nao encontrei a proxima rodada do Brasileirao Serie A.")
             return
 
-        await _send_embeds(ctx, self._build_round_embeds(round_fixtures, "proxima rodada"))
+        await _send_embeds(ctx, self._build_round_embeds(round_fixtures, "próxima rodada"))
 
     @brasileirao_group.command(name="status")
     async def status(self, ctx: commands.Context) -> None:
@@ -381,7 +381,7 @@ class Brasileirao(commands.Cog):
     @staticmethod
     def _build_round_embeds(fixtures: list[BrasileiraoFixture], label: str) -> list[discord.Embed]:
         round_number = fixtures[0].round_number
-        title = f"BrasileirÃ£o SÃ©rie A - {label}"
+        title = f"Brasileirão Série A - {label}"
         if round_number is not None:
             title = f"{title} {round_number}"
 
@@ -408,7 +408,7 @@ class Brasileirao(commands.Cog):
             description=_format_fixture_line(fixture),
             color=color_for_active_fixture(fixture, active_fixtures),
         )
-        embed.set_author(name="BrasileirÃ£o SÃ©rie A")
+        embed.set_author(name="Brasileirão Série A")
         if scorers:
             embed.add_field(name="Gols", value="\n".join(scorers), inline=False)
         return embed
@@ -424,7 +424,7 @@ def _format_fixture_title(fixture: BrasileiraoFixture) -> str:
 
 
 def _format_fixture_details(fixture: BrasileiraoFixture, scorers: list[str] | None = None) -> str:
-    status = fixture.status_long or fixture.status_short or "Status indisponÃ­vel"
+    status = fixture.status_long or fixture.status_short or "Status indisponível"
     elapsed = f" - {fixture.elapsed}'" if fixture.elapsed is not None else ""
     kickoff = f"\nData: <t:{int(fixture.kickoff_at.timestamp())}:f>" if fixture.kickoff_at is not None else ""
     scorers_line = f"\nGols:\n**{chr(10).join(scorers)}**" if scorers else ""

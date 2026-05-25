@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 
 from cogs.brasileirao import EMBED_COLOR as BRASILEIRAO_COLOR
 from cogs.brasileirao import Brasileirao
+from cogs.copadobrasil import CopaDoBrasil
 from cogs.football_colors import color_for_active_fixture, color_for_fixture
 from cogs.futebol import COMPETITIONS, Futebol
 from services.brasileirao_service import BrasileiraoFixture
@@ -47,6 +48,7 @@ class FootballEmbedTests(unittest.TestCase):
         embeds = Brasileirao._build_round_embeds(fixtures, "rodada atual")
 
         self.assertEqual(len(embeds), 2)
+        self.assertEqual(embeds[0].title, "Brasileirão Série A - rodada atual 1")
         self.assertEqual(embeds[0].color.value, BRASILEIRAO_COLOR)
         self.assertEqual(embeds[1].color.value, BRASILEIRAO_COLOR)
 
@@ -56,6 +58,14 @@ class FootballEmbedTests(unittest.TestCase):
         embed = Brasileirao._build_score_embed(fixture, reason="Atualizacao de placar")
 
         self.assertEqual(embed.color.value, color_for_fixture(fixture))
+        self.assertEqual(embed.author.name, "Brasileirão Série A")
+
+    def test_copa_do_brasil_embed_displays_utf8_fallback_status(self) -> None:
+        fixture = _fixture(1, "Sao Paulo", "Bahia", status_short="", status_long="")
+
+        embed = CopaDoBrasil._build_today_embeds([fixture])[0]
+
+        self.assertIn("Status indisponível", embed.fields[0].value)
 
     def test_single_match_score_embed_uses_active_fixture_color_when_available(self) -> None:
         fixtures = [_fixture(1, "Sao Paulo", "Bahia"), _fixture(2, "Flamengo", "Vasco da Gama")]
@@ -68,7 +78,13 @@ class FootballEmbedTests(unittest.TestCase):
         self.assertNotEqual(first_embed.color.value, second_embed.color.value)
 
 
-def _fixture(fixture_id: int, home_team: str, away_team: str) -> BrasileiraoFixture:
+def _fixture(
+    fixture_id: int,
+    home_team: str,
+    away_team: str,
+    status_short: str = "notstarted",
+    status_long: str = "Nao iniciado",
+) -> BrasileiraoFixture:
     return BrasileiraoFixture(
         fixture_id=fixture_id,
         league_id=1,
@@ -78,8 +94,8 @@ def _fixture(fixture_id: int, home_team: str, away_team: str) -> BrasileiraoFixt
         away_team=away_team,
         home_goals=None,
         away_goals=None,
-        status_short="notstarted",
-        status_long="Nao iniciado",
+        status_short=status_short,
+        status_long=status_long,
         elapsed=None,
         kickoff_at=datetime(2026, 5, 3, 19, 0, tzinfo=timezone.utc),
     )

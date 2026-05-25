@@ -284,6 +284,8 @@ def describe_fixture_update(
 
     if fixture.status_short == "halftime" and previous_status != "halftime":
         return "Intervalo"
+    if fixture.status_short == "2nd_half" and previous_status == "halftime":
+        return "Início do segundo tempo"
     if fixture.status_short == "finished" and previous_status != "finished":
         return "Fim de jogo"
     if fixture.is_live and previous_status == NOT_STARTED_STATUS_CODE:

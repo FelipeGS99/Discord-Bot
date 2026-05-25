@@ -238,7 +238,7 @@ class BrasileiraoServiceTests(unittest.TestCase):
 
         self.assertEqual(describe_fixture_update(fixture, "0|0|1st_half"), "Gol")
 
-    def test_describe_fixture_update_halftime_and_finished(self) -> None:
+    def test_describe_fixture_update_halftime_second_half_and_finished(self) -> None:
         halftime = parse_fixtures_response(
             {
                 "results": [
@@ -269,8 +269,24 @@ class BrasileiraoServiceTests(unittest.TestCase):
                 ]
             }
         )[0]
+        second_half = parse_fixtures_response(
+            {
+                "results": [
+                    {
+                        "id": 1,
+                        "league": {"id": 9, "name": "Brasileirao Serie A"},
+                        "home_team": "Time A",
+                        "away_team": "Time B",
+                        "home_score": 0,
+                        "away_score": 0,
+                        "status": "2nd_half",
+                    }
+                ]
+            }
+        )[0]
 
         self.assertEqual(describe_fixture_update(halftime, "0|0|1st_half"), "Intervalo")
+        self.assertEqual(describe_fixture_update(second_half, "0|0|halftime"), "Início do segundo tempo")
         self.assertEqual(describe_fixture_update(finished, "0|0|2nd_half"), "Fim de jogo")
 
     def test_state_repository_defaults_and_save_multiple_channels(self) -> None:

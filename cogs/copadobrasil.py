@@ -51,11 +51,11 @@ class CopaDoBrasil(commands.Cog):
             "\n".join(
                 [
                     "**Copa do Brasil**",
-                    "Use para consultar jogos e configurar alertas automÃ¡ticos da Copa do Brasil.",
-                    f"`{prefix}copadobrasil hoje` - Mostra jogos de hoje com horÃ¡rio, placar, status e gols quando disponÃ­vel.",
-                    f"`{prefix}copadobrasil canal #canal` - Ativa alertas de inÃ­cio, gol, intervalo, volta de status e fim de jogo. Exemplo: `{prefix}copadobrasil canal #placares`.",
+                    "Use para consultar jogos e configurar alertas automáticos da Copa do Brasil.",
+                    f"`{prefix}copadobrasil hoje` - Mostra jogos de hoje com horário, placar, status e gols quando disponível.",
+                    f"`{prefix}copadobrasil canal #canal` - Ativa alertas de início, gol, intervalo, volta de status e fim de jogo. Exemplo: `{prefix}copadobrasil canal #placares`.",
                     f"`{prefix}copadobrasil status` - Mostra canal configurado, API, liga e cache atual.",
-                    f"`{prefix}copadobrasil parar` - Desativa os alertas automÃ¡ticos da Copa do Brasil.",
+                    f"`{prefix}copadobrasil parar` - Desativa os alertas automáticos da Copa do Brasil.",
                 ]
             )
         )
@@ -333,7 +333,7 @@ def _format_fixture_title(fixture: BrasileiraoFixture) -> str:
 
 
 def _format_fixture_details(fixture: BrasileiraoFixture, scorers: list[str] | None = None) -> str:
-    status = fixture.status_long or fixture.status_short or "Status indisponÃ­vel"
+    status = fixture.status_long or fixture.status_short or "Status indisponível"
     elapsed = f" - {fixture.elapsed}'" if fixture.elapsed is not None else ""
     kickoff = f"\nData: <t:{int(fixture.kickoff_at.timestamp())}:f>" if fixture.kickoff_at is not None else ""
     scorers_line = f"\nGols:\n**{chr(10).join(scorers)}**" if scorers else ""
