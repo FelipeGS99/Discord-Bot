@@ -1,0 +1,39 @@
+{
+  "note": "Public Twitch metadata captured 2026-11-16. Online control is outside player catalog. Test player transitions are explicitly synthetic.",
+  "offline": {
+    "data": {
+      "user": {
+        "id": "129281939",
+        "login": "caps",
+        "displayName": "caps",
+        "description": "",
+        "broadcastSettings": {
+          "title": "A sudden caps stream appears"
+        },
+        "stream": null
+      }
+    }
+  },
+  "online_control": {
+    "data": {
+      "user": {
+        "id": "90075649",
+        "login": "illojuan",
+        "displayName": "IlloJuan",
+        "broadcastSettings": {
+          "title": "2 DÍAS 📅 ADIÓS GTA 5 👋🏻 QUE ALGUIEN ME PELLIZQUE 🥺 BUENOS AIRES ENDING 🥰 - Grand Theft Auto V #7 [FINAL]"
+        },
+        "stream": {
+          "id": "318368224356",
+          "type": "live",
+          "createdAt": "2026-11-16T18:41:08Z"
+        }
+      }
+    }
+  },
+  "missing_user": {
+    "data": {
+      "user": null
+    }
+  }
+}

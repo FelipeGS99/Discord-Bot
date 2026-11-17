@@ -48,6 +48,7 @@ class Moderation(commands.Cog):
                 f"`{prefix}sulamericana` - Jogos e alertas da Sul-Americana.",
                 f"`{prefix}copadobrasil` - Jogos e alertas da Copa do Brasil.",
                 f"`{prefix}lol` - Partidas e alertas de League of Legends.",
+                f"`{prefix}prolives` - Lives profissionais de LoL na Asia e na Twitch global.",
                 f"`{prefix}cs2` - Partidas e alertas de CS2.",
                 f"`{prefix}valorant` - Partidas e alertas de Valorant.",
                 f"`{prefix}genoticias` - Noticias de futebol do GE.",

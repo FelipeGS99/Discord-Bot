@@ -15,3 +15,7 @@ lol_state.json
 cs2_state.json
 valorant_state.json
 telegram_state.json
+pro_lives.sqlite3
+pro_lives.sqlite3-journal
+pro_lives.sqlite3-wal
+pro_lives.sqlite3-shm

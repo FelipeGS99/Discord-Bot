@@ -1,0 +1,1983 @@
+{
+  "schema_version": 1,
+  "players": [
+    {
+      "id": "flandre",
+      "name": "Flandre",
+      "team": "Bilibili Gaming",
+      "league": "LPL",
+      "division": 1,
+      "role": "TOP",
+      "active": true,
+      "verified_at": "2026-11-16T14:36:39Z",
+      "valid_until": "2026-11-17T00:00:00Z",
+      "roster_sources": [
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER100_INFO.js",
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM57_INFO.js"
+      ],
+      "channels": [
+        {
+          "platform": "huya",
+          "channel_id": "913004",
+          "verified_at": "2026-11-16T14:36:39Z",
+          "source_urls": [
+            "https://blog.huya.com/news/33511",
+            "https://www.huya.com/913004"
+          ],
+          "verification_note": "Associacao explicitamente publicada e identidade atual da sala conferida. Consulta com o adaptador existente retornou offline. Nao e garantia de uso regular ou de exclusividade desta conta."
+        }
+      ],
+      "competitive_status": "tier1",
+      "contract_status": "renewal_unconfirmed"
+    },
+    {
+      "id": "jiejie",
+      "name": "Jiejie",
+      "team": "EDward Gaming",
+      "league": "LPL",
+      "division": 1,
+      "role": "JUNGLE",
+      "active": true,
+      "verified_at": "2026-11-16T14:36:39Z",
+      "valid_until": "2026-11-23T14:36:39Z",
+      "roster_sources": [
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER2770_INFO.js",
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM1_INFO.js"
+      ],
+      "channels": [
+        {
+          "platform": "huya",
+          "channel_id": "913005",
+          "verified_at": "2026-11-16T14:36:39Z",
+          "source_urls": [
+            "https://blog.huya.com/news/33511",
+            "https://www.huya.com/913005"
+          ],
+          "verification_note": "Associacao explicitamente publicada e identidade atual da sala conferida. Consulta com o adaptador existente retornou offline. Nao e garantia de uso regular ou de exclusividade desta conta."
+        }
+      ],
+      "competitive_status": "tier1",
+      "contract_status": "unknown"
+    },
+    {
+      "id": "knight",
+      "name": "knight",
+      "team": "Bilibili Gaming",
+      "league": "LPL",
+      "division": 1,
+      "role": "MID",
+      "active": true,
+      "verified_at": "2026-11-16T14:36:39Z",
+      "valid_until": "2026-11-23T14:36:39Z",
+      "roster_sources": [
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER2562_INFO.js",
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM57_INFO.js"
+      ],
+      "channels": [
+        {
+          "platform": "huya",
+          "channel_id": "969689",
+          "verified_at": "2026-11-16T14:36:39Z",
+          "source_urls": [
+            "https://zh.wikipedia.org/wiki/%E5%8D%93%E5%AE%9A",
+            "https://www.huya.com/knight9",
+            "https://www.huya.com/969689"
+          ],
+          "verification_note": "Associacao explicitamente publicada e identidade atual da sala conferida. Consulta com o adaptador existente retornou offline. Nao e garantia de uso regular ou de exclusividade desta conta."
+        },
+        {
+          "platform": "bilibili",
+          "channel_id": "31934797",
+          "verified_at": "2026-11-16T16:49:58Z",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://space.bilibili.com/3546597304568306",
+            "https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=3546597304568306",
+            "https://api.live.bilibili.com/room/v1/Room/get_info?room_id=31934797",
+            "https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=31934797"
+          ],
+          "verification_note": "Perfil pessoal 3546597304568306 publicado pela fonte Mauro resolvido pela Bilibili para sala 31934797; UID titular conferido nas APIs de sala e perfil, com identificacao BLG. Consulta no adaptador existente reconheceu offline em 2026-11-16T16:49:58Z. UID de perfil nao foi usado como ID de sala."
+        }
+      ],
+      "competitive_status": "tier1",
+      "contract_status": "unknown"
+    },
+    {
+      "id": "jackeylove",
+      "name": "JackeyLove",
+      "team": "Top Esports",
+      "league": "LPL",
+      "division": 1,
+      "role": "ADC",
+      "active": true,
+      "verified_at": "2026-11-16T14:36:39Z",
+      "valid_until": "2026-11-23T14:36:39Z",
+      "roster_sources": [
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER1832_INFO.js",
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM42_INFO.js"
+      ],
+      "channels": [
+        {
+          "platform": "huya",
+          "channel_id": "111800",
+          "verified_at": "2026-11-16T14:36:39Z",
+          "source_urls": [
+            "https://www.bilibili.com/video/BV151p36DES1/",
+            "https://www.huya.com/111800"
+          ],
+          "verification_note": "Associacao explicitamente publicada e identidade atual da sala conferida. Consulta com o adaptador existente retornou offline. Nao e garantia de uso regular ou de exclusividade desta conta."
+        }
+      ],
+      "competitive_status": "tier1",
+      "contract_status": "unknown"
+    },
+    {
+      "id": "meiko",
+      "name": "Meiko",
+      "team": "Invictus Gaming",
+      "league": "LPL",
+      "division": 1,
+      "role": "SUPPORT",
+      "active": true,
+      "verified_at": "2026-11-16T14:36:39Z",
+      "valid_until": "2026-11-23T14:36:39Z",
+      "roster_sources": [
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER5_INFO.js",
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM2_INFO.js"
+      ],
+      "channels": [
+        {
+          "platform": "huya",
+          "channel_id": "913001",
+          "verified_at": "2026-11-16T14:36:39Z",
+          "source_urls": [
+            "https://blog.huya.com/news/33511",
+            "https://www.huya.com/913001"
+          ],
+          "verification_note": "Associacao explicitamente publicada e identidade atual da sala conferida. Consulta com o adaptador existente retornou offline. Nao e garantia de uso regular ou de exclusividade desta conta."
+        }
+      ],
+      "competitive_status": "tier1",
+      "contract_status": "unknown"
+    },
+    {
+      "id": "theshy",
+      "name": "TheShy",
+      "team": "Invictus Gaming",
+      "league": "LPL",
+      "division": 1,
+      "role": "TOP",
+      "active": true,
+      "verified_at": "2026-11-16T14:36:39Z",
+      "valid_until": "2026-11-23T14:36:39Z",
+      "roster_sources": [
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER1478_INFO.js",
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM2_INFO.js"
+      ],
+      "channels": [
+        {
+          "platform": "huya",
+          "channel_id": "991111",
+          "verified_at": "2026-11-16T14:36:39Z",
+          "source_urls": [
+            "https://zh.wikipedia.org/wiki/%E5%A7%9C%E6%89%BF%E9%8C%B2",
+            "https://www.huya.com/991111"
+          ],
+          "verification_note": "Associacao explicitamente publicada e identidade atual da sala conferida. Consulta com o adaptador existente retornou offline. Nao e garantia de uso regular ou de exclusividade desta conta."
+        }
+      ],
+      "competitive_status": "tier1",
+      "contract_status": "unknown"
+    },
+    {
+      "id": "kiin",
+      "name": "Kiin",
+      "team": "Gen.G",
+      "league": "LCK",
+      "division": 1,
+      "role": "TOP",
+      "active": true,
+      "verified_at": "2026-11-16T14:36:39Z",
+      "valid_until": "2026-11-23T14:36:39Z",
+      "roster_sources": [
+        "https://geng.gg/pages/league-of-legends"
+      ],
+      "channels": [
+        {
+          "platform": "soop",
+          "channel_id": "rldls5656",
+          "verified_at": "2026-11-16T14:36:39Z",
+          "source_urls": [
+            "https://geng.gg/pages/league-of-legends",
+            "https://bj.afreecatv.com/rldls5656"
+          ],
+          "verification_note": "Vinculo na pagina oficial da Gen.G; identidade confirmada no endpoint de estacao. Consulta corrigida em 16/11/2026 reconheceu RESULT=0 como offline apos validar a estacao. Estado online validado separadamente com transmissao publica de controle; nao foi observado inicio real de live deste jogador."
+        }
+      ],
+      "competitive_status": "tier1",
+      "contract_status": "unknown"
+    },
+    {
+      "id": "canyon",
+      "name": "Canyon",
+      "team": "Gen.G",
+      "league": "LCK",
+      "division": 1,
+      "role": "JUNGLE",
+      "active": true,
+      "verified_at": "2026-11-16T14:36:39Z",
+      "valid_until": "2026-11-23T14:36:39Z",
+      "roster_sources": [
+        "https://geng.gg/pages/league-of-legends"
+      ],
+      "channels": [
+        {
+          "platform": "soop",
+          "channel_id": "rjsqn0618",
+          "verified_at": "2026-11-16T14:36:39Z",
+          "source_urls": [
+            "https://geng.gg/pages/league-of-legends",
+            "https://bj.afreecatv.com/rjsqn0618"
+          ],
+          "verification_note": "Vinculo na pagina oficial da Gen.G; identidade confirmada no endpoint de estacao. Consulta corrigida em 16/11/2026 reconheceu RESULT=0 como offline apos validar a estacao. Estado online validado separadamente com transmissao publica de controle; nao foi observado inicio real de live deste jogador."
+        }
+      ],
+      "competitive_status": "tier1",
+      "contract_status": "unknown"
+    },
+    {
+      "id": "chovy",
+      "name": "Chovy",
+      "team": "Gen.G",
+      "league": "LCK",
+      "division": 1,
+      "role": "MID",
+      "active": true,
+      "verified_at": "2026-11-16T14:36:39Z",
+      "valid_until": "2026-11-23T14:36:39Z",
+      "roster_sources": [
+        "https://geng.gg/pages/league-of-legends"
+      ],
+      "channels": [
+        {
+          "platform": "soop",
+          "channel_id": "wlgnsdl0303",
+          "verified_at": "2026-11-16T14:36:39Z",
+          "source_urls": [
+            "https://geng.gg/pages/league-of-legends",
+            "https://bj.afreecatv.com/wlgnsdl0303"
+          ],
+          "verification_note": "Vinculo na pagina oficial da Gen.G; identidade confirmada no endpoint de estacao. Consulta corrigida em 16/11/2026 reconheceu RESULT=0 como offline apos validar a estacao. Estado online validado separadamente com transmissao publica de controle; nao foi observado inicio real de live deste jogador."
+        }
+      ],
+      "competitive_status": "tier1",
+      "contract_status": "unknown"
+    },
+    {
+      "id": "duro",
+      "name": "Duro",
+      "team": "Gen.G",
+      "league": "LCK",
+      "division": 1,
+      "role": "SUPPORT",
+      "active": true,
+      "verified_at": "2026-11-16T14:36:39Z",
+      "valid_until": "2026-11-23T14:36:39Z",
+      "roster_sources": [
+        "https://geng.gg/pages/league-of-legends"
+      ],
+      "channels": [
+        {
+          "platform": "soop",
+          "channel_id": "jmg3495",
+          "verified_at": "2026-11-16T14:36:39Z",
+          "source_urls": [
+            "https://geng.gg/pages/league-of-legends",
+            "https://ch.sooplive.co.kr/jmg3495"
+          ],
+          "verification_note": "Vinculo na pagina oficial da Gen.G; identidade confirmada no endpoint de estacao. Consulta corrigida em 16/11/2026 reconheceu RESULT=0 como offline apos validar a estacao. Estado online validado separadamente com transmissao publica de controle; nao foi observado inicio real de live deste jogador."
+        }
+      ],
+      "competitive_status": "tier1",
+      "contract_status": "unknown"
+    },
+    {
+      "id": "peyz",
+      "name": "Peyz",
+      "team": "T1",
+      "league": "LCK",
+      "division": 1,
+      "role": "ADC",
+      "active": true,
+      "verified_at": "2026-11-16T16:49:58Z",
+      "valid_until": "2026-11-23T16:49:58Z",
+      "roster_sources": [
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER4002_INFO.js",
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM692_INFO.js"
+      ],
+      "channels": [
+        {
+          "platform": "soop",
+          "channel_id": "rlantnghks",
+          "verified_at": "2026-11-16T16:49:58Z",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.sooplive.com/station/rlantnghks",
+            "https://api-channel.sooplive.com/v1.1/channel/rlantnghks/station"
+          ],
+          "verification_note": "Mauro associa explicitamente o jogador a esta estacao; userId conferido, nome 페이즈으 e selo Pro Gamer. Consulta no adaptador existente reconheceu offline em 2026-11-16T16:49:58Z. Equipe e posicao conferidas na fonte oficial."
+        }
+      ],
+      "competitive_status": "tier1",
+      "contract_status": "unknown"
+    },
+    {
+      "id": "faker",
+      "name": "Faker",
+      "team": "T1",
+      "league": "LCK",
+      "division": 1,
+      "role": "MID",
+      "active": true,
+      "verified_at": "2026-11-16T16:49:58Z",
+      "valid_until": "2026-11-23T16:49:58Z",
+      "roster_sources": [
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER1651_INFO.js",
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM692_INFO.js"
+      ],
+      "channels": [
+        {
+          "platform": "soop",
+          "channel_id": "leesh2148",
+          "verified_at": "2026-11-16T16:49:58Z",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.sooplive.com/station/leesh2148",
+            "https://api-channel.sooplive.com/v1.1/channel/leesh2148/station"
+          ],
+          "verification_note": "Mauro associa explicitamente o jogador a esta estacao; userId conferido, nome 고전파0 e selo Pro Gamer. Consulta no adaptador existente reconheceu offline em 2026-11-16T16:49:58Z. Equipe e posicao conferidas na fonte oficial."
+        }
+      ],
+      "competitive_status": "tier1",
+      "contract_status": "unknown"
+    },
+    {
+      "id": "siwoo",
+      "name": "Siwoo",
+      "team": "Dplus KIA",
+      "league": "LCK",
+      "division": 1,
+      "role": "TOP",
+      "active": true,
+      "verified_at": "2026-11-16T16:49:58Z",
+      "valid_until": "2026-11-23T16:49:58Z",
+      "roster_sources": [
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER1000866_INFO.js",
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM591_INFO.js"
+      ],
+      "channels": [
+        {
+          "platform": "soop",
+          "channel_id": "siwoojun1234",
+          "verified_at": "2026-11-16T16:49:58Z",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.sooplive.com/station/siwoojun1234",
+            "https://api-channel.sooplive.com/v1.1/channel/siwoojun1234/station"
+          ],
+          "verification_note": "Mauro associa explicitamente o jogador a esta estacao; userId conferido, nome DK시우 e selo Pro Gamer. Consulta no adaptador existente reconheceu offline em 2026-11-16T16:49:58Z. Equipe e posicao conferidas na fonte oficial."
+        }
+      ],
+      "competitive_status": "tier1",
+      "contract_status": "unknown"
+    },
+    {
+      "id": "doran",
+      "name": "Doran",
+      "team": "T1",
+      "league": "LCK",
+      "division": 1,
+      "role": "TOP",
+      "active": true,
+      "verified_at": "2026-11-16T16:49:58Z",
+      "valid_until": "2026-11-23T16:49:58Z",
+      "roster_sources": [
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER2829_INFO.js",
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM692_INFO.js"
+      ],
+      "channels": [
+        {
+          "platform": "soop",
+          "channel_id": "choi15778",
+          "verified_at": "2026-11-16T16:49:58Z",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.sooplive.com/station/choi15778",
+            "https://api-channel.sooplive.com/v1.1/channel/choi15778/station"
+          ],
+          "verification_note": "Mauro associa explicitamente o jogador a esta estacao; userId conferido, nome 도란도라아안 e selo Pro Gamer. Consulta no adaptador existente reconheceu offline em 2026-11-16T16:49:58Z. Equipe e posicao conferidas na fonte oficial."
+        }
+      ],
+      "competitive_status": "tier1",
+      "contract_status": "unknown"
+    },
+    {
+      "id": "perfect",
+      "name": "PerfecT",
+      "team": "KT Rolster",
+      "league": "LCK",
+      "division": 1,
+      "role": "TOP",
+      "active": true,
+      "verified_at": "2026-11-16T16:49:58Z",
+      "valid_until": "2026-11-23T16:49:58Z",
+      "roster_sources": [
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER4436_INFO.js",
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM21_INFO.js"
+      ],
+      "channels": [
+        {
+          "platform": "soop",
+          "channel_id": "nsmin1243",
+          "verified_at": "2026-11-16T16:49:58Z",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.sooplive.com/station/nsmin1243",
+            "https://api-channel.sooplive.com/v1.1/channel/nsmin1243/station"
+          ],
+          "verification_note": "Mauro associa explicitamente o jogador a esta estacao; userId conferido, nome PerfecT5 e selo Pro Gamer. Consulta no adaptador existente reconheceu offline em 2026-11-16T16:49:58Z. Equipe e posicao conferidas na fonte oficial."
+        }
+      ],
+      "competitive_status": "tier1",
+      "contract_status": "unknown"
+    },
+    {
+      "id": "lucid",
+      "name": "Lucid",
+      "team": "Dplus KIA",
+      "league": "LCK",
+      "division": 1,
+      "role": "JUNGLE",
+      "active": true,
+      "verified_at": "2026-11-16T16:49:58Z",
+      "valid_until": "2026-11-23T16:49:58Z",
+      "roster_sources": [
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER4432_INFO.js",
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM591_INFO.js"
+      ],
+      "channels": [
+        {
+          "platform": "soop",
+          "channel_id": "tagada008",
+          "verified_at": "2026-11-16T16:49:58Z",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.sooplive.com/station/tagada008",
+            "https://api-channel.sooplive.com/v1.1/channel/tagada008/station"
+          ],
+          "verification_note": "Mauro associa explicitamente o jogador a esta estacao; userId conferido, nome DK루시드 e selo Pro Gamer. Consulta no adaptador existente reconheceu offline em 2026-11-16T16:49:58Z. Equipe e posicao conferidas na fonte oficial."
+        }
+      ],
+      "competitive_status": "tier1",
+      "contract_status": "unknown"
+    },
+    {
+      "id": "oner",
+      "name": "Oner",
+      "team": "T1",
+      "league": "LCK",
+      "division": 1,
+      "role": "JUNGLE",
+      "active": true,
+      "verified_at": "2026-11-16T16:49:58Z",
+      "valid_until": "2026-11-23T16:49:58Z",
+      "roster_sources": [
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER3832_INFO.js",
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM692_INFO.js"
+      ],
+      "channels": [
+        {
+          "platform": "soop",
+          "channel_id": "ansguswns519",
+          "verified_at": "2026-11-16T16:49:58Z",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.sooplive.com/station/ansguswns519",
+            "https://api-channel.sooplive.com/v1.1/channel/ansguswns519/station"
+          ],
+          "verification_note": "Mauro associa explicitamente o jogador a esta estacao; userId conferido, nome onerrrr e selo Pro Gamer. Consulta no adaptador existente reconheceu offline em 2026-11-16T16:49:58Z. Equipe e posicao conferidas na fonte oficial."
+        }
+      ],
+      "competitive_status": "tier1",
+      "contract_status": "unknown"
+    },
+    {
+      "id": "cuzz",
+      "name": "Cuzz",
+      "team": "KT Rolster",
+      "league": "LCK",
+      "division": 1,
+      "role": "JUNGLE",
+      "active": true,
+      "verified_at": "2026-11-16T16:49:58Z",
+      "valid_until": "2026-11-23T16:49:58Z",
+      "roster_sources": [
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER1512_INFO.js",
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM21_INFO.js"
+      ],
+      "channels": [
+        {
+          "platform": "soop",
+          "channel_id": "yhk7737",
+          "verified_at": "2026-11-16T16:49:58Z",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.sooplive.com/station/yhk7737",
+            "https://api-channel.sooplive.com/v1.1/channel/yhk7737/station"
+          ],
+          "verification_note": "Mauro associa explicitamente o jogador a esta estacao; userId conferido, nome Cuzz e selo Pro Gamer. Consulta no adaptador existente reconheceu offline em 2026-11-16T16:49:58Z. Equipe e posicao conferidas na fonte oficial."
+        }
+      ],
+      "competitive_status": "tier1",
+      "contract_status": "unknown"
+    },
+    {
+      "id": "raptor",
+      "name": "Raptor",
+      "team": "BNK FearX",
+      "league": "LCK",
+      "division": 1,
+      "role": "JUNGLE",
+      "active": true,
+      "verified_at": "2026-11-16T16:49:58Z",
+      "valid_until": "2026-11-23T16:49:58Z",
+      "roster_sources": [
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER3766_INFO.js",
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM1130_INFO.js"
+      ],
+      "channels": [
+        {
+          "platform": "soop",
+          "channel_id": "jun25jin",
+          "verified_at": "2026-11-16T16:49:58Z",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.sooplive.com/station/jun25jin",
+            "https://api-channel.sooplive.com/v1.1/channel/jun25jin/station"
+          ],
+          "verification_note": "Mauro associa explicitamente o jogador a esta estacao; userId conferido, nome Raptorr e selo Pro Gamer. Consulta no adaptador existente reconheceu offline em 2026-11-16T16:49:58Z. Equipe e posicao conferidas na fonte oficial."
+        }
+      ],
+      "competitive_status": "tier1",
+      "contract_status": "unknown"
+    },
+    {
+      "id": "showmaker",
+      "name": "ShowMaker",
+      "team": "Dplus KIA",
+      "league": "LCK",
+      "division": 1,
+      "role": "MID",
+      "active": true,
+      "verified_at": "2026-11-16T16:49:58Z",
+      "valid_until": "2026-11-23T16:49:58Z",
+      "roster_sources": [
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER2832_INFO.js",
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM591_INFO.js"
+      ],
+      "channels": [
+        {
+          "platform": "soop",
+          "channel_id": "showmakerr",
+          "verified_at": "2026-11-16T16:49:58Z",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.sooplive.com/station/showmakerr",
+            "https://api-channel.sooplive.com/v1.1/channel/showmakerr/station"
+          ],
+          "verification_note": "Mauro associa explicitamente o jogador a esta estacao; userId conferido, nome DK쇼메쇼메 e selo Pro Gamer. Consulta no adaptador existente reconheceu offline em 2026-11-16T16:49:58Z. Equipe e posicao conferidas na fonte oficial."
+        }
+      ],
+      "competitive_status": "tier1",
+      "contract_status": "unknown"
+    },
+    {
+      "id": "bdd",
+      "name": "Bdd",
+      "team": "KT Rolster",
+      "league": "LCK",
+      "division": 1,
+      "role": "MID",
+      "active": true,
+      "verified_at": "2026-11-16T16:49:58Z",
+      "valid_until": "2026-11-23T16:49:58Z",
+      "roster_sources": [
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER1231_INFO.js",
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM21_INFO.js"
+      ],
+      "channels": [
+        {
+          "platform": "soop",
+          "channel_id": "s735258",
+          "verified_at": "2026-11-16T16:49:58Z",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.sooplive.com/station/s735258",
+            "https://api-channel.sooplive.com/v1.1/channel/s735258/station"
+          ],
+          "verification_note": "Mauro associa explicitamente o jogador a esta estacao; userId conferido, nome 비디디31 e selo Pro Gamer. Consulta no adaptador existente reconheceu offline em 2026-11-16T16:49:58Z. Equipe e posicao conferidas na fonte oficial."
+        }
+      ],
+      "competitive_status": "tier1",
+      "contract_status": "unknown"
+    },
+    {
+      "id": "smash",
+      "name": "Smash",
+      "team": "Dplus KIA",
+      "league": "LCK",
+      "division": 1,
+      "role": "ADC",
+      "active": true,
+      "verified_at": "2026-11-16T16:49:58Z",
+      "valid_until": "2026-11-23T16:49:58Z",
+      "roster_sources": [
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER1000838_INFO.js",
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM591_INFO.js"
+      ],
+      "channels": [
+        {
+          "platform": "soop",
+          "channel_id": "tlsrmawo",
+          "verified_at": "2026-11-16T16:49:58Z",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.sooplive.com/station/tlsrmawo",
+            "https://api-channel.sooplive.com/v1.1/channel/tlsrmawo/station"
+          ],
+          "verification_note": "Mauro associa explicitamente o jogador a esta estacao; userId conferido, nome DK스매쉬 e selo Pro Gamer. Consulta no adaptador existente reconheceu offline em 2026-11-16T16:49:58Z. Equipe e posicao conferidas na fonte oficial."
+        }
+      ],
+      "competitive_status": "tier1",
+      "contract_status": "unknown"
+    },
+    {
+      "id": "ruler",
+      "name": "Ruler",
+      "team": "Gen.G",
+      "league": "LCK",
+      "division": 1,
+      "role": "ADC",
+      "active": true,
+      "verified_at": "2026-11-16T16:49:58Z",
+      "valid_until": "2026-11-23T16:49:58Z",
+      "roster_sources": [
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER643_INFO.js",
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM137_INFO.js"
+      ],
+      "channels": [
+        {
+          "platform": "soop",
+          "channel_id": "pwh9811",
+          "verified_at": "2026-11-16T16:49:58Z",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.sooplive.com/station/pwh9811",
+            "https://api-channel.sooplive.com/v1.1/channel/pwh9811/station"
+          ],
+          "verification_note": "Mauro associa explicitamente o jogador a esta estacao; userId conferido, nome 룰러어 e selo Pro Gamer. Consulta no adaptador existente reconheceu offline em 2026-11-16T16:49:58Z. Equipe e posicao conferidas na fonte oficial."
+        }
+      ],
+      "competitive_status": "tier1",
+      "contract_status": "unknown"
+    },
+    {
+      "id": "career",
+      "name": "Career",
+      "team": "Dplus KIA",
+      "league": "LCK",
+      "division": 1,
+      "role": "SUPPORT",
+      "active": true,
+      "verified_at": "2026-11-16T16:49:58Z",
+      "valid_until": "2026-11-23T16:49:58Z",
+      "roster_sources": [
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER1000668_INFO.js",
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM591_INFO.js"
+      ],
+      "channels": [
+        {
+          "platform": "soop",
+          "channel_id": "pro20040829",
+          "verified_at": "2026-11-16T16:49:58Z",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.sooplive.com/station/pro20040829",
+            "https://api-channel.sooplive.com/v1.1/channel/pro20040829/station"
+          ],
+          "verification_note": "Mauro associa explicitamente o jogador a esta estacao; userId conferido, nome DK커리어 e selo Pro Gamer. Consulta no adaptador existente reconheceu offline em 2026-11-16T16:49:58Z. Equipe e posicao conferidas na fonte oficial."
+        }
+      ],
+      "competitive_status": "tier1",
+      "contract_status": "unknown"
+    },
+    {
+      "id": "keria",
+      "name": "Keria",
+      "team": "T1",
+      "league": "LCK",
+      "division": 1,
+      "role": "SUPPORT",
+      "active": true,
+      "verified_at": "2026-11-16T16:49:58Z",
+      "valid_until": "2026-11-23T16:49:58Z",
+      "roster_sources": [
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER3139_INFO.js",
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM692_INFO.js"
+      ],
+      "channels": [
+        {
+          "platform": "soop",
+          "channel_id": "fbalstjr1234",
+          "verified_at": "2026-11-16T16:49:58Z",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.sooplive.com/station/fbalstjr1234",
+            "https://api-channel.sooplive.com/v1.1/channel/fbalstjr1234/station"
+          ],
+          "verification_note": "Mauro associa explicitamente o jogador a esta estacao; userId conferido, nome 케리아아 e selo Pro Gamer. Consulta no adaptador existente reconheceu offline em 2026-11-16T16:49:58Z. Equipe e posicao conferidas na fonte oficial."
+        }
+      ],
+      "competitive_status": "tier1",
+      "contract_status": "unknown"
+    },
+    {
+      "id": "effort",
+      "name": "Effort",
+      "team": "KT Rolster",
+      "league": "LCK",
+      "division": 1,
+      "role": "SUPPORT",
+      "active": true,
+      "verified_at": "2026-11-16T16:49:58Z",
+      "valid_until": "2026-11-23T16:49:58Z",
+      "roster_sources": [
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER1876_INFO.js",
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM21_INFO.js"
+      ],
+      "channels": [
+        {
+          "platform": "soop",
+          "channel_id": "dltkdgh2000",
+          "verified_at": "2026-11-16T16:49:58Z",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.sooplive.com/station/dltkdgh2000",
+            "https://api-channel.sooplive.com/v1.1/channel/dltkdgh2000/station"
+          ],
+          "verification_note": "Mauro associa explicitamente o jogador a esta estacao; userId conferido, nome 에포트이상호 e selo Pro Gamer. Consulta no adaptador existente reconheceu offline em 2026-11-16T16:49:58Z. Equipe e posicao conferidas na fonte oficial."
+        }
+      ],
+      "competitive_status": "tier1",
+      "contract_status": "unknown"
+    },
+    {
+      "id": "369",
+      "name": "369",
+      "team": "Top Esports",
+      "league": "LPL",
+      "division": 1,
+      "role": "TOP",
+      "active": true,
+      "verified_at": "2026-11-16T16:49:58Z",
+      "valid_until": "2026-11-23T16:49:58Z",
+      "roster_sources": [
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER2147_INFO.js",
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM42_INFO.js"
+      ],
+      "channels": [
+        {
+          "platform": "huya",
+          "channel_id": "520369",
+          "verified_at": "2026-11-16T16:49:58Z",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.huya.com/video/u/1356069176",
+            "https://www.huya.com/bjh369",
+            "https://www.huya.com/520369"
+          ],
+          "verification_note": "Fonte Mauro aponta UID de videos 1356069176; o alias de live foi resolvido para sala canonica 520369, com o mesmo titular (JDG.369). Consulta no adaptador existente reconheceu offline em 2026-11-16T16:49:58Z. Equipe atual obtida da fonte oficial, independentemente do prefixo antigo da conta."
+        }
+      ],
+      "competitive_status": "tier1",
+      "contract_status": "unknown"
+    },
+    {
+      "id": "breathe",
+      "name": "Breathe",
+      "team": "Anyone's Legend",
+      "league": "LPL",
+      "division": 1,
+      "role": "TOP",
+      "active": true,
+      "verified_at": "2026-11-16T16:49:58Z",
+      "valid_until": "2026-11-23T16:49:58Z",
+      "roster_sources": [
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER3519_INFO.js",
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM422_INFO.js"
+      ],
+      "channels": [
+        {
+          "platform": "huya",
+          "channel_id": "390001",
+          "verified_at": "2026-11-16T16:49:58Z",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.huya.com/video/u/1590402724",
+            "https://www.huya.com/390001"
+          ],
+          "verification_note": "Fonte Mauro aponta UID de videos 1590402724; o alias de live foi resolvido para sala canonica 390001, com o mesmo titular (Breatheeee). Consulta no adaptador existente reconheceu offline em 2026-11-16T16:49:58Z. Equipe atual obtida da fonte oficial, independentemente do prefixo antigo da conta."
+        }
+      ],
+      "competitive_status": "tier1",
+      "contract_status": "unknown"
+    },
+    {
+      "id": "tian",
+      "name": "Tian",
+      "team": "Top Esports",
+      "league": "LPL",
+      "division": 1,
+      "role": "JUNGLE",
+      "active": true,
+      "verified_at": "2026-11-16T16:49:58Z",
+      "valid_until": "2026-11-23T16:49:58Z",
+      "roster_sources": [
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER1458_INFO.js",
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM42_INFO.js"
+      ],
+      "channels": [
+        {
+          "platform": "huya",
+          "channel_id": "594877",
+          "verified_at": "2026-11-16T16:49:58Z",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.huya.com/video/u/1504623021",
+            "https://www.huya.com/594877"
+          ],
+          "verification_note": "Fonte Mauro aponta UID de videos 1504623021; o alias de live foi resolvido para sala canonica 594877, com o mesmo titular (Tian高天亮). Consulta no adaptador existente reconheceu offline em 2026-11-16T16:49:58Z. Equipe atual obtida da fonte oficial, independentemente do prefixo antigo da conta."
+        }
+      ],
+      "competitive_status": "tier1",
+      "contract_status": "unknown"
+    },
+    {
+      "id": "bin",
+      "name": "Bin",
+      "team": "Bilibili Gaming",
+      "league": "LPL",
+      "division": 1,
+      "role": "TOP",
+      "active": true,
+      "verified_at": "2026-11-16T16:49:58Z",
+      "valid_until": "2026-11-23T16:49:58Z",
+      "roster_sources": [
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER2687_INFO.js",
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM57_INFO.js"
+      ],
+      "channels": [
+        {
+          "platform": "bilibili",
+          "channel_id": "13914640",
+          "verified_at": "2026-11-16T16:49:58Z",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://space.bilibili.com/325315550",
+            "https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=325315550",
+            "https://api.live.bilibili.com/room/v1/Room/get_info?room_id=13914640",
+            "https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=13914640"
+          ],
+          "verification_note": "Perfil pessoal 325315550 publicado pela fonte Mauro resolvido pela Bilibili para sala 13914640; UID titular conferido nas APIs de sala e perfil, com identificacao BLG. Consulta no adaptador existente reconheceu offline em 2026-11-16T16:49:58Z. UID de perfil nao foi usado como ID de sala."
+        }
+      ],
+      "competitive_status": "tier1",
+      "contract_status": "unknown"
+    },
+    {
+      "id": "viper",
+      "name": "Viper",
+      "team": "Bilibili Gaming",
+      "league": "LPL",
+      "division": 1,
+      "role": "ADC",
+      "active": true,
+      "verified_at": "2026-11-16T16:49:58Z",
+      "valid_until": "2026-11-17T00:00:00Z",
+      "roster_sources": [
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER193_INFO.js",
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM57_INFO.js"
+      ],
+      "channels": [
+        {
+          "platform": "bilibili",
+          "channel_id": "1880715130",
+          "verified_at": "2026-11-16T16:49:58Z",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://space.bilibili.com/3690988432263598",
+            "https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=3690988432263598",
+            "https://api.live.bilibili.com/room/v1/Room/get_info?room_id=1880715130",
+            "https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=1880715130",
+            "https://api.bilibili.com/x/web-interface/card?mid=3690988432263598"
+          ],
+          "verification_note": "Perfil pessoal 3690988432263598 publicado pela fonte Mauro resolvido pela Bilibili para sala 1880715130; UID titular conferido nas APIs de sala e perfil, com identificacao BLG. Consulta no adaptador existente reconheceu offline em 2026-11-16T16:49:58Z. UID de perfil nao foi usado como ID de sala."
+        }
+      ],
+      "competitive_status": "tier1",
+      "contract_status": "renewal_unconfirmed"
+    },
+    {
+      "id": "xun",
+      "name": "Xun",
+      "team": "Bilibili Gaming",
+      "league": "LPL",
+      "division": 1,
+      "role": "JUNGLE",
+      "active": true,
+      "verified_at": "2026-11-16T16:49:58Z",
+      "valid_until": "2026-11-23T16:49:58Z",
+      "roster_sources": [
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER3114_INFO.js",
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM57_INFO.js"
+      ],
+      "channels": [
+        {
+          "platform": "bilibili",
+          "channel_id": "26808302",
+          "verified_at": "2026-11-16T16:49:58Z",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://space.bilibili.com/594325484",
+            "https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=594325484",
+            "https://api.live.bilibili.com/room/v1/Room/get_info?room_id=26808302",
+            "https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=26808302"
+          ],
+          "verification_note": "Perfil pessoal 594325484 publicado pela fonte Mauro resolvido pela Bilibili para sala 26808302; UID titular conferido nas APIs de sala e perfil, com identificacao BLG. Consulta no adaptador existente reconheceu offline em 2026-11-16T16:49:58Z. UID de perfil nao foi usado como ID de sala."
+        }
+      ],
+      "competitive_status": "tier1",
+      "contract_status": "unknown"
+    },
+    {
+      "id": "on",
+      "name": "ON",
+      "team": "Bilibili Gaming",
+      "league": "LPL",
+      "division": 1,
+      "role": "SUPPORT",
+      "active": true,
+      "verified_at": "2026-11-16T16:49:58Z",
+      "valid_until": "2026-11-23T16:49:58Z",
+      "roster_sources": [
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER3509_INFO.js",
+        "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM57_INFO.js"
+      ],
+      "channels": [
+        {
+          "platform": "bilibili",
+          "channel_id": "26808227",
+          "verified_at": "2026-11-16T16:49:58Z",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://space.bilibili.com/398692774",
+            "https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=398692774",
+            "https://api.live.bilibili.com/room/v1/Room/get_info?room_id=26808227",
+            "https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=26808227"
+          ],
+          "verification_note": "Perfil pessoal 398692774 publicado pela fonte Mauro resolvido pela Bilibili para sala 26808227; UID titular conferido nas APIs de sala e perfil, com identificacao BLG. Consulta no adaptador existente reconheceu offline em 2026-11-16T16:49:58Z. UID de perfil nao foi usado como ID de sala."
+        }
+      ],
+      "competitive_status": "tier1",
+      "contract_status": "unknown"
+    },
+    {
+      "id": "oscarinin",
+      "name": "Oscarinin",
+      "team": "Nao informado pela fonte",
+      "league": "GLOBAL",
+      "division": null,
+      "role": "TOP",
+      "active": true,
+      "competitive_status": "unconfirmed",
+      "contract_status": "unknown",
+      "verified_at": "2026-11-16T23:48:46Z",
+      "valid_until": "2026-11-23T23:48:46Z",
+      "roster_sources": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers"
+      ],
+      "roster_note": "Jogador profissional identificado no catalogo Mauro. Equipe/posicao sao as informadas pela fonte, sem auditoria contratual; vinculo atual nao certificado. GLOBAL indica equipe/liga atual nao informada.",
+      "channels": [
+        {
+          "platform": "twitch",
+          "channel_id": "oscarinin",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.twitch.tv/Oscarinin"
+          ],
+          "user_id": "99334995",
+          "monitoring_status": "ready",
+          "verified_at": "2026-11-16T23:48:46Z",
+          "verification_note": "Associacao explicita publicada por Mauro; login e UID 99334995 confirmados pela Twitch. Consulta reconheceu offline em 2026-11-16T23:43:37.615946+00:00. Nao garante uso regular ou equipe atual."
+        }
+      ]
+    },
+    {
+      "id": "brokenblade",
+      "name": "BrokenBlade",
+      "team": "G2 Esports",
+      "league": "LEC",
+      "division": null,
+      "role": "TOP",
+      "active": true,
+      "competitive_status": "unconfirmed",
+      "contract_status": "unknown",
+      "verified_at": "2026-11-16T23:48:46Z",
+      "valid_until": "2026-11-23T23:48:46Z",
+      "roster_sources": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers"
+      ],
+      "roster_note": "Jogador profissional identificado no catalogo Mauro. Equipe/posicao sao as informadas pela fonte, sem auditoria contratual; vinculo atual nao certificado. GLOBAL indica equipe/liga atual nao informada.",
+      "channels": [
+        {
+          "platform": "twitch",
+          "channel_id": "brokenblade",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.twitch.tv/brokenblade"
+          ],
+          "user_id": "60461580",
+          "monitoring_status": "ready",
+          "verified_at": "2026-11-16T23:48:46Z",
+          "verification_note": "Associacao explicita publicada por Mauro; login e UID 60461580 confirmados pela Twitch. Consulta reconheceu offline em 2026-11-16T23:43:37.616022+00:00. Nao garante uso regular ou equipe atual."
+        }
+      ]
+    },
+    {
+      "id": "canna",
+      "name": "Canna",
+      "team": "Karmine Corp",
+      "league": "LEC",
+      "division": null,
+      "role": "TOP",
+      "active": true,
+      "competitive_status": "unconfirmed",
+      "contract_status": "unknown",
+      "verified_at": "2026-11-16T23:48:46Z",
+      "valid_until": "2026-11-23T23:48:46Z",
+      "roster_sources": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers"
+      ],
+      "roster_note": "Jogador profissional identificado no catalogo Mauro. Equipe/posicao sao as informadas pela fonte, sem auditoria contratual; vinculo atual nao certificado. GLOBAL indica equipe/liga atual nao informada.",
+      "channels": [
+        {
+          "platform": "twitch",
+          "channel_id": "canna",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.twitch.tv/canna"
+          ],
+          "user_id": "476354382",
+          "monitoring_status": "ready",
+          "verified_at": "2026-11-16T23:48:46Z",
+          "verification_note": "Associacao explicita publicada por Mauro; login e UID 476354382 confirmados pela Twitch. Consulta reconheceu offline em 2026-11-16T23:43:37.616039+00:00. Nao garante uso regular ou equipe atual."
+        }
+      ]
+    },
+    {
+      "id": "myrwn",
+      "name": "Myrwn",
+      "team": "Movistar KOI",
+      "league": "LEC",
+      "division": null,
+      "role": "TOP",
+      "active": true,
+      "competitive_status": "unconfirmed",
+      "contract_status": "unknown",
+      "verified_at": "2026-11-16T23:48:46Z",
+      "valid_until": "2026-11-23T23:48:46Z",
+      "roster_sources": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers"
+      ],
+      "roster_note": "Jogador profissional identificado no catalogo Mauro. Equipe/posicao sao as informadas pela fonte, sem auditoria contratual; vinculo atual nao certificado. GLOBAL indica equipe/liga atual nao informada.",
+      "channels": [
+        {
+          "platform": "twitch",
+          "channel_id": "myrwnn",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.twitch.tv/myrwnn"
+          ],
+          "user_id": "432895037",
+          "monitoring_status": "ready",
+          "verified_at": "2026-11-16T23:48:46Z",
+          "verification_note": "Associacao explicita publicada por Mauro; login e UID 432895037 confirmados pela Twitch. Consulta reconheceu offline em 2026-11-16T23:43:37.616050+00:00. Nao garante uso regular ou equipe atual."
+        }
+      ]
+    },
+    {
+      "id": "naak-nako",
+      "name": "Naak Nako",
+      "team": "Team Vitality",
+      "league": "LEC",
+      "division": null,
+      "role": "TOP",
+      "active": true,
+      "competitive_status": "unconfirmed",
+      "contract_status": "unknown",
+      "verified_at": "2026-11-16T23:48:46Z",
+      "valid_until": "2026-11-23T23:48:46Z",
+      "roster_sources": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers"
+      ],
+      "roster_note": "Jogador profissional identificado no catalogo Mauro. Equipe/posicao sao as informadas pela fonte, sem auditoria contratual; vinculo atual nao certificado. GLOBAL indica equipe/liga atual nao informada.",
+      "channels": [
+        {
+          "platform": "twitch",
+          "channel_id": "naaknako7",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.twitch.tv/naaknako7"
+          ],
+          "user_id": "724538269",
+          "monitoring_status": "ready",
+          "verified_at": "2026-11-16T23:48:46Z",
+          "verification_note": "Associacao explicita publicada por Mauro; login e UID 724538269 confirmados pela Twitch. Consulta reconheceu offline em 2026-11-16T23:43:37.616060+00:00. Nao garante uso regular ou equipe atual."
+        }
+      ]
+    },
+    {
+      "id": "razork",
+      "name": "Razork",
+      "team": "Fnatic",
+      "league": "LEC",
+      "division": null,
+      "role": "JUNGLE",
+      "active": true,
+      "competitive_status": "unconfirmed",
+      "contract_status": "unknown",
+      "verified_at": "2026-11-16T23:48:46Z",
+      "valid_until": "2026-11-23T23:48:46Z",
+      "roster_sources": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers"
+      ],
+      "roster_note": "Jogador profissional identificado no catalogo Mauro. Equipe/posicao sao as informadas pela fonte, sem auditoria contratual; vinculo atual nao certificado. GLOBAL indica equipe/liga atual nao informada.",
+      "channels": [
+        {
+          "platform": "twitch",
+          "channel_id": "razorklol",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.twitch.tv/razorklol"
+          ],
+          "user_id": "141449939",
+          "monitoring_status": "ready",
+          "verified_at": "2026-11-16T23:48:46Z",
+          "verification_note": "Associacao explicita publicada por Mauro; login e UID 141449939 confirmados pela Twitch. Consulta reconheceu offline em 2026-11-16T23:43:37.616077+00:00. Nao garante uso regular ou equipe atual."
+        }
+      ]
+    },
+    {
+      "id": "humanoid",
+      "name": "Humanoid",
+      "team": "Team Vitality",
+      "league": "LEC",
+      "division": null,
+      "role": "MID",
+      "active": true,
+      "competitive_status": "unconfirmed",
+      "contract_status": "unknown",
+      "verified_at": "2026-11-16T23:48:46Z",
+      "valid_until": "2026-11-23T23:48:46Z",
+      "roster_sources": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers"
+      ],
+      "roster_note": "Jogador profissional identificado no catalogo Mauro. Equipe/posicao sao as informadas pela fonte, sem auditoria contratual; vinculo atual nao certificado. GLOBAL indica equipe/liga atual nao informada.",
+      "channels": [
+        {
+          "platform": "twitch",
+          "channel_id": "humanoiidd",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.twitch.tv/humanoiidd"
+          ],
+          "monitoring_status": "pending",
+          "checked_at": "2026-11-16T23:48:46Z",
+          "pending_reason": "O login publicado pela fonte retornou usuario nao encontrado na Twitch; confirmar link atual. Nao representa estado offline."
+        }
+      ]
+    },
+    {
+      "id": "upset",
+      "name": "Upset",
+      "team": "Fnatic",
+      "league": "LEC",
+      "division": null,
+      "role": "ADC",
+      "active": true,
+      "competitive_status": "unconfirmed",
+      "contract_status": "unknown",
+      "verified_at": "2026-11-16T23:48:46Z",
+      "valid_until": "2026-11-23T23:48:46Z",
+      "roster_sources": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers"
+      ],
+      "roster_note": "Jogador profissional identificado no catalogo Mauro. Equipe/posicao sao as informadas pela fonte, sem auditoria contratual; vinculo atual nao certificado. GLOBAL indica equipe/liga atual nao informada.",
+      "channels": [
+        {
+          "platform": "twitch",
+          "channel_id": "upsetger",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.twitch.tv/upsetger"
+          ],
+          "user_id": "144750714",
+          "monitoring_status": "ready",
+          "verified_at": "2026-11-16T23:48:46Z",
+          "verification_note": "Associacao explicita publicada por Mauro; login e UID 144750714 confirmados pela Twitch. Consulta reconheceu offline em 2026-11-16T23:43:37.616092+00:00. Nao garante uso regular ou equipe atual."
+        }
+      ]
+    },
+    {
+      "id": "mikyx",
+      "name": "Mikyx",
+      "team": "SK Gaming",
+      "league": "LEC",
+      "division": null,
+      "role": "SUPPORT",
+      "active": true,
+      "competitive_status": "unconfirmed",
+      "contract_status": "unknown",
+      "verified_at": "2026-11-16T23:48:46Z",
+      "valid_until": "2026-11-23T23:48:46Z",
+      "roster_sources": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers"
+      ],
+      "roster_note": "Jogador profissional identificado no catalogo Mauro. Equipe/posicao sao as informadas pela fonte, sem auditoria contratual; vinculo atual nao certificado. GLOBAL indica equipe/liga atual nao informada.",
+      "channels": [
+        {
+          "platform": "twitch",
+          "channel_id": "m1kyx",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.twitch.tv/m1kyx"
+          ],
+          "user_id": "44905884",
+          "monitoring_status": "ready",
+          "verified_at": "2026-11-16T23:48:46Z",
+          "verification_note": "Associacao explicita publicada por Mauro; login e UID 44905884 confirmados pela Twitch. Consulta reconheceu offline em 2026-11-16T23:43:37.616102+00:00. Nao garante uso regular ou equipe atual."
+        }
+      ]
+    },
+    {
+      "id": "skewmond",
+      "name": "SkewMond",
+      "team": "G2 Esports",
+      "league": "LEC",
+      "division": null,
+      "role": "JUNGLE",
+      "active": true,
+      "competitive_status": "unconfirmed",
+      "contract_status": "unknown",
+      "verified_at": "2026-11-16T23:48:46Z",
+      "valid_until": "2026-11-23T23:48:46Z",
+      "roster_sources": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers"
+      ],
+      "roster_note": "Jogador profissional identificado no catalogo Mauro. Equipe/posicao sao as informadas pela fonte, sem auditoria contratual; vinculo atual nao certificado. GLOBAL indica equipe/liga atual nao informada.",
+      "channels": [
+        {
+          "platform": "twitch",
+          "channel_id": "skewmond_lol",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.twitch.tv/skewmond_lol"
+          ],
+          "user_id": "156068514",
+          "monitoring_status": "ready",
+          "verified_at": "2026-11-16T23:48:46Z",
+          "verification_note": "Associacao explicita publicada por Mauro; login e UID 156068514 confirmados pela Twitch. Consulta reconheceu offline em 2026-11-16T23:43:37.616110+00:00. Nao garante uso regular ou equipe atual."
+        }
+      ]
+    },
+    {
+      "id": "caps",
+      "name": "Caps",
+      "team": "G2 Esports",
+      "league": "LEC",
+      "division": null,
+      "role": "MID",
+      "active": true,
+      "competitive_status": "unconfirmed",
+      "contract_status": "unknown",
+      "verified_at": "2026-11-16T23:48:46Z",
+      "valid_until": "2026-11-23T23:48:46Z",
+      "roster_sources": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers"
+      ],
+      "roster_note": "Jogador profissional identificado no catalogo Mauro. Equipe/posicao sao as informadas pela fonte, sem auditoria contratual; vinculo atual nao certificado. GLOBAL indica equipe/liga atual nao informada.",
+      "channels": [
+        {
+          "platform": "twitch",
+          "channel_id": "caps",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.twitch.tv/caps"
+          ],
+          "user_id": "129281939",
+          "monitoring_status": "ready",
+          "verified_at": "2026-11-16T23:48:46Z",
+          "verification_note": "Associacao explicita publicada por Mauro; login e UID 129281939 confirmados pela Twitch. Consulta reconheceu offline em 2026-11-16T23:43:37.616118+00:00. Nao garante uso regular ou equipe atual."
+        }
+      ]
+    },
+    {
+      "id": "hans-sama",
+      "name": "Hans Sama",
+      "team": "G2 Esports",
+      "league": "LEC",
+      "division": null,
+      "role": "ADC",
+      "active": true,
+      "competitive_status": "unconfirmed",
+      "contract_status": "unknown",
+      "verified_at": "2026-11-16T23:48:46Z",
+      "valid_until": "2026-11-23T23:48:46Z",
+      "roster_sources": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers"
+      ],
+      "roster_note": "Jogador profissional identificado no catalogo Mauro. Equipe/posicao sao as informadas pela fonte, sem auditoria contratual; vinculo atual nao certificado. GLOBAL indica equipe/liga atual nao informada.",
+      "channels": [
+        {
+          "platform": "twitch",
+          "channel_id": "hanssama",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.twitch.tv/hanssama"
+          ],
+          "user_id": "46715307",
+          "monitoring_status": "ready",
+          "verified_at": "2026-11-16T23:48:46Z",
+          "verification_note": "Associacao explicita publicada por Mauro; login e UID 46715307 confirmados pela Twitch. Consulta reconheceu offline em 2026-11-16T23:43:37.616141+00:00. Nao garante uso regular ou equipe atual."
+        }
+      ]
+    },
+    {
+      "id": "jackies",
+      "name": "Jackies",
+      "team": "GIANTX",
+      "league": "LEC",
+      "division": null,
+      "role": "MID",
+      "active": true,
+      "competitive_status": "unconfirmed",
+      "contract_status": "unknown",
+      "verified_at": "2026-11-16T23:48:46Z",
+      "valid_until": "2026-11-23T23:48:46Z",
+      "roster_sources": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers"
+      ],
+      "roster_note": "Jogador profissional identificado no catalogo Mauro. Equipe/posicao sao as informadas pela fonte, sem auditoria contratual; vinculo atual nao certificado. GLOBAL indica equipe/liga atual nao informada.",
+      "channels": [
+        {
+          "platform": "twitch",
+          "channel_id": "jackissek",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.twitch.tv/jackissek"
+          ],
+          "monitoring_status": "pending",
+          "checked_at": "2026-11-16T23:48:46Z",
+          "pending_reason": "O login publicado pela fonte retornou usuario nao encontrado na Twitch; confirmar link atual. Nao representa estado offline."
+        }
+      ]
+    },
+    {
+      "id": "noah",
+      "name": "Noah",
+      "team": "GIANTX",
+      "league": "LEC",
+      "division": null,
+      "role": "ADC",
+      "active": true,
+      "competitive_status": "unconfirmed",
+      "contract_status": "unknown",
+      "verified_at": "2026-11-16T23:48:46Z",
+      "valid_until": "2026-11-23T23:48:46Z",
+      "roster_sources": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers"
+      ],
+      "roster_note": "Jogador profissional identificado no catalogo Mauro. Equipe/posicao sao as informadas pela fonte, sem auditoria contratual; vinculo atual nao certificado. GLOBAL indica equipe/liga atual nao informada.",
+      "channels": [
+        {
+          "platform": "twitch",
+          "channel_id": "krnoah7",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.twitch.tv/krnoah7"
+          ],
+          "user_id": "678349186",
+          "monitoring_status": "ready",
+          "verified_at": "2026-11-16T23:48:46Z",
+          "verification_note": "Associacao explicita publicada por Mauro; login e UID 678349186 confirmados pela Twitch. Consulta reconheceu offline em 2026-11-16T23:43:37.616159+00:00. Nao garante uso regular ou equipe atual."
+        }
+      ]
+    },
+    {
+      "id": "yike",
+      "name": "Yike",
+      "team": "Karmine Corp",
+      "league": "LEC",
+      "division": null,
+      "role": "JUNGLE",
+      "active": true,
+      "competitive_status": "unconfirmed",
+      "contract_status": "unknown",
+      "verified_at": "2026-11-16T23:48:46Z",
+      "valid_until": "2026-11-23T23:48:46Z",
+      "roster_sources": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers"
+      ],
+      "roster_note": "Jogador profissional identificado no catalogo Mauro. Equipe/posicao sao as informadas pela fonte, sem auditoria contratual; vinculo atual nao certificado. GLOBAL indica equipe/liga atual nao informada.",
+      "channels": [
+        {
+          "platform": "twitch",
+          "channel_id": "yikelol",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.twitch.tv/yikelol"
+          ],
+          "user_id": "41124654",
+          "monitoring_status": "ready",
+          "verified_at": "2026-11-16T23:48:46Z",
+          "verification_note": "Associacao explicita publicada por Mauro; login e UID 41124654 confirmados pela Twitch. Consulta reconheceu offline em 2026-11-16T23:43:37.616166+00:00. Nao garante uso regular ou equipe atual."
+        }
+      ]
+    },
+    {
+      "id": "caliste",
+      "name": "Caliste",
+      "team": "Karmine Corp",
+      "league": "LEC",
+      "division": null,
+      "role": "ADC",
+      "active": true,
+      "competitive_status": "unconfirmed",
+      "contract_status": "unknown",
+      "verified_at": "2026-11-16T23:48:46Z",
+      "valid_until": "2026-11-23T23:48:46Z",
+      "roster_sources": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers"
+      ],
+      "roster_note": "Jogador profissional identificado no catalogo Mauro. Equipe/posicao sao as informadas pela fonte, sem auditoria contratual; vinculo atual nao certificado. GLOBAL indica equipe/liga atual nao informada.",
+      "channels": [
+        {
+          "platform": "twitch",
+          "channel_id": "caliste_lol",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.twitch.tv/caliste_lol"
+          ],
+          "user_id": "203986266",
+          "monitoring_status": "ready",
+          "verified_at": "2026-11-16T23:48:46Z",
+          "verification_note": "Associacao explicita publicada por Mauro; login e UID 203986266 confirmados pela Twitch. Consulta reconheceu offline em 2026-11-16T23:43:37.616174+00:00. Nao garante uso regular ou equipe atual."
+        }
+      ]
+    },
+    {
+      "id": "targamas",
+      "name": "Targamas",
+      "team": "Team BDS",
+      "league": "LEC",
+      "division": null,
+      "role": "SUPPORT",
+      "active": true,
+      "competitive_status": "unconfirmed",
+      "contract_status": "unknown",
+      "verified_at": "2026-11-16T23:48:46Z",
+      "valid_until": "2026-11-23T23:48:46Z",
+      "roster_sources": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers"
+      ],
+      "roster_note": "Jogador profissional identificado no catalogo Mauro. Equipe/posicao sao as informadas pela fonte, sem auditoria contratual; vinculo atual nao certificado. GLOBAL indica equipe/liga atual nao informada.",
+      "channels": [
+        {
+          "platform": "twitch",
+          "channel_id": "targamas1",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.twitch.tv/targamas1"
+          ],
+          "user_id": "139887547",
+          "monitoring_status": "ready",
+          "verified_at": "2026-11-16T23:48:46Z",
+          "verification_note": "Associacao explicita publicada por Mauro; login e UID 139887547 confirmados pela Twitch. Consulta reconheceu offline em 2026-11-16T23:43:37.616183+00:00. Nao garante uso regular ou equipe atual."
+        }
+      ]
+    },
+    {
+      "id": "elyoya",
+      "name": "Elyoya",
+      "team": "Movistar KOI",
+      "league": "LEC",
+      "division": null,
+      "role": "JUNGLE",
+      "active": true,
+      "competitive_status": "unconfirmed",
+      "contract_status": "unknown",
+      "verified_at": "2026-11-16T23:48:46Z",
+      "valid_until": "2026-11-23T23:48:46Z",
+      "roster_sources": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers"
+      ],
+      "roster_note": "Jogador profissional identificado no catalogo Mauro. Equipe/posicao sao as informadas pela fonte, sem auditoria contratual; vinculo atual nao certificado. GLOBAL indica equipe/liga atual nao informada.",
+      "channels": [
+        {
+          "platform": "twitch",
+          "channel_id": "elyoyalol",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.twitch.tv/elyoyalol"
+          ],
+          "user_id": "427520929",
+          "monitoring_status": "ready",
+          "verified_at": "2026-11-16T23:48:46Z",
+          "verification_note": "Associacao explicita publicada por Mauro; login e UID 427520929 confirmados pela Twitch. Consulta reconheceu offline em 2026-11-16T23:43:37.616191+00:00. Nao garante uso regular ou equipe atual."
+        }
+      ]
+    },
+    {
+      "id": "jojopyun",
+      "name": "Jojopyun",
+      "team": "Movistar KOI",
+      "league": "LEC",
+      "division": null,
+      "role": "MID",
+      "active": true,
+      "competitive_status": "unconfirmed",
+      "contract_status": "unknown",
+      "verified_at": "2026-11-16T23:48:46Z",
+      "valid_until": "2026-11-23T23:48:46Z",
+      "roster_sources": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers"
+      ],
+      "roster_note": "Jogador profissional identificado no catalogo Mauro. Equipe/posicao sao as informadas pela fonte, sem auditoria contratual; vinculo atual nao certificado. GLOBAL indica equipe/liga atual nao informada.",
+      "channels": [
+        {
+          "platform": "twitch",
+          "channel_id": "jojopyun",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.twitch.tv/jojopyun"
+          ],
+          "user_id": "404773370",
+          "monitoring_status": "ready",
+          "verified_at": "2026-11-16T23:48:46Z",
+          "verification_note": "Associacao explicita publicada por Mauro; login e UID 404773370 confirmados pela Twitch. Consulta reconheceu offline em 2026-11-16T23:43:37.616199+00:00. Nao garante uso regular ou equipe atual."
+        }
+      ]
+    },
+    {
+      "id": "supa",
+      "name": "Supa",
+      "team": "Movistar KOI",
+      "league": "LEC",
+      "division": null,
+      "role": "ADC",
+      "active": true,
+      "competitive_status": "unconfirmed",
+      "contract_status": "unknown",
+      "verified_at": "2026-11-16T23:48:46Z",
+      "valid_until": "2026-11-23T23:48:46Z",
+      "roster_sources": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers"
+      ],
+      "roster_note": "Jogador profissional identificado no catalogo Mauro. Equipe/posicao sao as informadas pela fonte, sem auditoria contratual; vinculo atual nao certificado. GLOBAL indica equipe/liga atual nao informada.",
+      "channels": [
+        {
+          "platform": "twitch",
+          "channel_id": "supa_lol",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.twitch.tv/supa_lol"
+          ],
+          "user_id": "413584085",
+          "monitoring_status": "ready",
+          "verified_at": "2026-11-16T23:48:46Z",
+          "verification_note": "Associacao explicita publicada por Mauro; login e UID 413584085 confirmados pela Twitch. Consulta reconheceu offline em 2026-11-16T23:43:37.616208+00:00. Nao garante uso regular ou equipe atual."
+        }
+      ]
+    },
+    {
+      "id": "alvaro",
+      "name": "Alvaro",
+      "team": "Movistar KOI",
+      "league": "LEC",
+      "division": null,
+      "role": "SUPPORT",
+      "active": true,
+      "competitive_status": "unconfirmed",
+      "contract_status": "unknown",
+      "verified_at": "2026-11-16T23:48:46Z",
+      "valid_until": "2026-11-23T23:48:46Z",
+      "roster_sources": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers"
+      ],
+      "roster_note": "Jogador profissional identificado no catalogo Mauro. Equipe/posicao sao as informadas pela fonte, sem auditoria contratual; vinculo atual nao certificado. GLOBAL indica equipe/liga atual nao informada.",
+      "channels": [
+        {
+          "platform": "twitch",
+          "channel_id": "alvaro710x",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.twitch.tv/alvaro710x"
+          ],
+          "user_id": "140153834",
+          "monitoring_status": "ready",
+          "verified_at": "2026-11-16T23:48:46Z",
+          "verification_note": "Associacao explicita publicada por Mauro; login e UID 140153834 confirmados pela Twitch. Consulta reconheceu offline em 2026-11-16T23:43:38.892179+00:00. Nao garante uso regular ou equipe atual."
+        }
+      ]
+    },
+    {
+      "id": "nuc",
+      "name": "Nuc",
+      "team": "Shifters",
+      "league": "LEC",
+      "division": null,
+      "role": "MID",
+      "active": true,
+      "competitive_status": "unconfirmed",
+      "contract_status": "unknown",
+      "verified_at": "2026-11-16T23:48:46Z",
+      "valid_until": "2026-11-23T23:48:46Z",
+      "roster_sources": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers"
+      ],
+      "roster_note": "Jogador profissional identificado no catalogo Mauro. Equipe/posicao sao as informadas pela fonte, sem auditoria contratual; vinculo atual nao certificado. GLOBAL indica equipe/liga atual nao informada.",
+      "channels": [
+        {
+          "platform": "twitch",
+          "channel_id": "nuclearintt",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.twitch.tv/nuclearintt"
+          ],
+          "monitoring_status": "pending",
+          "checked_at": "2026-11-16T23:48:46Z",
+          "pending_reason": "O login publicado pela fonte retornou usuario nao encontrado na Twitch; confirmar link atual. Nao representa estado offline."
+        }
+      ]
+    },
+    {
+      "id": "sheo",
+      "name": "Sheo",
+      "team": "Team Heretics",
+      "league": "LEC",
+      "division": null,
+      "role": "JUNGLE",
+      "active": true,
+      "competitive_status": "unconfirmed",
+      "contract_status": "unknown",
+      "verified_at": "2026-11-16T23:48:46Z",
+      "valid_until": "2026-11-23T23:48:46Z",
+      "roster_sources": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers"
+      ],
+      "roster_note": "Jogador profissional identificado no catalogo Mauro. Equipe/posicao sao as informadas pela fonte, sem auditoria contratual; vinculo atual nao certificado. GLOBAL indica equipe/liga atual nao informada.",
+      "channels": [
+        {
+          "platform": "twitch",
+          "channel_id": "sheo_lol",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.twitch.tv/sheo_lol"
+          ],
+          "user_id": "539047450",
+          "monitoring_status": "ready",
+          "verified_at": "2026-11-16T23:48:46Z",
+          "verification_note": "Associacao explicita publicada por Mauro; login e UID 539047450 confirmados pela Twitch. Consulta reconheceu offline em 2026-11-16T23:43:38.892257+00:00. Nao garante uso regular ou equipe atual."
+        }
+      ]
+    },
+    {
+      "id": "flakked",
+      "name": "Flakked",
+      "team": "GIANTX",
+      "league": "LEC",
+      "division": null,
+      "role": "ADC",
+      "active": true,
+      "competitive_status": "unconfirmed",
+      "contract_status": "unknown",
+      "verified_at": "2026-11-16T23:48:46Z",
+      "valid_until": "2026-11-23T23:48:46Z",
+      "roster_sources": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers"
+      ],
+      "roster_note": "Jogador profissional identificado no catalogo Mauro. Equipe/posicao sao as informadas pela fonte, sem auditoria contratual; vinculo atual nao certificado. GLOBAL indica equipe/liga atual nao informada.",
+      "channels": [
+        {
+          "platform": "twitch",
+          "channel_id": "getflakked",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.twitch.tv/getFlakked"
+          ],
+          "user_id": "159785521",
+          "monitoring_status": "ready",
+          "verified_at": "2026-11-16T23:48:46Z",
+          "verification_note": "Associacao explicita publicada por Mauro; login e UID 159785521 confirmados pela Twitch. Consulta reconheceu offline em 2026-11-16T23:43:38.892268+00:00. Nao garante uso regular ou equipe atual."
+        }
+      ]
+    },
+    {
+      "id": "lyncas",
+      "name": "Lyncas",
+      "team": "Team Vitality",
+      "league": "LEC",
+      "division": null,
+      "role": "JUNGLE",
+      "active": true,
+      "competitive_status": "unconfirmed",
+      "contract_status": "unknown",
+      "verified_at": "2026-11-16T23:48:46Z",
+      "valid_until": "2026-11-23T23:48:46Z",
+      "roster_sources": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers"
+      ],
+      "roster_note": "Jogador profissional identificado no catalogo Mauro. Equipe/posicao sao as informadas pela fonte, sem auditoria contratual; vinculo atual nao certificado. GLOBAL indica equipe/liga atual nao informada.",
+      "channels": [
+        {
+          "platform": "twitch",
+          "channel_id": "lyncaslol",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.twitch.tv/lyncaslol"
+          ],
+          "user_id": "143357902",
+          "monitoring_status": "ready",
+          "verified_at": "2026-11-16T23:48:46Z",
+          "verification_note": "Associacao explicita publicada por Mauro; login e UID 143357902 confirmados pela Twitch. Consulta reconheceu offline em 2026-11-16T23:43:38.892284+00:00. Nao garante uso regular ou equipe atual."
+        }
+      ]
+    },
+    {
+      "id": "carzzy",
+      "name": "Carzzy",
+      "team": "Team Vitality",
+      "league": "LEC",
+      "division": null,
+      "role": "ADC",
+      "active": true,
+      "competitive_status": "unconfirmed",
+      "contract_status": "unknown",
+      "verified_at": "2026-11-16T23:48:46Z",
+      "valid_until": "2026-11-23T23:48:46Z",
+      "roster_sources": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers"
+      ],
+      "roster_note": "Jogador profissional identificado no catalogo Mauro. Equipe/posicao sao as informadas pela fonte, sem auditoria contratual; vinculo atual nao certificado. GLOBAL indica equipe/liga atual nao informada.",
+      "channels": [
+        {
+          "platform": "twitch",
+          "channel_id": "carzzy",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.twitch.tv/carzzy"
+          ],
+          "user_id": "58196006",
+          "monitoring_status": "ready",
+          "verified_at": "2026-11-16T23:48:46Z",
+          "verification_note": "Associacao explicita publicada por Mauro; login e UID 58196006 confirmados pela Twitch. Consulta reconheceu offline em 2026-11-16T23:43:38.892296+00:00. Nao garante uso regular ou equipe atual."
+        }
+      ]
+    },
+    {
+      "id": "hylissang",
+      "name": "Hylissang",
+      "team": "Nao informado pela fonte",
+      "league": "GLOBAL",
+      "division": null,
+      "role": "SUPPORT",
+      "active": true,
+      "competitive_status": "unconfirmed",
+      "contract_status": "unknown",
+      "verified_at": "2026-11-16T23:48:46Z",
+      "valid_until": "2026-11-23T23:48:46Z",
+      "roster_sources": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers"
+      ],
+      "roster_note": "Jogador profissional identificado no catalogo Mauro. Equipe/posicao sao as informadas pela fonte, sem auditoria contratual; vinculo atual nao certificado. GLOBAL indica equipe/liga atual nao informada.",
+      "channels": [
+        {
+          "platform": "twitch",
+          "channel_id": "hylissanglol",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.twitch.tv/hylissanglol"
+          ],
+          "user_id": "185851694",
+          "monitoring_status": "ready",
+          "verified_at": "2026-11-16T23:48:46Z",
+          "verification_note": "Associacao explicita publicada por Mauro; login e UID 185851694 confirmados pela Twitch. Consulta reconheceu offline em 2026-11-16T23:43:38.892307+00:00. Nao garante uso regular ou equipe atual."
+        }
+      ]
+    },
+    {
+      "id": "busio",
+      "name": "Busio",
+      "team": "Karmine Corp",
+      "league": "LEC",
+      "division": null,
+      "role": "SUPPORT",
+      "active": true,
+      "competitive_status": "unconfirmed",
+      "contract_status": "unknown",
+      "verified_at": "2026-11-16T23:48:46Z",
+      "valid_until": "2026-11-23T23:48:46Z",
+      "roster_sources": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers"
+      ],
+      "roster_note": "Jogador profissional identificado no catalogo Mauro. Equipe/posicao sao as informadas pela fonte, sem auditoria contratual; vinculo atual nao certificado. GLOBAL indica equipe/liga atual nao informada.",
+      "channels": [
+        {
+          "platform": "twitch",
+          "channel_id": "busiolol",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.twitch.tv/busiolol"
+          ],
+          "user_id": "137761685",
+          "monitoring_status": "ready",
+          "verified_at": "2026-11-16T23:48:46Z",
+          "verification_note": "Associacao explicita publicada por Mauro; login e UID 137761685 confirmados pela Twitch. Consulta reconheceu offline em 2026-11-16T23:43:38.892318+00:00. Nao garante uso regular ou equipe atual."
+        }
+      ]
+    },
+    {
+      "id": "jopa",
+      "name": "Jopa",
+      "team": "Nao informado pela fonte",
+      "league": "GLOBAL",
+      "division": null,
+      "role": "ADC",
+      "active": true,
+      "competitive_status": "unconfirmed",
+      "contract_status": "unknown",
+      "verified_at": "2026-11-16T23:48:46Z",
+      "valid_until": "2026-11-23T23:48:46Z",
+      "roster_sources": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers"
+      ],
+      "roster_note": "Jogador profissional identificado no catalogo Mauro. Equipe/posicao sao as informadas pela fonte, sem auditoria contratual; vinculo atual nao certificado. GLOBAL indica equipe/liga atual nao informada.",
+      "channels": [
+        {
+          "platform": "twitch",
+          "channel_id": "adcjopa",
+          "source_urls": [
+            "https://www.maurogarih.com/en/herramientas/streamers",
+            "https://www.maurogarih.com/api/streamers",
+            "https://www.twitch.tv/adcjopa"
+          ],
+          "user_id": "188656545",
+          "monitoring_status": "ready",
+          "verified_at": "2026-11-16T23:48:46Z",
+          "verification_note": "Associacao explicita publicada por Mauro; login e UID 188656545 confirmados pela Twitch. Consulta reconheceu offline em 2026-11-16T23:43:38.892326+00:00. Nao garante uso regular ou equipe atual."
+        }
+      ]
+    }
+  ]
+}

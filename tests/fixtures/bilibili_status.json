@@ -1,0 +1,154 @@
+{
+  "captured_at": "2026-11-16",
+  "note": "Public room metadata only. Online control is outside the player catalog. Player live transitions in tests are explicitly simulated, not observed.",
+  "online_control": {
+    "requested_id": "5067",
+    "directory": "https://api.live.bilibili.com/xlive/web-interface/v1/webMain/getList?platform=web",
+    "at": "2026-11-16T17:07:25.194516+00:00",
+    "outside_catalog": true,
+    "canonical_id": "5067",
+    "response": {
+      "code": 0,
+      "data": {
+        "uid": 227933,
+        "room_id": 5067,
+        "short_id": 1000,
+        "live_status": 1,
+        "live_time": "2026-11-16 21:36:05",
+        "title": "【坂本】开肝"
+      }
+    },
+    "parsed": {
+      "live": true,
+      "session_id": "2026-11-16 21:36:05",
+      "title": "【坂本】开肝"
+    },
+    "adapter": {
+      "live": true,
+      "session_id": "2026-11-16 21:36:05",
+      "title": "【坂本】开肝"
+    }
+  },
+  "offline_players": [
+    {
+      "player": "knight",
+      "channel_id": "31934797",
+      "response": {
+        "code": 0,
+        "data": {
+          "uid": 3546597304568306,
+          "room_id": 31934797,
+          "short_id": 0,
+          "live_status": 0,
+          "live_time": "0000-00-00 00:00:00",
+          "title": "聊聊天"
+        }
+      }
+    },
+    {
+      "player": "bin",
+      "channel_id": "13914640",
+      "response": {
+        "code": 0,
+        "data": {
+          "uid": 325315550,
+          "room_id": 13914640,
+          "short_id": 0,
+          "live_status": 0,
+          "live_time": "0000-00-00 00:00:00",
+          "title": "播一会"
+        }
+      }
+    },
+    {
+      "player": "viper",
+      "channel_id": "1880715130",
+      "response": {
+        "code": 0,
+        "data": {
+          "uid": 3690988432263598,
+          "room_id": 1880715130,
+          "short_id": 0,
+          "live_status": 0,
+          "live_time": "0000-00-00 00:00:00",
+          "title": "好久不见"
+        }
+      }
+    },
+    {
+      "player": "xun",
+      "channel_id": "26808302",
+      "response": {
+        "code": 0,
+        "data": {
+          "uid": 594325484,
+          "room_id": 26808302,
+          "short_id": 0,
+          "live_status": 0,
+          "live_time": "0000-00-00 00:00:00",
+          "title": "直播会"
+        }
+      }
+    },
+    {
+      "player": "on",
+      "channel_id": "26808227",
+      "response": {
+        "code": 0,
+        "data": {
+          "uid": 398692774,
+          "room_id": 26808227,
+          "short_id": 0,
+          "live_status": 0,
+          "live_time": "0000-00-00 00:00:00",
+          "title": "纽约户外"
+        }
+      }
+    }
+  ],
+  "replay_control": {
+    "kind": "original_control_recheck",
+    "channel_id": "5067",
+    "at": "2026-11-16T17:15:41.587286+00:00",
+    "response": {
+      "code": 0,
+      "data": {
+        "uid": 227933,
+        "room_id": 5067,
+        "short_id": 1000,
+        "live_status": 2,
+        "live_time": "0000-00-00 00:00:00",
+        "title": "【坂本】开肝"
+      }
+    },
+    "adapter": {
+      "live": false,
+      "session_id": "",
+      "title": ""
+    }
+  },
+  "online_control_after_fix": {
+    "kind": "new_online_control_after_parser_fix",
+    "directory": "https://api.live.bilibili.com/xlive/web-interface/v1/webMain/getList?platform=web",
+    "outside_catalog": true,
+    "at": "2026-11-16T17:15:44.749449+00:00",
+    "requested_id": "1713545054",
+    "canonical_id": "1713545054",
+    "response": {
+      "code": 0,
+      "data": {
+        "uid": 3690982725913434,
+        "room_id": 1713545054,
+        "short_id": 0,
+        "live_status": 1,
+        "live_time": "2026-11-16 07:59:43",
+        "title": "纯女声优质点唱 一个很来财的点唱厅"
+      }
+    },
+    "adapter": {
+      "live": true,
+      "session_id": "2026-11-16 07:59:43",
+      "title": "纯女声优质点唱 一个很来财的点唱厅"
+    }
+  }
+}
