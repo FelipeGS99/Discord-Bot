@@ -1,0 +1,40 @@
+{
+  "description": "Minimal fields captured from public SOOP responses; online control is not a professional-player association and must not enter the production roster.",
+  "captured_at": "2026-11-16T15:24:43.469075+00:00",
+  "sources": [
+    "https://api-channel.sooplive.com/v1.1/channel/{channel_id}/station",
+    "https://live.sooplive.com/afreeca/player_live_api.php",
+    "https://api.m.sooplive.com/broad/a/items"
+  ],
+  "offline": {
+    "station": {
+      "station": {
+        "stationNo": 15382020,
+        "userId": "rldls5656",
+        "userNick": "기인2"
+      }
+    },
+    "player": {
+      "CHANNEL": {
+        "RESULT": 0
+      }
+    }
+  },
+  "online": {
+    "station": {
+      "station": {
+        "stationNo": 9668846,
+        "userId": "dongwon1118",
+        "userNick": "규직이"
+      }
+    },
+    "player": {
+      "CHANNEL": {
+        "RESULT": 1,
+        "BNO": "298640685",
+        "BJID": "dongwon1118",
+        "TITLE": "10/22 무자본 글클메 시작"
+      }
+    }
+  }
+}

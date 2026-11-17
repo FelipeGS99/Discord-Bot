@@ -17,6 +17,7 @@ COGS = (
     "cogs.copadobrasil",
     "cogs.futebol",
     "cogs.esports",
+    "cogs.pro_lives",
     "cogs.telegram_alerts",
     "cogs.voice_tts",
     "cogs.ai_chat",

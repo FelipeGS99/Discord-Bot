@@ -1,0 +1,2456 @@
+{
+  "audited_at": "2026-11-16T17:16:30.994557+00:00",
+  "summary": {
+    "players": 33,
+    "channels": 34,
+    "platform_counts": {
+      "huya": 9,
+      "bilibili": 5,
+      "soop": 20
+    },
+    "duplicate_channels": 0,
+    "duplicate_platform_owners": 0,
+    "duplicate_member_ids": 0,
+    "out_of_scope_players": 0,
+    "valid_state_checks": 34,
+    "currently_online": 0,
+    "currently_offline": 34,
+    "catalog_preserved_byte_for_byte": true,
+    "changed_existing_python_files": [
+      "services/pro_live_platforms.py"
+    ],
+    "existing_tests_passed": 122,
+    "full_suite_tests_passed": 130,
+    "expires_at_2026_11_17_00_00_utc": {
+      "players": 31,
+      "channels": 32
+    }
+  },
+  "roster_checks": [
+    {
+      "player_id": "flandre",
+      "name": "Flandre",
+      "team": "Bilibili Gaming",
+      "league": "LPL",
+      "role": "TOP",
+      "verified": true,
+      "member_id": "100",
+      "UserStatus": "1",
+      "iStatus": "1",
+      "active_team_list": true,
+      "member_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER100_INFO.js",
+      "member_fetched_at": "2026-11-16T17:03:55.186544+00:00",
+      "member_exported_at": "2026-11-17 01:00:01",
+      "member_sUpdated": "2026-10-25 00:00:04",
+      "team_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM57_INFO.js",
+      "team_fetched_at": "2026-11-16T17:06:23.856249+00:00",
+      "team_updated_at": "2026-10-31 23:50:04",
+      "catalog_valid_until": "2026-11-17T00:00:00Z",
+      "review_pending_before_expiry": true
+    },
+    {
+      "player_id": "jiejie",
+      "name": "Jiejie",
+      "team": "EDward Gaming",
+      "league": "LPL",
+      "role": "JUNGLE",
+      "verified": true,
+      "member_id": "2770",
+      "UserStatus": "1",
+      "iStatus": "1",
+      "active_team_list": true,
+      "member_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER2770_INFO.js",
+      "member_fetched_at": "2026-11-16T17:05:51.024545+00:00",
+      "member_exported_at": "2026-11-17 01:00:13",
+      "member_sUpdated": "2026-08-11 18:20:08",
+      "team_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM1_INFO.js",
+      "team_fetched_at": "2026-11-16T17:06:12.153353+00:00",
+      "team_updated_at": "2026-10-31 23:50:06",
+      "catalog_valid_until": "2026-11-23T14:36:39Z",
+      "review_pending_before_expiry": false
+    },
+    {
+      "player_id": "knight",
+      "name": "knight",
+      "team": "Bilibili Gaming",
+      "league": "LPL",
+      "role": "MID",
+      "verified": true,
+      "member_id": "2562",
+      "UserStatus": "1",
+      "iStatus": "1",
+      "active_team_list": true,
+      "member_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER2562_INFO.js",
+      "member_fetched_at": "2026-11-16T17:05:48.303907+00:00",
+      "member_exported_at": "2026-11-17 01:00:12",
+      "member_sUpdated": "2026-10-25 00:00:03",
+      "team_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM57_INFO.js",
+      "team_fetched_at": "2026-11-16T17:06:23.856249+00:00",
+      "team_updated_at": "2026-10-31 23:50:04",
+      "catalog_valid_until": "2026-11-23T14:36:39Z",
+      "review_pending_before_expiry": false
+    },
+    {
+      "player_id": "jackeylove",
+      "name": "JackeyLove",
+      "team": "Top Esports",
+      "league": "LPL",
+      "role": "ADC",
+      "verified": true,
+      "member_id": "1832",
+      "UserStatus": "1",
+      "iStatus": "1",
+      "active_team_list": true,
+      "member_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER1832_INFO.js",
+      "member_fetched_at": "2026-11-16T17:05:42.524637+00:00",
+      "member_exported_at": "2026-11-17 01:00:07",
+      "member_sUpdated": "2026-10-25 00:00:04",
+      "team_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM42_INFO.js",
+      "team_fetched_at": "2026-11-16T17:09:45.902184+00:00",
+      "team_updated_at": "2026-10-31 23:50:04",
+      "catalog_valid_until": "2026-11-23T14:36:39Z",
+      "review_pending_before_expiry": false
+    },
+    {
+      "player_id": "meiko",
+      "name": "Meiko",
+      "team": "Invictus Gaming",
+      "league": "LPL",
+      "role": "SUPPORT",
+      "verified": true,
+      "member_id": "5",
+      "UserStatus": "1",
+      "iStatus": "1",
+      "active_team_list": true,
+      "member_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER5_INFO.js",
+      "member_fetched_at": "2026-11-16T17:06:06.969439+00:00",
+      "member_exported_at": "2026-11-17 01:00:01",
+      "member_sUpdated": "2026-10-25 00:00:04",
+      "team_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM2_INFO.js",
+      "team_fetched_at": "2026-11-16T17:06:15.144829+00:00",
+      "team_updated_at": "2026-10-31 23:50:02",
+      "catalog_valid_until": "2026-11-23T14:36:39Z",
+      "review_pending_before_expiry": false
+    },
+    {
+      "player_id": "theshy",
+      "name": "TheShy",
+      "team": "Invictus Gaming",
+      "league": "LPL",
+      "role": "TOP",
+      "verified": true,
+      "member_id": "1478",
+      "UserStatus": "1",
+      "iStatus": "1",
+      "active_team_list": true,
+      "member_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER1478_INFO.js",
+      "member_fetched_at": "2026-11-16T17:05:37.216347+00:00",
+      "member_exported_at": "2026-11-17 01:00:05",
+      "member_sUpdated": "2026-10-25 00:00:04",
+      "team_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM2_INFO.js",
+      "team_fetched_at": "2026-11-16T17:06:15.144829+00:00",
+      "team_updated_at": "2026-10-31 23:50:02",
+      "catalog_valid_until": "2026-11-23T14:36:39Z",
+      "review_pending_before_expiry": false
+    },
+    {
+      "player_id": "kiin",
+      "name": "Kiin",
+      "team": "Gen.G",
+      "league": "LCK",
+      "role": "TOP",
+      "verified": true,
+      "member_id": "1875",
+      "UserStatus": "1",
+      "iStatus": "1",
+      "active_team_list": true,
+      "member_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER1875_INFO.js",
+      "member_fetched_at": "2026-11-16T17:07:30.367132+00:00",
+      "member_exported_at": "2026-11-17 01:00:07",
+      "member_sUpdated": "2024-09-24 22:46:30",
+      "team_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM137_INFO.js",
+      "team_fetched_at": "2026-11-16T17:06:10.704215+00:00",
+      "team_updated_at": "2026-10-24 23:50:03",
+      "catalog_valid_until": "2026-11-23T14:36:39Z",
+      "review_pending_before_expiry": false
+    },
+    {
+      "player_id": "canyon",
+      "name": "Canyon",
+      "team": "Gen.G",
+      "league": "LCK",
+      "role": "JUNGLE",
+      "verified": true,
+      "member_id": "2831",
+      "UserStatus": "1",
+      "iStatus": "1",
+      "active_team_list": true,
+      "member_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER2831_INFO.js",
+      "member_fetched_at": "2026-11-16T17:07:31.854955+00:00",
+      "member_exported_at": "2026-11-17 01:00:13",
+      "member_sUpdated": "2024-09-24 22:46:07",
+      "team_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM137_INFO.js",
+      "team_fetched_at": "2026-11-16T17:06:10.704215+00:00",
+      "team_updated_at": "2026-10-24 23:50:03",
+      "catalog_valid_until": "2026-11-23T14:36:39Z",
+      "review_pending_before_expiry": false
+    },
+    {
+      "player_id": "chovy",
+      "name": "Chovy",
+      "team": "Gen.G",
+      "league": "LCK",
+      "role": "MID",
+      "verified": true,
+      "member_id": "2216",
+      "UserStatus": "1",
+      "iStatus": "1",
+      "active_team_list": true,
+      "member_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER2216_INFO.js",
+      "member_fetched_at": "2026-11-16T17:07:33.923881+00:00",
+      "member_exported_at": "2026-11-17 01:00:09",
+      "member_sUpdated": "2024-09-24 22:47:07",
+      "team_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM137_INFO.js",
+      "team_fetched_at": "2026-11-16T17:06:10.704215+00:00",
+      "team_updated_at": "2026-10-24 23:50:03",
+      "catalog_valid_until": "2026-11-23T14:36:39Z",
+      "review_pending_before_expiry": false
+    },
+    {
+      "player_id": "duro",
+      "name": "Duro",
+      "team": "Gen.G",
+      "league": "LCK",
+      "role": "SUPPORT",
+      "verified": true,
+      "member_id": "4462",
+      "UserStatus": "1",
+      "iStatus": "1",
+      "active_team_list": true,
+      "member_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER4462_INFO.js",
+      "member_fetched_at": "2026-11-16T17:07:35.387435+00:00",
+      "member_exported_at": "2026-11-17 01:00:29",
+      "member_sUpdated": "2023-08-31 23:12:54",
+      "team_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM137_INFO.js",
+      "team_fetched_at": "2026-11-16T17:06:10.704215+00:00",
+      "team_updated_at": "2026-10-24 23:50:03",
+      "catalog_valid_until": "2026-11-23T14:36:39Z",
+      "review_pending_before_expiry": false
+    },
+    {
+      "player_id": "peyz",
+      "name": "Peyz",
+      "team": "T1",
+      "league": "LCK",
+      "role": "ADC",
+      "verified": true,
+      "member_id": "4002",
+      "UserStatus": "1",
+      "iStatus": "1",
+      "active_team_list": true,
+      "member_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER4002_INFO.js",
+      "member_fetched_at": "2026-11-16T17:06:03.207891+00:00",
+      "member_exported_at": "2026-11-17 01:00:25",
+      "member_sUpdated": "2025-01-08 19:50:07",
+      "team_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM692_INFO.js",
+      "team_fetched_at": "2026-11-16T17:07:28.338237+00:00",
+      "team_updated_at": "2026-10-24 23:50:03",
+      "catalog_valid_until": "2026-11-23T16:49:58Z",
+      "review_pending_before_expiry": false
+    },
+    {
+      "player_id": "faker",
+      "name": "Faker",
+      "team": "T1",
+      "league": "LCK",
+      "role": "MID",
+      "verified": true,
+      "member_id": "1651",
+      "UserStatus": "1",
+      "iStatus": "1",
+      "active_team_list": true,
+      "member_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER1651_INFO.js",
+      "member_fetched_at": "2026-11-16T17:05:40.545247+00:00",
+      "member_exported_at": "2026-11-17 01:00:06",
+      "member_sUpdated": "2024-09-24 22:53:16",
+      "team_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM692_INFO.js",
+      "team_fetched_at": "2026-11-16T17:07:28.338237+00:00",
+      "team_updated_at": "2026-10-24 23:50:03",
+      "catalog_valid_until": "2026-11-23T16:49:58Z",
+      "review_pending_before_expiry": false
+    },
+    {
+      "player_id": "siwoo",
+      "name": "Siwoo",
+      "team": "Dplus KIA",
+      "league": "LCK",
+      "role": "TOP",
+      "verified": true,
+      "member_id": "1000866",
+      "UserStatus": "1",
+      "iStatus": "1",
+      "active_team_list": true,
+      "member_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER1000866_INFO.js",
+      "member_fetched_at": "2026-11-16T17:03:53.724472+00:00",
+      "member_exported_at": "2026-11-17 01:00:56",
+      "member_sUpdated": "",
+      "team_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM591_INFO.js",
+      "team_fetched_at": "2026-11-16T17:07:25.858050+00:00",
+      "team_updated_at": "2026-10-24 23:50:03",
+      "catalog_valid_until": "2026-11-23T16:49:58Z",
+      "review_pending_before_expiry": false
+    },
+    {
+      "player_id": "doran",
+      "name": "Doran",
+      "team": "T1",
+      "league": "LCK",
+      "role": "TOP",
+      "verified": true,
+      "member_id": "2829",
+      "UserStatus": "1",
+      "iStatus": "1",
+      "active_team_list": true,
+      "member_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER2829_INFO.js",
+      "member_fetched_at": "2026-11-16T17:05:52.486025+00:00",
+      "member_exported_at": "2026-11-17 01:00:13",
+      "member_sUpdated": "2024-09-24 21:07:44",
+      "team_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM692_INFO.js",
+      "team_fetched_at": "2026-11-16T17:07:28.338237+00:00",
+      "team_updated_at": "2026-10-24 23:50:03",
+      "catalog_valid_until": "2026-11-23T16:49:58Z",
+      "review_pending_before_expiry": false
+    },
+    {
+      "player_id": "perfect",
+      "name": "PerfecT",
+      "team": "KT Rolster",
+      "league": "LCK",
+      "role": "TOP",
+      "verified": true,
+      "member_id": "4436",
+      "UserStatus": "1",
+      "iStatus": "1",
+      "active_team_list": true,
+      "member_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER4436_INFO.js",
+      "member_fetched_at": "2026-11-16T17:06:05.712806+00:00",
+      "member_exported_at": "2026-11-17 01:00:29",
+      "member_sUpdated": "2023-10-19 08:58:44",
+      "team_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM21_INFO.js",
+      "team_fetched_at": "2026-11-16T17:06:13.646045+00:00",
+      "team_updated_at": "2026-09-30 23:50:07",
+      "catalog_valid_until": "2026-11-23T16:49:58Z",
+      "review_pending_before_expiry": false
+    },
+    {
+      "player_id": "lucid",
+      "name": "Lucid",
+      "team": "Dplus KIA",
+      "league": "LCK",
+      "role": "JUNGLE",
+      "verified": true,
+      "member_id": "4432",
+      "UserStatus": "1",
+      "iStatus": "1",
+      "active_team_list": true,
+      "member_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER4432_INFO.js",
+      "member_fetched_at": "2026-11-16T17:06:04.452742+00:00",
+      "member_exported_at": "2026-11-17 01:00:29",
+      "member_sUpdated": "2024-09-24 21:25:10",
+      "team_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM591_INFO.js",
+      "team_fetched_at": "2026-11-16T17:07:25.858050+00:00",
+      "team_updated_at": "2026-10-24 23:50:03",
+      "catalog_valid_until": "2026-11-23T16:49:58Z",
+      "review_pending_before_expiry": false
+    },
+    {
+      "player_id": "oner",
+      "name": "Oner",
+      "team": "T1",
+      "league": "LCK",
+      "role": "JUNGLE",
+      "verified": true,
+      "member_id": "3832",
+      "UserStatus": "1",
+      "iStatus": "1",
+      "active_team_list": true,
+      "member_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER3832_INFO.js",
+      "member_fetched_at": "2026-11-16T17:06:01.960039+00:00",
+      "member_exported_at": "2026-11-17 01:00:24",
+      "member_sUpdated": "2024-09-24 22:51:59",
+      "team_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM692_INFO.js",
+      "team_fetched_at": "2026-11-16T17:07:28.338237+00:00",
+      "team_updated_at": "2026-10-24 23:50:03",
+      "catalog_valid_until": "2026-11-23T16:49:58Z",
+      "review_pending_before_expiry": false
+    },
+    {
+      "player_id": "cuzz",
+      "name": "Cuzz",
+      "team": "KT Rolster",
+      "league": "LCK",
+      "role": "JUNGLE",
+      "verified": true,
+      "member_id": "1512",
+      "UserStatus": "1",
+      "iStatus": "1",
+      "active_team_list": true,
+      "member_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER1512_INFO.js",
+      "member_fetched_at": "2026-11-16T17:05:38.675284+00:00",
+      "member_exported_at": "2026-11-17 01:00:05",
+      "member_sUpdated": "2023-10-18 18:18:10",
+      "team_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM21_INFO.js",
+      "team_fetched_at": "2026-11-16T17:06:13.646045+00:00",
+      "team_updated_at": "2026-09-30 23:50:07",
+      "catalog_valid_until": "2026-11-23T16:49:58Z",
+      "review_pending_before_expiry": false
+    },
+    {
+      "player_id": "raptor",
+      "name": "Raptor",
+      "team": "BNK FearX",
+      "league": "LCK",
+      "role": "JUNGLE",
+      "verified": true,
+      "member_id": "3766",
+      "UserStatus": "1",
+      "iStatus": "1",
+      "active_team_list": true,
+      "member_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER3766_INFO.js",
+      "member_fetched_at": "2026-11-16T17:06:00.707699+00:00",
+      "member_exported_at": "2026-11-17 01:00:23",
+      "member_sUpdated": "2021-07-13 20:59:44",
+      "team_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM1130_INFO.js",
+      "team_fetched_at": "2026-11-16T17:06:09.464386+00:00",
+      "team_updated_at": "2026-09-30 23:50:07",
+      "catalog_valid_until": "2026-11-23T16:49:58Z",
+      "review_pending_before_expiry": false
+    },
+    {
+      "player_id": "showmaker",
+      "name": "ShowMaker",
+      "team": "Dplus KIA",
+      "league": "LCK",
+      "role": "MID",
+      "verified": true,
+      "member_id": "2832",
+      "UserStatus": "1",
+      "iStatus": "1",
+      "active_team_list": true,
+      "member_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER2832_INFO.js",
+      "member_fetched_at": "2026-11-16T17:05:53.942095+00:00",
+      "member_exported_at": "2026-11-17 01:00:13",
+      "member_sUpdated": "2024-09-24 21:25:55",
+      "team_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM591_INFO.js",
+      "team_fetched_at": "2026-11-16T17:07:25.858050+00:00",
+      "team_updated_at": "2026-10-24 23:50:03",
+      "catalog_valid_until": "2026-11-23T16:49:58Z",
+      "review_pending_before_expiry": false
+    },
+    {
+      "player_id": "bdd",
+      "name": "Bdd",
+      "team": "KT Rolster",
+      "league": "LCK",
+      "role": "MID",
+      "verified": true,
+      "member_id": "1231",
+      "UserStatus": "1",
+      "iStatus": "1",
+      "active_team_list": true,
+      "member_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER1231_INFO.js",
+      "member_fetched_at": "2026-11-16T17:03:56.650229+00:00",
+      "member_exported_at": "2026-11-17 01:00:04",
+      "member_sUpdated": "2023-10-18 18:16:33",
+      "team_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM21_INFO.js",
+      "team_fetched_at": "2026-11-16T17:06:13.646045+00:00",
+      "team_updated_at": "2026-09-30 23:50:07",
+      "catalog_valid_until": "2026-11-23T16:49:58Z",
+      "review_pending_before_expiry": false
+    },
+    {
+      "player_id": "smash",
+      "name": "Smash",
+      "team": "Dplus KIA",
+      "league": "LCK",
+      "role": "ADC",
+      "verified": true,
+      "member_id": "1000838",
+      "UserStatus": "1",
+      "iStatus": "1",
+      "active_team_list": true,
+      "member_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER1000838_INFO.js",
+      "member_fetched_at": "2026-11-16T17:03:51.650290+00:00",
+      "member_exported_at": "2026-11-17 01:00:54",
+      "member_sUpdated": "",
+      "team_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM591_INFO.js",
+      "team_fetched_at": "2026-11-16T17:07:25.858050+00:00",
+      "team_updated_at": "2026-10-24 23:50:03",
+      "catalog_valid_until": "2026-11-23T16:49:58Z",
+      "review_pending_before_expiry": false
+    },
+    {
+      "player_id": "ruler",
+      "name": "Ruler",
+      "team": "Gen.G",
+      "league": "LCK",
+      "role": "ADC",
+      "verified": true,
+      "member_id": "643",
+      "UserStatus": "1",
+      "iStatus": "1",
+      "active_team_list": true,
+      "member_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER643_INFO.js",
+      "member_fetched_at": "2026-11-16T17:06:08.212441+00:00",
+      "member_exported_at": "2026-11-17 01:00:04",
+      "member_sUpdated": "2024-05-31 18:00:30",
+      "team_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM137_INFO.js",
+      "team_fetched_at": "2026-11-16T17:06:10.704215+00:00",
+      "team_updated_at": "2026-10-24 23:50:03",
+      "catalog_valid_until": "2026-11-23T16:49:58Z",
+      "review_pending_before_expiry": false
+    },
+    {
+      "player_id": "career",
+      "name": "Career",
+      "team": "Dplus KIA",
+      "league": "LCK",
+      "role": "SUPPORT",
+      "verified": true,
+      "member_id": "1000668",
+      "UserStatus": "1",
+      "iStatus": "1",
+      "active_team_list": true,
+      "member_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER1000668_INFO.js",
+      "member_fetched_at": "2026-11-16T17:03:49.326490+00:00",
+      "member_exported_at": "2026-11-17 01:00:49",
+      "member_sUpdated": "",
+      "team_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM591_INFO.js",
+      "team_fetched_at": "2026-11-16T17:07:25.858050+00:00",
+      "team_updated_at": "2026-10-24 23:50:03",
+      "catalog_valid_until": "2026-11-23T16:49:58Z",
+      "review_pending_before_expiry": false
+    },
+    {
+      "player_id": "keria",
+      "name": "Keria",
+      "team": "T1",
+      "league": "LCK",
+      "role": "SUPPORT",
+      "verified": true,
+      "member_id": "3139",
+      "UserStatus": "1",
+      "iStatus": "1",
+      "active_team_list": true,
+      "member_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER3139_INFO.js",
+      "member_fetched_at": "2026-11-16T17:05:56.756225+00:00",
+      "member_exported_at": "2026-11-17 01:00:16",
+      "member_sUpdated": "2024-09-24 22:55:18",
+      "team_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM692_INFO.js",
+      "team_fetched_at": "2026-11-16T17:07:28.338237+00:00",
+      "team_updated_at": "2026-10-24 23:50:03",
+      "catalog_valid_until": "2026-11-23T16:49:58Z",
+      "review_pending_before_expiry": false
+    },
+    {
+      "player_id": "effort",
+      "name": "Effort",
+      "team": "KT Rolster",
+      "league": "LCK",
+      "role": "SUPPORT",
+      "verified": true,
+      "member_id": "1876",
+      "UserStatus": "1",
+      "iStatus": "1",
+      "active_team_list": true,
+      "member_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER1876_INFO.js",
+      "member_fetched_at": "2026-11-16T17:05:44.125101+00:00",
+      "member_exported_at": "2026-11-17 01:00:07",
+      "member_sUpdated": "2020-05-21 18:30:18",
+      "team_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM21_INFO.js",
+      "team_fetched_at": "2026-11-16T17:06:13.646045+00:00",
+      "team_updated_at": "2026-09-30 23:50:07",
+      "catalog_valid_until": "2026-11-23T16:49:58Z",
+      "review_pending_before_expiry": false
+    },
+    {
+      "player_id": "369",
+      "name": "369",
+      "team": "Top Esports",
+      "league": "LPL",
+      "role": "TOP",
+      "verified": true,
+      "member_id": "2147",
+      "UserStatus": "1",
+      "iStatus": "1",
+      "active_team_list": true,
+      "member_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER2147_INFO.js",
+      "member_fetched_at": "2026-11-16T17:05:46.833482+00:00",
+      "member_exported_at": "2026-11-17 01:00:08",
+      "member_sUpdated": "2026-10-25 00:00:03",
+      "team_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM42_INFO.js",
+      "team_fetched_at": "2026-11-16T17:09:45.902184+00:00",
+      "team_updated_at": "2026-10-31 23:50:04",
+      "catalog_valid_until": "2026-11-23T16:49:58Z",
+      "review_pending_before_expiry": false
+    },
+    {
+      "player_id": "breathe",
+      "name": "Breathe",
+      "team": "Anyone's Legend",
+      "league": "LPL",
+      "role": "TOP",
+      "verified": true,
+      "member_id": "3519",
+      "UserStatus": "1",
+      "iStatus": "1",
+      "active_team_list": true,
+      "member_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER3519_INFO.js",
+      "member_fetched_at": "2026-11-16T17:05:59.458907+00:00",
+      "member_exported_at": "2026-11-17 01:00:19",
+      "member_sUpdated": "2026-10-25 00:00:04",
+      "team_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM422_INFO.js",
+      "team_fetched_at": "2026-11-16T17:06:16.357687+00:00",
+      "team_updated_at": "2026-10-31 23:50:04",
+      "catalog_valid_until": "2026-11-23T16:49:58Z",
+      "review_pending_before_expiry": false
+    },
+    {
+      "player_id": "tian",
+      "name": "Tian",
+      "team": "Top Esports",
+      "league": "LPL",
+      "role": "JUNGLE",
+      "verified": true,
+      "member_id": "1458",
+      "UserStatus": "1",
+      "iStatus": "1",
+      "active_team_list": true,
+      "member_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER1458_INFO.js",
+      "member_fetched_at": "2026-11-16T17:05:35.473303+00:00",
+      "member_exported_at": "2026-11-17 01:00:05",
+      "member_sUpdated": "2026-10-25 00:00:03",
+      "team_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM42_INFO.js",
+      "team_fetched_at": "2026-11-16T17:09:45.902184+00:00",
+      "team_updated_at": "2026-10-31 23:50:04",
+      "catalog_valid_until": "2026-11-23T16:49:58Z",
+      "review_pending_before_expiry": false
+    },
+    {
+      "player_id": "bin",
+      "name": "Bin",
+      "team": "Bilibili Gaming",
+      "league": "LPL",
+      "role": "TOP",
+      "verified": true,
+      "member_id": "2687",
+      "UserStatus": "1",
+      "iStatus": "1",
+      "active_team_list": true,
+      "member_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER2687_INFO.js",
+      "member_fetched_at": "2026-11-16T17:05:49.552426+00:00",
+      "member_exported_at": "2026-11-17 01:00:12",
+      "member_sUpdated": "2026-10-25 00:00:05",
+      "team_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM57_INFO.js",
+      "team_fetched_at": "2026-11-16T17:06:23.856249+00:00",
+      "team_updated_at": "2026-10-31 23:50:04",
+      "catalog_valid_until": "2026-11-23T16:49:58Z",
+      "review_pending_before_expiry": false
+    },
+    {
+      "player_id": "viper",
+      "name": "Viper",
+      "team": "Bilibili Gaming",
+      "league": "LPL",
+      "role": "ADC",
+      "verified": true,
+      "member_id": "193",
+      "UserStatus": "1",
+      "iStatus": "1",
+      "active_team_list": true,
+      "member_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER193_INFO.js",
+      "member_fetched_at": "2026-11-16T17:05:45.588883+00:00",
+      "member_exported_at": "2026-11-17 01:00:02",
+      "member_sUpdated": "2026-10-25 00:00:04",
+      "team_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM57_INFO.js",
+      "team_fetched_at": "2026-11-16T17:06:23.856249+00:00",
+      "team_updated_at": "2026-10-31 23:50:04",
+      "catalog_valid_until": "2026-11-17T00:00:00Z",
+      "review_pending_before_expiry": true
+    },
+    {
+      "player_id": "xun",
+      "name": "Xun",
+      "team": "Bilibili Gaming",
+      "league": "LPL",
+      "role": "JUNGLE",
+      "verified": true,
+      "member_id": "3114",
+      "UserStatus": "1",
+      "iStatus": "1",
+      "active_team_list": true,
+      "member_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER3114_INFO.js",
+      "member_fetched_at": "2026-11-16T17:05:55.533346+00:00",
+      "member_exported_at": "2026-11-17 01:00:16",
+      "member_sUpdated": "2026-10-25 00:00:02",
+      "team_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM57_INFO.js",
+      "team_fetched_at": "2026-11-16T17:06:23.856249+00:00",
+      "team_updated_at": "2026-10-31 23:50:04",
+      "catalog_valid_until": "2026-11-23T16:49:58Z",
+      "review_pending_before_expiry": false
+    },
+    {
+      "player_id": "on",
+      "name": "ON",
+      "team": "Bilibili Gaming",
+      "league": "LPL",
+      "role": "SUPPORT",
+      "verified": true,
+      "member_id": "3509",
+      "UserStatus": "1",
+      "iStatus": "1",
+      "active_team_list": true,
+      "member_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_MEMBER3509_INFO.js",
+      "member_fetched_at": "2026-11-16T17:05:58.216901+00:00",
+      "member_exported_at": "2026-11-17 01:00:19",
+      "member_sUpdated": "2026-10-25 00:00:03",
+      "team_url": "https://lpl.qq.com/web201612/data/LOL_MATCH2_TEAM_TEAM57_INFO.js",
+      "team_fetched_at": "2026-11-16T17:06:23.856249+00:00",
+      "team_updated_at": "2026-10-31 23:50:04",
+      "catalog_valid_until": "2026-11-23T16:49:58Z",
+      "review_pending_before_expiry": false
+    }
+  ],
+  "channel_checks": [
+    {
+      "player_id": "flandre",
+      "name": "Flandre",
+      "team": "Bilibili Gaming",
+      "league": "LPL",
+      "role": "TOP",
+      "platform": "huya",
+      "channel_id": "913004",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "flandre",
+        "name": "Flandre",
+        "platform": "huya",
+        "channel_id": "913004",
+        "checked_at": "2026-11-16T17:03:49.326516+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [
+        "reported_start_time_february_2026_recent_use_not_confirmed",
+        "contract_renewal_unverified_existing_short_expiry_preserved"
+      ],
+      "source_urls_preserved": [
+        "https://blog.huya.com/news/33511",
+        "https://www.huya.com/913004"
+      ],
+      "owner": {
+        "uid": "1755405074",
+        "nick": "Flandre圣枪哥",
+        "profileRoom": 913004
+      },
+      "reported_start_at_utc": "2026-02-09T15:56:17+00:00",
+      "historical_start_time_note": "This is the startTime currently reported by the page, not a complete channel history or proof of abandonment."
+    },
+    {
+      "player_id": "jiejie",
+      "name": "Jiejie",
+      "team": "EDward Gaming",
+      "league": "LPL",
+      "role": "JUNGLE",
+      "platform": "huya",
+      "channel_id": "913005",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "jiejie",
+        "name": "Jiejie",
+        "platform": "huya",
+        "channel_id": "913005",
+        "checked_at": "2026-11-16T17:03:49.326530+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [
+        "historical_channel_recent_use_not_confirmed"
+      ],
+      "source_urls_preserved": [
+        "https://blog.huya.com/news/33511",
+        "https://www.huya.com/913005"
+      ],
+      "owner": {
+        "uid": "1865736411",
+        "nick": "Jiejie",
+        "profileRoom": 913005
+      },
+      "reported_start_at_utc": "2024-02-17T14:22:33+00:00",
+      "historical_start_time_note": "This is the startTime currently reported by the page, not a complete channel history or proof of abandonment."
+    },
+    {
+      "player_id": "knight",
+      "name": "knight",
+      "team": "Bilibili Gaming",
+      "league": "LPL",
+      "role": "MID",
+      "platform": "huya",
+      "channel_id": "969689",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "knight",
+        "name": "knight",
+        "platform": "huya",
+        "channel_id": "969689",
+        "checked_at": "2026-11-16T17:03:49.326647+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [
+        "historical_channel_recent_use_not_confirmed",
+        "legacy_team_in_nickname_not_current_roster_evidence"
+      ],
+      "source_urls_preserved": [
+        "https://zh.wikipedia.org/wiki/%E5%8D%93%E5%AE%9A",
+        "https://www.huya.com/knight9",
+        "https://www.huya.com/969689"
+      ],
+      "owner": {
+        "uid": "1502479964",
+        "nick": "JDG.knight",
+        "profileRoom": 969689
+      },
+      "reported_start_at_utc": "2023-07-03T15:40:33+00:00",
+      "historical_start_time_note": "This is the startTime currently reported by the page, not a complete channel history or proof of abandonment."
+    },
+    {
+      "player_id": "knight",
+      "name": "knight",
+      "team": "Bilibili Gaming",
+      "league": "LPL",
+      "role": "MID",
+      "platform": "bilibili",
+      "channel_id": "31934797",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "knight",
+        "name": "knight",
+        "platform": "bilibili",
+        "channel_id": "31934797",
+        "checked_at": "2026-11-16T17:03:49.326656+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [
+        "player_online_not_observed_platform_online_control_only"
+      ],
+      "source_urls_preserved": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers",
+        "https://space.bilibili.com/3546597304568306",
+        "https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=3546597304568306",
+        "https://api.live.bilibili.com/room/v1/Room/get_info?room_id=31934797",
+        "https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=31934797"
+      ],
+      "owner": {
+        "uid": "3546597304568306",
+        "name": "BLGKnight",
+        "Official": {
+          "role": 2,
+          "title": "BLG电子竞技俱乐部英雄联盟选手",
+          "desc": "",
+          "type": 0
+        }
+      },
+      "identity_matches": true
+    },
+    {
+      "player_id": "jackeylove",
+      "name": "JackeyLove",
+      "team": "Top Esports",
+      "league": "LPL",
+      "role": "ADC",
+      "platform": "huya",
+      "channel_id": "111800",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "jackeylove",
+        "name": "JackeyLove",
+        "platform": "huya",
+        "channel_id": "111800",
+        "checked_at": "2026-11-16T17:03:49.326665+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [],
+      "source_urls_preserved": [
+        "https://www.bilibili.com/video/BV151p36DES1/",
+        "https://www.huya.com/111800"
+      ],
+      "owner": {
+        "uid": "1199620812769",
+        "nick": "滔搏JackeyLove",
+        "profileRoom": 111800
+      },
+      "reported_start_at_utc": "2026-11-14T18:45:19+00:00",
+      "historical_start_time_note": "This is the startTime currently reported by the page, not a complete channel history or proof of abandonment."
+    },
+    {
+      "player_id": "meiko",
+      "name": "Meiko",
+      "team": "Invictus Gaming",
+      "league": "LPL",
+      "role": "SUPPORT",
+      "platform": "huya",
+      "channel_id": "913001",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "meiko",
+        "name": "Meiko",
+        "platform": "huya",
+        "channel_id": "913001",
+        "checked_at": "2026-11-16T17:03:49.326671+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [],
+      "source_urls_preserved": [
+        "https://blog.huya.com/news/33511",
+        "https://www.huya.com/913001"
+      ],
+      "owner": {
+        "uid": "1682985823",
+        "nick": "Meiko",
+        "profileRoom": 913001
+      },
+      "reported_start_at_utc": "2026-08-02T15:00:20+00:00",
+      "historical_start_time_note": "This is the startTime currently reported by the page, not a complete channel history or proof of abandonment."
+    },
+    {
+      "player_id": "theshy",
+      "name": "TheShy",
+      "team": "Invictus Gaming",
+      "league": "LPL",
+      "role": "TOP",
+      "platform": "huya",
+      "channel_id": "991111",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "theshy",
+        "name": "TheShy",
+        "platform": "huya",
+        "channel_id": "991111",
+        "checked_at": "2026-11-16T17:03:49.326692+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [],
+      "source_urls_preserved": [
+        "https://zh.wikipedia.org/wiki/%E5%A7%9C%E6%89%BF%E9%8C%B2",
+        "https://www.huya.com/991111"
+      ],
+      "owner": {
+        "uid": "1199536199401",
+        "nick": "TheShy",
+        "profileRoom": 991111
+      },
+      "reported_start_at_utc": "2026-08-02T14:59:10+00:00",
+      "historical_start_time_note": "This is the startTime currently reported by the page, not a complete channel history or proof of abandonment."
+    },
+    {
+      "player_id": "kiin",
+      "name": "Kiin",
+      "team": "Gen.G",
+      "league": "LCK",
+      "role": "TOP",
+      "platform": "soop",
+      "channel_id": "rldls5656",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "kiin",
+        "name": "Kiin",
+        "platform": "soop",
+        "channel_id": "rldls5656",
+        "checked_at": "2026-11-16T17:03:49.326738+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [],
+      "source_urls_preserved": [
+        "https://geng.gg/pages/league-of-legends",
+        "https://bj.afreecatv.com/rldls5656"
+      ],
+      "owner": {
+        "userId": "rldls5656",
+        "userNick": "기인2",
+        "stationNo": 15382020
+      }
+    },
+    {
+      "player_id": "canyon",
+      "name": "Canyon",
+      "team": "Gen.G",
+      "league": "LCK",
+      "role": "JUNGLE",
+      "platform": "soop",
+      "channel_id": "rjsqn0618",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "canyon",
+        "name": "Canyon",
+        "platform": "soop",
+        "channel_id": "rjsqn0618",
+        "checked_at": "2026-11-16T17:03:49.326747+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [],
+      "source_urls_preserved": [
+        "https://geng.gg/pages/league-of-legends",
+        "https://bj.afreecatv.com/rjsqn0618"
+      ],
+      "owner": {
+        "userId": "rjsqn0618",
+        "userNick": "Canyon_lol",
+        "stationNo": 26335065
+      }
+    },
+    {
+      "player_id": "chovy",
+      "name": "Chovy",
+      "team": "Gen.G",
+      "league": "LCK",
+      "role": "MID",
+      "platform": "soop",
+      "channel_id": "wlgnsdl0303",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "chovy",
+        "name": "Chovy",
+        "platform": "soop",
+        "channel_id": "wlgnsdl0303",
+        "checked_at": "2026-11-16T17:03:49.326754+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [],
+      "source_urls_preserved": [
+        "https://geng.gg/pages/league-of-legends",
+        "https://bj.afreecatv.com/wlgnsdl0303"
+      ],
+      "owner": {
+        "userId": "wlgnsdl0303",
+        "userNick": "쵸비03",
+        "stationNo": 14618953
+      }
+    },
+    {
+      "player_id": "duro",
+      "name": "Duro",
+      "team": "Gen.G",
+      "league": "LCK",
+      "role": "SUPPORT",
+      "platform": "soop",
+      "channel_id": "jmg3495",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "duro",
+        "name": "Duro",
+        "platform": "soop",
+        "channel_id": "jmg3495",
+        "checked_at": "2026-11-16T17:03:49.326759+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [],
+      "source_urls_preserved": [
+        "https://geng.gg/pages/league-of-legends",
+        "https://ch.sooplive.co.kr/jmg3495"
+      ],
+      "owner": {
+        "userId": "jmg3495",
+        "userNick": "듀로02",
+        "stationNo": 21226790
+      }
+    },
+    {
+      "player_id": "peyz",
+      "name": "Peyz",
+      "team": "T1",
+      "league": "LCK",
+      "role": "ADC",
+      "platform": "soop",
+      "channel_id": "rlantnghks",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "peyz",
+        "name": "Peyz",
+        "platform": "soop",
+        "channel_id": "rlantnghks",
+        "checked_at": "2026-11-16T17:03:49.326779+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [],
+      "source_urls_preserved": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers",
+        "https://www.sooplive.com/station/rlantnghks",
+        "https://api-channel.sooplive.com/v1.1/channel/rlantnghks/station"
+      ],
+      "owner": {
+        "userId": "rlantnghks",
+        "userNick": "페이즈으",
+        "stationNo": 25101685
+      }
+    },
+    {
+      "player_id": "faker",
+      "name": "Faker",
+      "team": "T1",
+      "league": "LCK",
+      "role": "MID",
+      "platform": "soop",
+      "channel_id": "leesh2148",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "faker",
+        "name": "Faker",
+        "platform": "soop",
+        "channel_id": "leesh2148",
+        "checked_at": "2026-11-16T17:03:49.326797+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [],
+      "source_urls_preserved": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers",
+        "https://www.sooplive.com/station/leesh2148",
+        "https://api-channel.sooplive.com/v1.1/channel/leesh2148/station"
+      ],
+      "owner": {
+        "userId": "leesh2148",
+        "userNick": "고전파0",
+        "stationNo": 7910539
+      }
+    },
+    {
+      "player_id": "siwoo",
+      "name": "Siwoo",
+      "team": "Dplus KIA",
+      "league": "LCK",
+      "role": "TOP",
+      "platform": "soop",
+      "channel_id": "siwoojun1234",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "siwoo",
+        "name": "Siwoo",
+        "platform": "soop",
+        "channel_id": "siwoojun1234",
+        "checked_at": "2026-11-16T17:03:49.326803+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [],
+      "source_urls_preserved": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers",
+        "https://www.sooplive.com/station/siwoojun1234",
+        "https://api-channel.sooplive.com/v1.1/channel/siwoojun1234/station"
+      ],
+      "owner": {
+        "userId": "siwoojun1234",
+        "userNick": "DK시우",
+        "stationNo": 30890318
+      }
+    },
+    {
+      "player_id": "doran",
+      "name": "Doran",
+      "team": "T1",
+      "league": "LCK",
+      "role": "TOP",
+      "platform": "soop",
+      "channel_id": "choi15778",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "doran",
+        "name": "Doran",
+        "platform": "soop",
+        "channel_id": "choi15778",
+        "checked_at": "2026-11-16T17:03:49.326825+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [],
+      "source_urls_preserved": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers",
+        "https://www.sooplive.com/station/choi15778",
+        "https://api-channel.sooplive.com/v1.1/channel/choi15778/station"
+      ],
+      "owner": {
+        "userId": "choi15778",
+        "userNick": "도란도라아안",
+        "stationNo": 14562495
+      }
+    },
+    {
+      "player_id": "perfect",
+      "name": "PerfecT",
+      "team": "KT Rolster",
+      "league": "LCK",
+      "role": "TOP",
+      "platform": "soop",
+      "channel_id": "nsmin1243",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "perfect",
+        "name": "PerfecT",
+        "platform": "soop",
+        "channel_id": "nsmin1243",
+        "checked_at": "2026-11-16T17:03:49.326833+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [],
+      "source_urls_preserved": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers",
+        "https://www.sooplive.com/station/nsmin1243",
+        "https://api-channel.sooplive.com/v1.1/channel/nsmin1243/station"
+      ],
+      "owner": {
+        "userId": "nsmin1243",
+        "userNick": "PerfecT5",
+        "stationNo": 26338005
+      }
+    },
+    {
+      "player_id": "lucid",
+      "name": "Lucid",
+      "team": "Dplus KIA",
+      "league": "LCK",
+      "role": "JUNGLE",
+      "platform": "soop",
+      "channel_id": "tagada008",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "lucid",
+        "name": "Lucid",
+        "platform": "soop",
+        "channel_id": "tagada008",
+        "checked_at": "2026-11-16T17:03:49.326922+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [],
+      "source_urls_preserved": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers",
+        "https://www.sooplive.com/station/tagada008",
+        "https://api-channel.sooplive.com/v1.1/channel/tagada008/station"
+      ],
+      "owner": {
+        "userId": "tagada008",
+        "userNick": "DK루시드",
+        "stationNo": 21270877
+      }
+    },
+    {
+      "player_id": "oner",
+      "name": "Oner",
+      "team": "T1",
+      "league": "LCK",
+      "role": "JUNGLE",
+      "platform": "soop",
+      "channel_id": "ansguswns519",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "oner",
+        "name": "Oner",
+        "platform": "soop",
+        "channel_id": "ansguswns519",
+        "checked_at": "2026-11-16T17:03:49.326928+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [],
+      "source_urls_preserved": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers",
+        "https://www.sooplive.com/station/ansguswns519",
+        "https://api-channel.sooplive.com/v1.1/channel/ansguswns519/station"
+      ],
+      "owner": {
+        "userId": "ansguswns519",
+        "userNick": "onerrrr",
+        "stationNo": 17812481
+      }
+    },
+    {
+      "player_id": "cuzz",
+      "name": "Cuzz",
+      "team": "KT Rolster",
+      "league": "LCK",
+      "role": "JUNGLE",
+      "platform": "soop",
+      "channel_id": "yhk7737",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "cuzz",
+        "name": "Cuzz",
+        "platform": "soop",
+        "channel_id": "yhk7737",
+        "checked_at": "2026-11-16T17:03:49.326934+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [],
+      "source_urls_preserved": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers",
+        "https://www.sooplive.com/station/yhk7737",
+        "https://api-channel.sooplive.com/v1.1/channel/yhk7737/station"
+      ],
+      "owner": {
+        "userId": "yhk7737",
+        "userNick": "Cuzz",
+        "stationNo": 9368111
+      }
+    },
+    {
+      "player_id": "raptor",
+      "name": "Raptor",
+      "team": "BNK FearX",
+      "league": "LCK",
+      "role": "JUNGLE",
+      "platform": "soop",
+      "channel_id": "jun25jin",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "raptor",
+        "name": "Raptor",
+        "platform": "soop",
+        "channel_id": "jun25jin",
+        "checked_at": "2026-11-16T17:03:49.326952+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [],
+      "source_urls_preserved": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers",
+        "https://www.sooplive.com/station/jun25jin",
+        "https://api-channel.sooplive.com/v1.1/channel/jun25jin/station"
+      ],
+      "owner": {
+        "userId": "jun25jin",
+        "userNick": "Raptorr",
+        "stationNo": 22505140
+      }
+    },
+    {
+      "player_id": "showmaker",
+      "name": "ShowMaker",
+      "team": "Dplus KIA",
+      "league": "LCK",
+      "role": "MID",
+      "platform": "soop",
+      "channel_id": "showmakerr",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "showmaker",
+        "name": "ShowMaker",
+        "platform": "soop",
+        "channel_id": "showmakerr",
+        "checked_at": "2026-11-16T17:03:49.326957+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [],
+      "source_urls_preserved": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers",
+        "https://www.sooplive.com/station/showmakerr",
+        "https://api-channel.sooplive.com/v1.1/channel/showmakerr/station"
+      ],
+      "owner": {
+        "userId": "showmakerr",
+        "userNick": "DK쇼메쇼메",
+        "stationNo": 30899308
+      }
+    },
+    {
+      "player_id": "bdd",
+      "name": "Bdd",
+      "team": "KT Rolster",
+      "league": "LCK",
+      "role": "MID",
+      "platform": "soop",
+      "channel_id": "s735258",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "bdd",
+        "name": "Bdd",
+        "platform": "soop",
+        "channel_id": "s735258",
+        "checked_at": "2026-11-16T17:03:49.326979+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [],
+      "source_urls_preserved": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers",
+        "https://www.sooplive.com/station/s735258",
+        "https://api-channel.sooplive.com/v1.1/channel/s735258/station"
+      ],
+      "owner": {
+        "userId": "s735258",
+        "userNick": "비디디31",
+        "stationNo": 17508040
+      }
+    },
+    {
+      "player_id": "smash",
+      "name": "Smash",
+      "team": "Dplus KIA",
+      "league": "LCK",
+      "role": "ADC",
+      "platform": "soop",
+      "channel_id": "tlsrmawo",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "smash",
+        "name": "Smash",
+        "platform": "soop",
+        "channel_id": "tlsrmawo",
+        "checked_at": "2026-11-16T17:03:49.326984+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [],
+      "source_urls_preserved": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers",
+        "https://www.sooplive.com/station/tlsrmawo",
+        "https://api-channel.sooplive.com/v1.1/channel/tlsrmawo/station"
+      ],
+      "owner": {
+        "userId": "tlsrmawo",
+        "userNick": "DK스매쉬",
+        "stationNo": 24528015
+      }
+    },
+    {
+      "player_id": "ruler",
+      "name": "Ruler",
+      "team": "Gen.G",
+      "league": "LCK",
+      "role": "ADC",
+      "platform": "soop",
+      "channel_id": "pwh9811",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "ruler",
+        "name": "Ruler",
+        "platform": "soop",
+        "channel_id": "pwh9811",
+        "checked_at": "2026-11-16T17:03:49.327002+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [],
+      "source_urls_preserved": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers",
+        "https://www.sooplive.com/station/pwh9811",
+        "https://api-channel.sooplive.com/v1.1/channel/pwh9811/station"
+      ],
+      "owner": {
+        "userId": "pwh9811",
+        "userNick": "룰러어",
+        "stationNo": 16696636
+      }
+    },
+    {
+      "player_id": "career",
+      "name": "Career",
+      "team": "Dplus KIA",
+      "league": "LCK",
+      "role": "SUPPORT",
+      "platform": "soop",
+      "channel_id": "pro20040829",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "career",
+        "name": "Career",
+        "platform": "soop",
+        "channel_id": "pro20040829",
+        "checked_at": "2026-11-16T17:03:49.327021+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [],
+      "source_urls_preserved": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers",
+        "https://www.sooplive.com/station/pro20040829",
+        "https://api-channel.sooplive.com/v1.1/channel/pro20040829/station"
+      ],
+      "owner": {
+        "userId": "pro20040829",
+        "userNick": "DK커리어",
+        "stationNo": 24643612
+      }
+    },
+    {
+      "player_id": "keria",
+      "name": "Keria",
+      "team": "T1",
+      "league": "LCK",
+      "role": "SUPPORT",
+      "platform": "soop",
+      "channel_id": "fbalstjr1234",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "keria",
+        "name": "Keria",
+        "platform": "soop",
+        "channel_id": "fbalstjr1234",
+        "checked_at": "2026-11-16T17:03:49.327027+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [],
+      "source_urls_preserved": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers",
+        "https://www.sooplive.com/station/fbalstjr1234",
+        "https://api-channel.sooplive.com/v1.1/channel/fbalstjr1234/station"
+      ],
+      "owner": {
+        "userId": "fbalstjr1234",
+        "userNick": "케리아아",
+        "stationNo": 17463468
+      }
+    },
+    {
+      "player_id": "effort",
+      "name": "Effort",
+      "team": "KT Rolster",
+      "league": "LCK",
+      "role": "SUPPORT",
+      "platform": "soop",
+      "channel_id": "dltkdgh2000",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "effort",
+        "name": "Effort",
+        "platform": "soop",
+        "channel_id": "dltkdgh2000",
+        "checked_at": "2026-11-16T17:03:49.327032+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [],
+      "source_urls_preserved": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers",
+        "https://www.sooplive.com/station/dltkdgh2000",
+        "https://api-channel.sooplive.com/v1.1/channel/dltkdgh2000/station"
+      ],
+      "owner": {
+        "userId": "dltkdgh2000",
+        "userNick": "에포트이상호",
+        "stationNo": 17062660
+      }
+    },
+    {
+      "player_id": "369",
+      "name": "369",
+      "team": "Top Esports",
+      "league": "LPL",
+      "role": "TOP",
+      "platform": "huya",
+      "channel_id": "520369",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "369",
+        "name": "369",
+        "platform": "huya",
+        "channel_id": "520369",
+        "checked_at": "2026-11-16T17:03:49.327050+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [
+        "historical_channel_recent_use_not_confirmed",
+        "legacy_team_in_nickname_not_current_roster_evidence"
+      ],
+      "source_urls_preserved": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers",
+        "https://www.huya.com/video/u/1356069176",
+        "https://www.huya.com/bjh369",
+        "https://www.huya.com/520369"
+      ],
+      "owner": {
+        "uid": "1356069176",
+        "nick": "JDG.369",
+        "profileRoom": 520369
+      },
+      "reported_start_at_utc": "2023-10-10T13:36:16+00:00",
+      "historical_start_time_note": "This is the startTime currently reported by the page, not a complete channel history or proof of abandonment."
+    },
+    {
+      "player_id": "breathe",
+      "name": "Breathe",
+      "team": "Anyone's Legend",
+      "league": "LPL",
+      "role": "TOP",
+      "platform": "huya",
+      "channel_id": "390001",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "breathe",
+        "name": "Breathe",
+        "platform": "huya",
+        "channel_id": "390001",
+        "checked_at": "2026-11-16T17:03:49.327073+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [],
+      "source_urls_preserved": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers",
+        "https://www.huya.com/video/u/1590402724",
+        "https://www.huya.com/390001"
+      ],
+      "owner": {
+        "uid": "1590402724",
+        "nick": "Breatheeee",
+        "profileRoom": 390001
+      },
+      "reported_start_at_utc": "2026-03-25T09:33:35+00:00",
+      "historical_start_time_note": "This is the startTime currently reported by the page, not a complete channel history or proof of abandonment."
+    },
+    {
+      "player_id": "tian",
+      "name": "Tian",
+      "team": "Top Esports",
+      "league": "LPL",
+      "role": "JUNGLE",
+      "platform": "huya",
+      "channel_id": "594877",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "tian",
+        "name": "Tian",
+        "platform": "huya",
+        "channel_id": "594877",
+        "checked_at": "2026-11-16T17:03:49.327078+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [],
+      "source_urls_preserved": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers",
+        "https://www.huya.com/video/u/1504623021",
+        "https://www.huya.com/594877"
+      ],
+      "owner": {
+        "uid": "1504623021",
+        "nick": "Tian高天亮",
+        "profileRoom": 594877
+      },
+      "reported_start_at_utc": "2026-03-17T16:24:14+00:00",
+      "historical_start_time_note": "This is the startTime currently reported by the page, not a complete channel history or proof of abandonment."
+    },
+    {
+      "player_id": "bin",
+      "name": "Bin",
+      "team": "Bilibili Gaming",
+      "league": "LPL",
+      "role": "TOP",
+      "platform": "bilibili",
+      "channel_id": "13914640",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "bin",
+        "name": "Bin",
+        "platform": "bilibili",
+        "channel_id": "13914640",
+        "checked_at": "2026-11-16T17:03:49.327096+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [
+        "player_online_not_observed_platform_online_control_only"
+      ],
+      "source_urls_preserved": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers",
+        "https://space.bilibili.com/325315550",
+        "https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=325315550",
+        "https://api.live.bilibili.com/room/v1/Room/get_info?room_id=13914640",
+        "https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=13914640"
+      ],
+      "owner": {
+        "uid": "325315550",
+        "name": "BLGBin",
+        "Official": {
+          "role": 2,
+          "title": "BLG电子竞技俱乐部英雄联盟选手",
+          "desc": "",
+          "type": 0
+        }
+      },
+      "identity_matches": true
+    },
+    {
+      "player_id": "viper",
+      "name": "Viper",
+      "team": "Bilibili Gaming",
+      "league": "LPL",
+      "role": "ADC",
+      "platform": "bilibili",
+      "channel_id": "1880715130",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "viper",
+        "name": "Viper",
+        "platform": "bilibili",
+        "channel_id": "1880715130",
+        "checked_at": "2026-11-16T17:03:49.327117+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [
+        "player_online_not_observed_platform_online_control_only",
+        "contract_renewal_unverified_existing_short_expiry_preserved"
+      ],
+      "source_urls_preserved": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers",
+        "https://space.bilibili.com/3690988432263598",
+        "https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=3690988432263598",
+        "https://api.live.bilibili.com/room/v1/Room/get_info?room_id=1880715130",
+        "https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=1880715130",
+        "https://api.bilibili.com/x/web-interface/card?mid=3690988432263598"
+      ],
+      "owner": {
+        "uid": "3690988432263598",
+        "name": "BLG_Viper",
+        "Official": {
+          "role": 9,
+          "title": "BLG电子竞技俱乐部英雄联盟选手",
+          "desc": "",
+          "type": 0
+        }
+      },
+      "identity_matches": true
+    },
+    {
+      "player_id": "xun",
+      "name": "Xun",
+      "team": "Bilibili Gaming",
+      "league": "LPL",
+      "role": "JUNGLE",
+      "platform": "bilibili",
+      "channel_id": "26808302",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "xun",
+        "name": "Xun",
+        "platform": "bilibili",
+        "channel_id": "26808302",
+        "checked_at": "2026-11-16T17:03:49.327149+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [
+        "player_online_not_observed_platform_online_control_only"
+      ],
+      "source_urls_preserved": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers",
+        "https://space.bilibili.com/594325484",
+        "https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=594325484",
+        "https://api.live.bilibili.com/room/v1/Room/get_info?room_id=26808302",
+        "https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=26808302"
+      ],
+      "owner": {
+        "uid": "594325484",
+        "name": "BLGXun",
+        "Official": {
+          "role": 2,
+          "title": "BLG电子竞技俱乐部英雄联盟选手",
+          "desc": "",
+          "type": 0
+        }
+      },
+      "identity_matches": true
+    },
+    {
+      "player_id": "on",
+      "name": "ON",
+      "team": "Bilibili Gaming",
+      "league": "LPL",
+      "role": "SUPPORT",
+      "platform": "bilibili",
+      "channel_id": "26808227",
+      "association": "confirmed_against_existing_sources_and_current_owner",
+      "status_check": {
+        "player": "on",
+        "name": "ON",
+        "platform": "bilibili",
+        "channel_id": "26808227",
+        "checked_at": "2026-11-16T17:03:49.327166+00:00",
+        "operational": true,
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        }
+      },
+      "warnings": [
+        "player_online_not_observed_platform_online_control_only"
+      ],
+      "source_urls_preserved": [
+        "https://www.maurogarih.com/en/herramientas/streamers",
+        "https://www.maurogarih.com/api/streamers",
+        "https://space.bilibili.com/398692774",
+        "https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=398692774",
+        "https://api.live.bilibili.com/room/v1/Room/get_info?room_id=26808227",
+        "https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=26808227"
+      ],
+      "owner": {
+        "uid": "398692774",
+        "name": "BLGON",
+        "Official": {
+          "role": 2,
+          "title": "BLG电子竞技俱乐部英雄联盟选手",
+          "desc": "",
+          "type": 0
+        }
+      },
+      "identity_matches": true
+    }
+  ],
+  "bilibili_public_online_control": {
+    "requested_id": "5067",
+    "directory": "https://api.live.bilibili.com/xlive/web-interface/v1/webMain/getList?platform=web",
+    "at": "2026-11-16T17:07:25.194516+00:00",
+    "outside_catalog": true,
+    "canonical_id": "5067",
+    "response": {
+      "code": 0,
+      "data": {
+        "uid": 227933,
+        "room_id": 5067,
+        "short_id": 1000,
+        "live_status": 1,
+        "live_time": "2026-11-16 21:36:05",
+        "title": "【坂本】开肝"
+      }
+    },
+    "parsed": {
+      "live": true,
+      "session_id": "2026-11-16 21:36:05",
+      "title": "【坂本】开肝"
+    },
+    "adapter": {
+      "live": true,
+      "session_id": "2026-11-16 21:36:05",
+      "title": "【坂本】开肝"
+    }
+  },
+  "bilibili_final_checks": [
+    {
+      "player": "knight",
+      "channel_id": "31934797",
+      "at": "2026-11-16T17:12:59.105593+00:00",
+      "state": {
+        "live": false,
+        "session_id": "",
+        "title": ""
+      }
+    },
+    {
+      "player": "bin",
+      "channel_id": "13914640",
+      "at": "2026-11-16T17:12:59.873480+00:00",
+      "state": {
+        "live": false,
+        "session_id": "",
+        "title": ""
+      }
+    },
+    {
+      "player": "viper",
+      "channel_id": "1880715130",
+      "at": "2026-11-16T17:13:01.384157+00:00",
+      "state": {
+        "live": false,
+        "session_id": "",
+        "title": ""
+      }
+    },
+    {
+      "player": "xun",
+      "channel_id": "26808302",
+      "at": "2026-11-16T17:13:02.803932+00:00",
+      "state": {
+        "live": false,
+        "session_id": "",
+        "title": ""
+      }
+    },
+    {
+      "player": "on",
+      "channel_id": "26808227",
+      "at": "2026-11-16T17:13:04.192011+00:00",
+      "state": {
+        "live": false,
+        "session_id": "",
+        "title": ""
+      }
+    },
+    {
+      "player": "public_control_outside_catalog",
+      "channel_id": "5067",
+      "at": "2026-11-16T17:13:05.593940+00:00",
+      "state": {
+        "live": false,
+        "session_id": "",
+        "title": ""
+      }
+    }
+  ],
+  "bilibili_controls_after_parser_fix": [
+    {
+      "kind": "original_control_recheck",
+      "channel_id": "5067",
+      "at": "2026-11-16T17:15:41.587286+00:00",
+      "response": {
+        "code": 0,
+        "data": {
+          "uid": 227933,
+          "room_id": 5067,
+          "short_id": 1000,
+          "live_status": 2,
+          "live_time": "0000-00-00 00:00:00",
+          "title": "【坂本】开肝"
+        }
+      },
+      "adapter": {
+        "live": false,
+        "session_id": "",
+        "title": ""
+      }
+    },
+    {
+      "kind": "new_online_control_after_parser_fix",
+      "directory": "https://api.live.bilibili.com/xlive/web-interface/v1/webMain/getList?platform=web",
+      "outside_catalog": true,
+      "at": "2026-11-16T17:15:44.749449+00:00",
+      "requested_id": "1713545054",
+      "canonical_id": "1713545054",
+      "response": {
+        "code": 0,
+        "data": {
+          "uid": 3690982725913434,
+          "room_id": 1713545054,
+          "short_id": 0,
+          "live_status": 1,
+          "live_time": "2026-11-16 07:59:43",
+          "title": "纯女声优质点唱 一个很来财的点唱厅"
+        }
+      },
+      "adapter": {
+        "live": true,
+        "session_id": "2026-11-16 07:59:43",
+        "title": "纯女声优质点唱 一个很来财的点唱厅"
+      }
+    }
+  ],
+  "bilibili_identity_checks": [
+    {
+      "player": "knight",
+      "channel_id": "31934797",
+      "expected_uid": "3546597304568306",
+      "at": "2026-11-16T17:05:06.620252+00:00",
+      "room": {
+        "uid": 3546597304568306,
+        "room_id": 31934797,
+        "short_id": 0,
+        "live_status": 0,
+        "live_time": "0000-00-00 00:00:00",
+        "title": "聊聊天"
+      },
+      "anchor": {
+        "uid": 3546597304568306,
+        "uname": "BLGKnight",
+        "official_verify": {
+          "type": 0,
+          "desc": "BLG电子竞技俱乐部英雄联盟选手",
+          "role": 2
+        }
+      },
+      "profile": {
+        "mid": "3546597304568306",
+        "name": "BLGKnight",
+        "Official": {
+          "role": 2,
+          "title": "BLG电子竞技俱乐部英雄联盟选手",
+          "desc": "",
+          "type": 0
+        },
+        "official_verify": {
+          "type": 0,
+          "desc": "BLG电子竞技俱乐部英雄联盟选手"
+        },
+        "sign": ""
+      },
+      "resolved_room": {
+        "code": 0,
+        "message": "OK",
+        "ttl": 1,
+        "data": {
+          "roomStatus": 1,
+          "roundStatus": 0,
+          "liveStatus": 0,
+          "url": "https://live.bilibili.com/31934797",
+          "title": "聊聊天",
+          "cover": "https://i0.hdslb.com/bfs/live/new_room_cover/ffdbd0050d067762de940c74d832807543eed535.jpg",
+          "online": 0,
+          "roomid": 31934797,
+          "broadcast_type": 0,
+          "online_hidden": 0,
+          "link": "https://live.bilibili.com/31934797?broadcast_type=0&is_room_feed=1"
+        }
+      },
+      "identity_matches": true,
+      "state": {
+        "live": false,
+        "session_id": "",
+        "title": ""
+      }
+    },
+    {
+      "player": "bin",
+      "channel_id": "13914640",
+      "expected_uid": "325315550",
+      "at": "2026-11-16T17:05:12.655036+00:00",
+      "room": {
+        "uid": 325315550,
+        "room_id": 13914640,
+        "short_id": 0,
+        "live_status": 0,
+        "live_time": "0000-00-00 00:00:00",
+        "title": "播一会"
+      },
+      "anchor": {
+        "uid": 325315550,
+        "uname": "BLGBin",
+        "official_verify": {
+          "type": 0,
+          "desc": "BLG电子竞技俱乐部英雄联盟选手",
+          "role": 2
+        }
+      },
+      "profile": {
+        "mid": "325315550",
+        "name": "BLGBin",
+        "Official": {
+          "role": 2,
+          "title": "BLG电子竞技俱乐部英雄联盟选手",
+          "desc": "",
+          "type": 0
+        },
+        "official_verify": {
+          "type": 0,
+          "desc": "BLG电子竞技俱乐部英雄联盟选手"
+        },
+        "sign": ""
+      },
+      "resolved_room": {
+        "code": 0,
+        "message": "OK",
+        "ttl": 1,
+        "data": {
+          "roomStatus": 1,
+          "roundStatus": 0,
+          "liveStatus": 0,
+          "url": "https://live.bilibili.com/13914640",
+          "title": "播一会",
+          "cover": "https://i0.hdslb.com/bfs/live/new_room_cover/3ca9d0409857d8cca1971cac12410248a6f16e1b.jpg",
+          "online": 0,
+          "roomid": 13914640,
+          "broadcast_type": 0,
+          "online_hidden": 0,
+          "link": "https://live.bilibili.com/13914640?broadcast_type=0&is_room_feed=1"
+        }
+      },
+      "identity_matches": true,
+      "state": {
+        "live": false,
+        "session_id": "",
+        "title": ""
+      }
+    },
+    {
+      "player": "viper",
+      "channel_id": "1880715130",
+      "expected_uid": "3690988432263598",
+      "at": "2026-11-16T17:05:18.582849+00:00",
+      "room": {
+        "uid": 3690988432263598,
+        "room_id": 1880715130,
+        "short_id": 0,
+        "live_status": 0,
+        "live_time": "0000-00-00 00:00:00",
+        "title": "好久不见"
+      },
+      "anchor": {
+        "uid": 3690988432263598,
+        "uname": "BLG_Viper",
+        "official_verify": {
+          "type": -1,
+          "desc": "BLG电子竞技俱乐部英雄联盟选手",
+          "role": 9
+        }
+      },
+      "profile": {
+        "mid": "3690988432263598",
+        "name": "BLG_Viper",
+        "Official": {
+          "role": 9,
+          "title": "BLG电子竞技俱乐部英雄联盟选手",
+          "desc": "",
+          "type": 0
+        },
+        "official_verify": {
+          "type": 1,
+          "desc": "BLG电子竞技俱乐部英雄联盟选手"
+        },
+        "sign": ""
+      },
+      "resolved_room": {
+        "code": 0,
+        "message": "OK",
+        "ttl": 1,
+        "data": {
+          "roomStatus": 1,
+          "roundStatus": 0,
+          "liveStatus": 0,
+          "url": "https://live.bilibili.com/1880715130",
+          "title": "好久不见",
+          "cover": "https://i0.hdslb.com/bfs/live/new_room_cover/6b05f3daf30dedd6fdabe728352027439d4ba998.jpg",
+          "online": 0,
+          "roomid": 1880715130,
+          "broadcast_type": 0,
+          "online_hidden": 0,
+          "link": "https://live.bilibili.com/1880715130?broadcast_type=0&is_room_feed=1"
+        }
+      },
+      "identity_matches": true,
+      "state": {
+        "live": false,
+        "session_id": "",
+        "title": ""
+      }
+    },
+    {
+      "player": "xun",
+      "channel_id": "26808302",
+      "expected_uid": "594325484",
+      "at": "2026-11-16T17:05:23.917471+00:00",
+      "room": {
+        "uid": 594325484,
+        "room_id": 26808302,
+        "short_id": 0,
+        "live_status": 0,
+        "live_time": "0000-00-00 00:00:00",
+        "title": "直播会"
+      },
+      "anchor": {
+        "uid": 594325484,
+        "uname": "BLGXun",
+        "official_verify": {
+          "type": 0,
+          "desc": "BLG电子竞技俱乐部英雄联盟选手",
+          "role": 2
+        }
+      },
+      "profile": {
+        "mid": "594325484",
+        "name": "BLGXun",
+        "Official": {
+          "role": 2,
+          "title": "BLG电子竞技俱乐部英雄联盟选手",
+          "desc": "",
+          "type": 0
+        },
+        "official_verify": {
+          "type": 0,
+          "desc": "BLG电子竞技俱乐部英雄联盟选手"
+        },
+        "sign": ""
+      },
+      "resolved_room": {
+        "code": 0,
+        "message": "OK",
+        "ttl": 1,
+        "data": {
+          "roomStatus": 1,
+          "roundStatus": 0,
+          "liveStatus": 0,
+          "url": "https://live.bilibili.com/26808302",
+          "title": "直播会",
+          "cover": "https://i0.hdslb.com/bfs/live/new_room_cover/64c96395cd04a6d1e7745a6701a81689da57f246.jpg",
+          "online": 0,
+          "roomid": 26808302,
+          "broadcast_type": 0,
+          "online_hidden": 0,
+          "link": "https://live.bilibili.com/26808302?broadcast_type=0&is_room_feed=1"
+        }
+      },
+      "identity_matches": true,
+      "state": {
+        "live": false,
+        "session_id": "",
+        "title": ""
+      }
+    },
+    {
+      "player": "on",
+      "channel_id": "26808227",
+      "expected_uid": "398692774",
+      "at": "2026-11-16T17:05:29.460496+00:00",
+      "room": {
+        "uid": 398692774,
+        "room_id": 26808227,
+        "short_id": 0,
+        "live_status": 0,
+        "live_time": "0000-00-00 00:00:00",
+        "title": "纽约户外"
+      },
+      "anchor": {
+        "uid": 398692774,
+        "uname": "BLGON",
+        "official_verify": {
+          "type": 0,
+          "desc": "BLG电子竞技俱乐部英雄联盟选手",
+          "role": 2
+        }
+      },
+      "profile": {
+        "mid": "398692774",
+        "name": "BLGON",
+        "Official": {
+          "role": 2,
+          "title": "BLG电子竞技俱乐部英雄联盟选手",
+          "desc": "",
+          "type": 0
+        },
+        "official_verify": {
+          "type": 0,
+          "desc": "BLG电子竞技俱乐部英雄联盟选手"
+        },
+        "sign": "\n"
+      },
+      "resolved_room": {
+        "code": 0,
+        "message": "OK",
+        "ttl": 1,
+        "data": {
+          "roomStatus": 1,
+          "roundStatus": 0,
+          "liveStatus": 0,
+          "url": "https://live.bilibili.com/26808227",
+          "title": "纽约户外",
+          "cover": "https://i0.hdslb.com/bfs/live/new_room_cover/303f3fa1729dc8f18335be9d4384eb37530c99aa.jpg",
+          "online": 0,
+          "roomid": 26808227,
+          "broadcast_type": 0,
+          "online_hidden": 0,
+          "link": "https://live.bilibili.com/26808227?broadcast_type=0&is_room_feed=1"
+        }
+      },
+      "identity_matches": true,
+      "state": {
+        "live": false,
+        "session_id": "",
+        "title": ""
+      }
+    }
+  ],
+  "caveats": [
+    "No catalog player was observed live. Natural start/stop transitions were not observed. Online was observed only in an unrelated public Bilibili control; transitions for all five players were simulated in automated tests.",
+    "No contract renewal for Flandre or Viper was confirmed; original validity deadlines were preserved. Official member/team sources were queried but do not certify future contract status.",
+    "Some Huya accounts have historical timestamps and legacy team names; these do not establish abandonment or invalidate the confirmed player/channel ownership.",
+    "No real Discord notifications, production database changes, GitHub publication or Square Cloud deployment."
+  ],
+  "external_source_failures": [
+    {
+      "source": "Tencent individual Tian and team TES",
+      "observed": "HTTP 503 transient; retried after cooldown; eventual official responses successful."
+    },
+    {
+      "source": "https://api.live.bilibili.com/xlive/web-interface/v1/second/getList",
+      "observed": "HTTP 200 with application code -352. No live/offline state inferred. Alternate public main directory supplied online control."
+    },
+    {
+      "source": "https://lol.fandom.com/wiki/Bilibili_Gaming",
+      "observed": "HTTP 402; not used to certify roster or renewal."
+    },
+    {
+      "source": "https://lolesports.com/en-US/news/global-contract-database",
+      "observed": "HTTP 200 shell without readable contract table; no renewal confirmed."
+    },
+    {
+      "source": "Official BLG Weibo announcements",
+      "observed": "Visitor-system shell instead of readable announcement; no renewal inferred."
+    }
+  ]
+}

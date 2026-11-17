@@ -1,0 +1,1037 @@
+{
+  "checked_at": "2026-11-16T23:55:33.431478+00:00",
+  "source_page": "https://www.maurogarih.com/en/herramientas/streamers",
+  "source_api": "https://www.maurogarih.com/api/streamers",
+  "source_updated_at_ms": 1794872617088,
+  "added_ready_players": 26,
+  "added_pending_players": 3,
+  "total_registered_players": 62,
+  "total_ready_players": 59,
+  "total_ready_channels": 60,
+  "total_pending_channels": 3,
+  "original_33_players_and_34_channels_preserved": true,
+  "candidates": [
+    {
+      "player": "Oscarinin",
+      "team_last_reported_by_source": "Nao informado pela fonte",
+      "league_label": "GLOBAL",
+      "role": "TOP",
+      "login": "oscarinin",
+      "user_id": "99334995",
+      "monitoring_status": "ready",
+      "source_name": "Oscarinin",
+      "source_team": "",
+      "source_live_url": "https://www.twitch.tv/Oscarinin",
+      "checked_at": "2026-11-16T23:43:37.615946+00:00",
+      "twitch_response": {
+        "data": {
+          "user": {
+            "id": "99334995",
+            "login": "oscarinin",
+            "displayName": "Oscarinin",
+            "stream": null,
+            "broadcastSettings": {
+              "title": "soloQ challenger GX top 2000lp"
+            }
+          }
+        }
+      }
+    },
+    {
+      "player": "BrokenBlade",
+      "team_last_reported_by_source": "G2 Esports",
+      "league_label": "LEC",
+      "role": "TOP",
+      "login": "brokenblade",
+      "user_id": "60461580",
+      "monitoring_status": "ready",
+      "source_name": "BB",
+      "source_team": "G2",
+      "source_live_url": "https://www.twitch.tv/brokenblade",
+      "checked_at": "2026-11-16T23:43:37.616022+00:00",
+      "twitch_response": {
+        "data": {
+          "user": {
+            "id": "60461580",
+            "login": "brokenblade",
+            "displayName": "brokenblade",
+            "stream": null,
+            "broadcastSettings": {
+              "title": "SoloQ until inhouse is back live :3"
+            }
+          }
+        }
+      }
+    },
+    {
+      "player": "Canna",
+      "team_last_reported_by_source": "Karmine Corp",
+      "league_label": "LEC",
+      "role": "TOP",
+      "login": "canna",
+      "user_id": "476354382",
+      "monitoring_status": "ready",
+      "source_name": "Canna",
+      "source_team": "KC",
+      "source_live_url": "https://www.twitch.tv/canna",
+      "checked_at": "2026-11-16T23:43:37.616039+00:00",
+      "twitch_response": {
+        "data": {
+          "user": {
+            "id": "476354382",
+            "login": "canna",
+            "displayName": "Canna",
+            "stream": null,
+            "broadcastSettings": {
+              "title": "Canna"
+            }
+          }
+        }
+      }
+    },
+    {
+      "player": "Myrwn",
+      "team_last_reported_by_source": "Movistar KOI",
+      "league_label": "LEC",
+      "role": "TOP",
+      "login": "myrwnn",
+      "user_id": "432895037",
+      "monitoring_status": "ready",
+      "source_name": "Myrwn",
+      "source_team": "MKOI",
+      "source_live_url": "https://www.twitch.tv/myrwnn",
+      "checked_at": "2026-11-16T23:43:37.616050+00:00",
+      "twitch_response": {
+        "data": {
+          "user": {
+            "id": "432895037",
+            "login": "myrwnn",
+            "displayName": "Myrwnn",
+            "stream": null,
+            "broadcastSettings": {
+              "title": "futuro desempleado en un torneo del deadlock"
+            }
+          }
+        }
+      }
+    },
+    {
+      "player": "Naak Nako",
+      "team_last_reported_by_source": "Team Vitality",
+      "league_label": "LEC",
+      "role": "TOP",
+      "login": "naaknako7",
+      "user_id": "724538269",
+      "monitoring_status": "ready",
+      "source_name": "Naak Nako",
+      "source_team": "VIT",
+      "source_live_url": "https://www.twitch.tv/naaknako7",
+      "checked_at": "2026-11-16T23:43:37.616060+00:00",
+      "twitch_response": {
+        "data": {
+          "user": {
+            "id": "724538269",
+            "login": "naaknako7",
+            "displayName": "NaakNako7",
+            "stream": null,
+            "broadcastSettings": {
+              "title": "west challenger solo q"
+            }
+          }
+        }
+      }
+    },
+    {
+      "player": "Razork",
+      "team_last_reported_by_source": "Fnatic",
+      "league_label": "LEC",
+      "role": "JUNGLE",
+      "login": "razorklol",
+      "user_id": "141449939",
+      "monitoring_status": "ready",
+      "source_name": "Razork",
+      "source_team": "FNC",
+      "source_live_url": "https://www.twitch.tv/razorklol",
+      "checked_at": "2026-11-16T23:43:37.616077+00:00",
+      "twitch_response": {
+        "data": {
+          "user": {
+            "id": "141449939",
+            "login": "razorklol",
+            "displayName": "Razorklol",
+            "stream": null,
+            "broadcastSettings": {
+              "title": "Jugando jayce de chill un par de games :)"
+            }
+          }
+        }
+      }
+    },
+    {
+      "player": "Humanoid",
+      "team_last_reported_by_source": "Team Vitality",
+      "league_label": "LEC",
+      "role": "MID",
+      "login": "humanoiidd",
+      "user_id": null,
+      "monitoring_status": "pending",
+      "source_name": "Humanoid",
+      "source_team": "VIT",
+      "source_live_url": "https://www.twitch.tv/humanoiidd",
+      "checked_at": "2026-11-16T23:43:37.616085+00:00",
+      "twitch_response": {
+        "data": {
+          "user": null
+        }
+      }
+    },
+    {
+      "player": "Upset",
+      "team_last_reported_by_source": "Fnatic",
+      "league_label": "LEC",
+      "role": "ADC",
+      "login": "upsetger",
+      "user_id": "144750714",
+      "monitoring_status": "ready",
+      "source_name": "Upset",
+      "source_team": "FNC",
+      "source_live_url": "https://www.twitch.tv/upsetger",
+      "checked_at": "2026-11-16T23:43:37.616092+00:00",
+      "twitch_response": {
+        "data": {
+          "user": {
+            "id": "144750714",
+            "login": "upsetger",
+            "displayName": "upsetger",
+            "stream": null,
+            "broadcastSettings": {
+              "title": "FNC Upset Chall soloq"
+            }
+          }
+        }
+      }
+    },
+    {
+      "player": "Mikyx",
+      "team_last_reported_by_source": "SK Gaming",
+      "league_label": "LEC",
+      "role": "SUPPORT",
+      "login": "m1kyx",
+      "user_id": "44905884",
+      "monitoring_status": "ready",
+      "source_name": "Mikyx",
+      "source_team": "SK",
+      "source_live_url": "https://www.twitch.tv/m1kyx",
+      "checked_at": "2026-11-16T23:43:37.616102+00:00",
+      "twitch_response": {
+        "data": {
+          "user": {
+            "id": "44905884",
+            "login": "m1kyx",
+            "displayName": "M1kyx",
+            "stream": null,
+            "broadcastSettings": {
+              "title": "Miky EUW Soloq"
+            }
+          }
+        }
+      }
+    },
+    {
+      "player": "SkewMond",
+      "team_last_reported_by_source": "G2 Esports",
+      "league_label": "LEC",
+      "role": "JUNGLE",
+      "login": "skewmond_lol",
+      "user_id": "156068514",
+      "monitoring_status": "ready",
+      "source_name": "SkewMond",
+      "source_team": "G2",
+      "source_live_url": "https://www.twitch.tv/skewmond_lol",
+      "checked_at": "2026-11-16T23:43:37.616110+00:00",
+      "twitch_response": {
+        "data": {
+          "user": {
+            "id": "156068514",
+            "login": "skewmond_lol",
+            "displayName": "skewmond_lol",
+            "stream": null,
+            "broadcastSettings": {
+              "title": "BDSA SkewMond rank 2 EUW 1900 lp soloQ NO MIC"
+            }
+          }
+        }
+      }
+    },
+    {
+      "player": "Caps",
+      "team_last_reported_by_source": "G2 Esports",
+      "league_label": "LEC",
+      "role": "MID",
+      "login": "caps",
+      "user_id": "129281939",
+      "monitoring_status": "ready",
+      "source_name": "Caps",
+      "source_team": "G2",
+      "source_live_url": "https://www.twitch.tv/caps",
+      "checked_at": "2026-11-16T23:43:37.616118+00:00",
+      "twitch_response": {
+        "data": {
+          "user": {
+            "id": "129281939",
+            "login": "caps",
+            "displayName": "caps",
+            "stream": null,
+            "broadcastSettings": {
+              "title": "A sudden caps stream appears"
+            }
+          }
+        }
+      }
+    },
+    {
+      "player": "Hans Sama",
+      "team_last_reported_by_source": "G2 Esports",
+      "league_label": "LEC",
+      "role": "ADC",
+      "login": "hanssama",
+      "user_id": "46715307",
+      "monitoring_status": "ready",
+      "source_name": "Hans Sama",
+      "source_team": "G2",
+      "source_live_url": "https://www.twitch.tv/hanssama",
+      "checked_at": "2026-11-16T23:43:37.616141+00:00",
+      "twitch_response": {
+        "data": {
+          "user": {
+            "id": "46715307",
+            "login": "hanssama",
+            "displayName": "Hanssama",
+            "stream": null,
+            "broadcastSettings": {
+              "title": "How well do Kitty and Hans REALLY know each other? HopEUm Special (Featuring Kitty & Hans Sama)"
+            }
+          }
+        }
+      }
+    },
+    {
+      "player": "Jackies",
+      "team_last_reported_by_source": "GIANTX",
+      "league_label": "LEC",
+      "role": "MID",
+      "login": "jackissek",
+      "user_id": null,
+      "monitoring_status": "pending",
+      "source_name": "Jackies",
+      "source_team": "GIANTX",
+      "source_live_url": "https://www.twitch.tv/jackissek",
+      "checked_at": "2026-11-16T23:43:37.616152+00:00",
+      "twitch_response": {
+        "data": {
+          "user": null
+        }
+      }
+    },
+    {
+      "player": "Noah",
+      "team_last_reported_by_source": "GIANTX",
+      "league_label": "LEC",
+      "role": "ADC",
+      "login": "krnoah7",
+      "user_id": "678349186",
+      "monitoring_status": "ready",
+      "source_name": "Noah",
+      "source_team": "GIANTX",
+      "source_live_url": "https://www.twitch.tv/krnoah7",
+      "checked_at": "2026-11-16T23:43:37.616159+00:00",
+      "twitch_response": {
+        "data": {
+          "user": {
+            "id": "678349186",
+            "login": "krnoah7",
+            "displayName": "krnoah7",
+            "stream": null,
+            "broadcastSettings": {
+              "title": "It's been a while  lec inhouse"
+            }
+          }
+        }
+      }
+    },
+    {
+      "player": "Yike",
+      "team_last_reported_by_source": "Karmine Corp",
+      "league_label": "LEC",
+      "role": "JUNGLE",
+      "login": "yikelol",
+      "user_id": "41124654",
+      "monitoring_status": "ready",
+      "source_name": "Yike",
+      "source_team": "KC",
+      "source_live_url": "https://www.twitch.tv/yikelol",
+      "checked_at": "2026-11-16T23:43:37.616166+00:00",
+      "twitch_response": {
+        "data": {
+          "user": {
+            "id": "41124654",
+            "login": "yikelol",
+            "displayName": "yikelol",
+            "stream": null,
+            "broadcastSettings": {
+              "title": "SoloQ before madrid roadtrip yaruuuuu"
+            }
+          }
+        }
+      }
+    },
+    {
+      "player": "Caliste",
+      "team_last_reported_by_source": "Karmine Corp",
+      "league_label": "LEC",
+      "role": "ADC",
+      "login": "caliste_lol",
+      "user_id": "203986266",
+      "monitoring_status": "ready",
+      "source_name": "Caliste",
+      "source_team": "KC",
+      "source_live_url": "https://www.twitch.tv/caliste_lol",
+      "checked_at": "2026-11-16T23:43:37.616174+00:00",
+      "twitch_response": {
+        "data": {
+          "user": {
+            "id": "203986266",
+            "login": "caliste_lol",
+            "displayName": "Caliste_LoL",
+            "stream": null,
+            "broadcastSettings": {
+              "title": "KC CALISTE - SOLOQ"
+            }
+          }
+        }
+      }
+    },
+    {
+      "player": "Targamas",
+      "team_last_reported_by_source": "Team BDS",
+      "league_label": "LEC",
+      "role": "SUPPORT",
+      "login": "targamas1",
+      "user_id": "139887547",
+      "monitoring_status": "ready",
+      "source_name": "Targamas",
+      "source_team": "BDS",
+      "source_live_url": "https://www.twitch.tv/targamas1",
+      "checked_at": "2026-11-16T23:43:37.616183+00:00",
+      "twitch_response": {
+        "data": {
+          "user": {
+            "id": "139887547",
+            "login": "targamas1",
+            "displayName": "Targamas1",
+            "stream": null,
+            "broadcastSettings": {
+              "title": "FF Targamas LFL vs JL"
+            }
+          }
+        }
+      }
+    },
+    {
+      "player": "Elyoya",
+      "team_last_reported_by_source": "Movistar KOI",
+      "league_label": "LEC",
+      "role": "JUNGLE",
+      "login": "elyoyalol",
+      "user_id": "427520929",
+      "monitoring_status": "ready",
+      "source_name": "Elyoya",
+      "source_team": "MKOI",
+      "source_live_url": "https://www.twitch.tv/elyoyalol",
+      "checked_at": "2026-11-16T23:43:37.616191+00:00",
+      "twitch_response": {
+        "data": {
+          "user": {
+            "id": "427520929",
+            "login": "elyoyalol",
+            "displayName": "elyoyalol",
+            "stream": null,
+            "broadcastSettings": {
+              "title": "nueva season mismo streameador profesional"
+            }
+          }
+        }
+      }
+    },
+    {
+      "player": "Jojopyun",
+      "team_last_reported_by_source": "Movistar KOI",
+      "league_label": "LEC",
+      "role": "MID",
+      "login": "jojopyun",
+      "user_id": "404773370",
+      "monitoring_status": "ready",
+      "source_name": "Jojopyun",
+      "source_team": "MKOI",
+      "source_live_url": "https://www.twitch.tv/jojopyun",
+      "checked_at": "2026-11-16T23:43:37.616199+00:00",
+      "twitch_response": {
+        "data": {
+          "user": {
+            "id": "404773370",
+            "login": "jojopyun",
+            "displayName": "jojopyun",
+            "stream": null,
+            "broadcastSettings": {
+              "title": "❗❗KOREA BOOTCAMP DAY 2 ❗❗ BEST STREAMER WORLD IS BACK❗❗NO MIC NO CAM IM SICK"
+            }
+          }
+        }
+      }
+    },
+    {
+      "player": "Supa",
+      "team_last_reported_by_source": "Movistar KOI",
+      "league_label": "LEC",
+      "role": "ADC",
+      "login": "supa_lol",
+      "user_id": "413584085",
+      "monitoring_status": "ready",
+      "source_name": "Supa",
+      "source_team": "MKOI",
+      "source_live_url": "https://www.twitch.tv/supa_lol",
+      "checked_at": "2026-11-16T23:43:37.616208+00:00",
+      "twitch_response": {
+        "data": {
+          "user": {
+            "id": "413584085",
+            "login": "supa_lol",
+            "displayName": "supa_lol",
+            "stream": null,
+            "broadcastSettings": {
+              "title": "Soloq NA PARA MI PUBLICO"
+            }
+          }
+        }
+      }
+    },
+    {
+      "player": "Alvaro",
+      "team_last_reported_by_source": "Movistar KOI",
+      "league_label": "LEC",
+      "role": "SUPPORT",
+      "login": "alvaro710x",
+      "user_id": "140153834",
+      "monitoring_status": "ready",
+      "source_name": "Alvaro",
+      "source_team": "MKOI",
+      "source_live_url": "https://www.twitch.tv/alvaro710x",
+      "checked_at": "2026-11-16T23:43:38.892179+00:00",
+      "twitch_response": {
+        "data": {
+          "user": {
+            "id": "140153834",
+            "login": "alvaro710x",
+            "displayName": "alvaro710x",
+            "stream": null,
+            "broadcastSettings": {
+              "title": "cs2 premier | MKOI Alvaro"
+            }
+          }
+        }
+      }
+    },
+    {
+      "player": "Nuc",
+      "team_last_reported_by_source": "Shifters",
+      "league_label": "LEC",
+      "role": "MID",
+      "login": "nuclearintt",
+      "user_id": null,
+      "monitoring_status": "pending",
+      "source_name": "Nuc",
+      "source_team": "Shifters",
+      "source_live_url": "https://www.twitch.tv/nuclearintt",
+      "checked_at": "2026-11-16T23:43:38.892244+00:00",
+      "twitch_response": {
+        "data": {
+          "user": null
+        }
+      }
+    },
+    {
+      "player": "Sheo",
+      "team_last_reported_by_source": "Team Heretics",
+      "league_label": "LEC",
+      "role": "JUNGLE",
+      "login": "sheo_lol",
+      "user_id": "539047450",
+      "monitoring_status": "ready",
+      "source_name": "Sheo",
+      "source_team": "TH",
+      "source_live_url": "https://www.twitch.tv/sheo_lol",
+      "checked_at": "2026-11-16T23:43:38.892257+00:00",
+      "twitch_response": {
+        "data": {
+          "user": {
+            "id": "539047450",
+            "login": "sheo_lol",
+            "displayName": "Sheo_lol",
+            "stream": null,
+            "broadcastSettings": {
+              "title": "tjrs pas une win en lec zebiiiiiiii"
+            }
+          }
+        }
+      }
+    },
+    {
+      "player": "Flakked",
+      "team_last_reported_by_source": "GIANTX",
+      "league_label": "LEC",
+      "role": "ADC",
+      "login": "getflakked",
+      "user_id": "159785521",
+      "monitoring_status": "ready",
+      "source_name": "Flakked",
+      "source_team": "GIANTX",
+      "source_live_url": "https://www.twitch.tv/getFlakked",
+      "checked_at": "2026-11-16T23:43:38.892268+00:00",
+      "twitch_response": {
+        "data": {
+          "user": {
+            "id": "159785521",
+            "login": "getflakked",
+            "displayName": "getFlakked",
+            "stream": null,
+            "broadcastSettings": {
+              "title": "Flakked | si pierdo cierro 100% WINRATE HOY | toca y vete cacahuete de rechupete !manolete !discord 🟢multistreaming🟢"
+            }
+          }
+        }
+      }
+    },
+    {
+      "player": "Lyncas",
+      "team_last_reported_by_source": "Team Vitality",
+      "league_label": "LEC",
+      "role": "JUNGLE",
+      "login": "lyncaslol",
+      "user_id": "143357902",
+      "monitoring_status": "ready",
+      "source_name": "Lyncas",
+      "source_team": "VIT",
+      "source_live_url": "https://www.twitch.tv/lyncaslol",
+      "checked_at": "2026-11-16T23:43:38.892284+00:00",
+      "twitch_response": {
+        "data": {
+          "user": {
+            "id": "143357902",
+            "login": "lyncaslol",
+            "displayName": "lyncaslol",
+            "stream": null,
+            "broadcastSettings": {
+              "title": "a bit sick so no cam, soloq before travel to china  for demacia cup / !settings !song !playlist"
+            }
+          }
+        }
+      }
+    },
+    {
+      "player": "Carzzy",
+      "team_last_reported_by_source": "Team Vitality",
+      "league_label": "LEC",
+      "role": "ADC",
+      "login": "carzzy",
+      "user_id": "58196006",
+      "monitoring_status": "ready",
+      "source_name": "Carzzy",
+      "source_team": "VIT",
+      "source_live_url": "https://www.twitch.tv/carzzy",
+      "checked_at": "2026-11-16T23:43:38.892296+00:00",
+      "twitch_response": {
+        "data": {
+          "user": {
+            "id": "58196006",
+            "login": "carzzy",
+            "displayName": "carzzy",
+            "stream": null,
+            "broadcastSettings": {
+              "title": "-310 STREAMERSCLASH DRAFT ZASE SE TO DĚJE panebože.... ŠMEJD NEBO NE?"
+            }
+          }
+        }
+      }
+    },
+    {
+      "player": "Hylissang",
+      "team_last_reported_by_source": "Nao informado pela fonte",
+      "league_label": "GLOBAL",
+      "role": "SUPPORT",
+      "login": "hylissanglol",
+      "user_id": "185851694",
+      "monitoring_status": "ready",
+      "source_name": "Hylissang",
+      "source_team": "",
+      "source_live_url": "https://www.twitch.tv/hylissanglol",
+      "checked_at": "2026-11-16T23:43:38.892307+00:00",
+      "twitch_response": {
+        "data": {
+          "user": {
+            "id": "185851694",
+            "login": "hylissanglol",
+            "displayName": "HylissangLoL",
+            "stream": null,
+            "broadcastSettings": {
+              "title": "Reviewing BLG vs GEN"
+            }
+          }
+        }
+      }
+    },
+    {
+      "player": "Busio",
+      "team_last_reported_by_source": "Karmine Corp",
+      "league_label": "LEC",
+      "role": "SUPPORT",
+      "login": "busiolol",
+      "user_id": "137761685",
+      "monitoring_status": "ready",
+      "source_name": "Busio",
+      "source_team": "KC",
+      "source_live_url": "https://www.twitch.tv/busiolol",
+      "checked_at": "2026-11-16T23:43:38.892318+00:00",
+      "twitch_response": {
+        "data": {
+          "user": {
+            "id": "137761685",
+            "login": "busiolol",
+            "displayName": "Busiolol",
+            "stream": null,
+            "broadcastSettings": {
+              "title": "YOUNG HANDSOME SUPPORT -> CHALLENGER GAMEPLAY -> ITS TOO LIT"
+            }
+          }
+        }
+      }
+    },
+    {
+      "player": "Jopa",
+      "team_last_reported_by_source": "Nao informado pela fonte",
+      "league_label": "GLOBAL",
+      "role": "ADC",
+      "login": "adcjopa",
+      "user_id": "188656545",
+      "monitoring_status": "ready",
+      "source_name": "Jopa",
+      "source_team": "",
+      "source_live_url": "https://www.twitch.tv/adcjopa",
+      "checked_at": "2026-11-16T23:43:38.892326+00:00",
+      "twitch_response": {
+        "data": {
+          "user": {
+            "id": "188656545",
+            "login": "adcjopa",
+            "displayName": "ADCJopa",
+            "stream": null,
+            "broadcastSettings": {
+              "title": "Challenger ADC 2945 LP start - LEC"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "adapter_validation": {
+    "checked_at": "2026-11-16T23:49:35.893694+00:00",
+    "accounts": [
+      {
+        "login": "oscarinin",
+        "user_id": "99334995",
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        },
+        "error": null
+      },
+      {
+        "login": "brokenblade",
+        "user_id": "60461580",
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        },
+        "error": null
+      },
+      {
+        "login": "canna",
+        "user_id": "476354382",
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        },
+        "error": null
+      },
+      {
+        "login": "myrwnn",
+        "user_id": "432895037",
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        },
+        "error": null
+      },
+      {
+        "login": "naaknako7",
+        "user_id": "724538269",
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        },
+        "error": null
+      },
+      {
+        "login": "razorklol",
+        "user_id": "141449939",
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        },
+        "error": null
+      },
+      {
+        "login": "upsetger",
+        "user_id": "144750714",
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        },
+        "error": null
+      },
+      {
+        "login": "m1kyx",
+        "user_id": "44905884",
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        },
+        "error": null
+      },
+      {
+        "login": "skewmond_lol",
+        "user_id": "156068514",
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        },
+        "error": null
+      },
+      {
+        "login": "caps",
+        "user_id": "129281939",
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        },
+        "error": null
+      },
+      {
+        "login": "hanssama",
+        "user_id": "46715307",
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        },
+        "error": null
+      },
+      {
+        "login": "krnoah7",
+        "user_id": "678349186",
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        },
+        "error": null
+      },
+      {
+        "login": "yikelol",
+        "user_id": "41124654",
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        },
+        "error": null
+      },
+      {
+        "login": "caliste_lol",
+        "user_id": "203986266",
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        },
+        "error": null
+      },
+      {
+        "login": "targamas1",
+        "user_id": "139887547",
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        },
+        "error": null
+      },
+      {
+        "login": "elyoyalol",
+        "user_id": "427520929",
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        },
+        "error": null
+      },
+      {
+        "login": "jojopyun",
+        "user_id": "404773370",
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        },
+        "error": null
+      },
+      {
+        "login": "supa_lol",
+        "user_id": "413584085",
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        },
+        "error": null
+      },
+      {
+        "login": "alvaro710x",
+        "user_id": "140153834",
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        },
+        "error": null
+      },
+      {
+        "login": "sheo_lol",
+        "user_id": "539047450",
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        },
+        "error": null
+      },
+      {
+        "login": "getflakked",
+        "user_id": "159785521",
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        },
+        "error": null
+      },
+      {
+        "login": "lyncaslol",
+        "user_id": "143357902",
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        },
+        "error": null
+      },
+      {
+        "login": "carzzy",
+        "user_id": "58196006",
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        },
+        "error": null
+      },
+      {
+        "login": "hylissanglol",
+        "user_id": "185851694",
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        },
+        "error": null
+      },
+      {
+        "login": "busiolol",
+        "user_id": "137761685",
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        },
+        "error": null
+      },
+      {
+        "login": "adcjopa",
+        "user_id": "188656545",
+        "state": {
+          "live": false,
+          "session_id": "",
+          "title": ""
+        },
+        "error": null
+      },
+      {
+        "login": "illojuan",
+        "user_id": "90075649",
+        "state": {
+          "live": true,
+          "session_id": "318368224356",
+          "title": "2 DÍAS 📅 ADIÓS GTA 5 👋🏻 QUE ALGUIEN ME PELLIZQUE 🥺 BUENOS AIRES ENDING 🥰 - Grand Theft Auto V #7 [FINAL]"
+        },
+        "error": null
+      }
+    ],
+    "public_control_login": "illojuan"
+  },
+  "online_control_not_a_catalog_player": {
+    "user": {
+      "id": "90075649",
+      "login": "illojuan",
+      "displayName": "IlloJuan",
+      "broadcastSettings": {
+        "title": "2 DÍAS 📅 ADIÓS GTA 5 👋🏻 QUE ALGUIEN ME PELLIZQUE 🥺 BUENOS AIRES ENDING 🥰 - Grand Theft Auto V #7 [FINAL]"
+      },
+      "stream": {
+        "id": "318368224356",
+        "type": "live",
+        "createdAt": "2026-11-16T18:41:08Z"
+      }
+    }
+  },
+  "note": "Only public identity and stream metadata. No user/OAuth/playback token, client secret or public website client ID is stored here. Player start/stop and Discord deliveries were simulated in automated tests; no real Discord message sent."
+}
