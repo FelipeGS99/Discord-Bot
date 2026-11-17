@@ -1,8 +1,17 @@
-"""Shared real/demo rendering; all recommendations are explicitly heuristic."""
+"""Shared, bounded Discord presentation. Missing evidence is never replaced by a generic build."""
 
 from __future__ import annotations
 
 import discord
+
+from services.lol_builds import (
+    recommend,
+    insufficient,
+    available,
+    patch_key,
+    ROLE_NAMES,
+)
+from services.lol_analysis import analyze
 
 CDN = "https://ddragon.leagueoflegends.com/cdn"
 COLOR = 0x0AC8B9
@@ -14,59 +23,6 @@ MODES = {
     450: "ARAM",
     490: "Partida rapida",
     1700: "Arena",
-}
-HEALERS = {
-    "Aatrox",
-    "Soraka",
-    "Vladimir",
-    "DrMundo",
-    "Warwick",
-    "Swain",
-    "Sylas",
-    "Yuumi",
-    "Briar",
-    "Fiora",
-    "Illaoi",
-    "Zac",
-    "Nami",
-}
-MAGIC = {
-    "Ahri",
-    "Akali",
-    "Anivia",
-    "Annie",
-    "AurelionSol",
-    "Azir",
-    "Brand",
-    "Cassiopeia",
-    "Diana",
-    "Evelynn",
-    "Fiddlesticks",
-    "Fizz",
-    "Karthus",
-    "Kassadin",
-    "Katarina",
-    "Kennen",
-    "LeBlanc",
-    "Lillia",
-    "Lux",
-    "Malzahar",
-    "Morgana",
-    "Orianna",
-    "Rumble",
-    "Ryze",
-    "Swain",
-    "Syndra",
-    "Teemo",
-    "Veigar",
-    "Velkoz",
-    "Vex",
-    "Viktor",
-    "Vladimir",
-    "Xerath",
-    "Ziggs",
-    "Zoe",
-    "Zyra",
 }
 
 
@@ -105,301 +61,328 @@ def item_label(catalog, item_id):
     return f"[{text(item['name'], 80)}]({icon})" if icon else text(item["name"], 80)
 
 
-def build_recommendation(catalog, selected, enemies, role=None, map_id=11):
-    champ = champion(catalog, selected)
-    tags = champ.get("tags", [])
-    foes = [champion(catalog, e.get("championId")) for e in enemies]
-    magic = sum("Mage" in c.get("tags", []) or c.get("id") in MAGIC for c in foes)
-    physical = sum(
-        c.get("id") not in MAGIC
-        and any(t in c.get("tags", []) for t in ["Marksman", "Fighter", "Assassin"])
-        for c in foes
+def build_recommendation(
+    catalog, selected, enemies, role=None, map_id=11, rows=None, queue_id=420, now=None
+):
+    return recommend(
+        catalog, selected, enemies, rows or [], role, map_id, queue_id, now
     )
-    tanks = sum("Tank" in c.get("tags", []) for c in foes)
-    healing = sum(c.get("id") in HEALERS for c in foes)
-    cc = sum("Tank" in c.get("tags", []) or "Mage" in c.get("tags", []) for c in foes)
-    primary = tags[0] if tags else None
-    profile = {
-        "Mage": "mage",
-        "Marksman": "marksman",
-        "Tank": "tank",
-        "Support": "support",
-        "Fighter": "fighter",
-        "Assassin": "assassin",
-    }.get(primary, "unknown")
-    if champ.get("id") in MAGIC:
-        profile = "mage"
-    if champ.get("id") in {
-        "Soraka",
-        "Nami",
-        "Lulu",
-        "Janna",
-        "Yuumi",
-        "Milio",
-        "Sona",
-        "Renata",
-        "Ivern",
-        "Bard",
-    }:
-        profile = "support"
-    if role in ["UTILITY", "SUPPORT"] and "Support" in tags:
-        profile = "support"
-    pools = {
-        "mage": ([1056, 1054], [6655, 2503, 4645, 3089, 3135, 3157]),
-        "marksman": ([1055], [6672, 3094, 3031, 3508, 3085, 3036]),
-        "tank": ([1054], [3068, 6664, 6665, 3083, 3075, 3065]),
-        "support": ([3865], [4005, 3504, 3107, 3190, 6617]),
-        "fighter": ([1055, 1054], [3071, 3074, 3161, 3053, 6333, 3153]),
-        "assassin": ([1036, 1055], [3142, 6692, 6694, 6697, 3814]),
-    }
-    items = catalog.get("items", {})
-
-    def available(i):
-        d = items.get(str(i), {})
-        return bool(
-            d
-            and d.get("gold", {}).get("purchasable", False)
-            and d.get("maps", {}).get(str(map_id), False)
-            and not d.get("requiredChampion")
-            and not d.get("inStore") is False
-        )
-
-    def pick(ids, n):
-        return [i for i in ids if available(i)][:n]
-
-    starter, core = pools.get(profile, ([], []))
-    boots = (
-        [3111, 3047]
-        if magic > physical or cc >= 3
-        else [3047, 3111]
-        if physical >= 3
-        else [3006, 3158]
-        if profile == "marksman"
-        else [3020, 3158]
-        if profile == "mage"
-        else [3158, 3111, 3047]
-    )
-    situational = []
-    options = [
-        (
-            "Contra tanques",
-            [3135] if profile == "mage" else [3036, 3153, 3071],
-            "Penetracao ou dano contra alvos resistentes; presenca estimada pelas classes dos inimigos.",
-        ),
-        (
-            "Contra cura",
-            [3165]
-            if profile == "mage"
-            else [3075]
-            if profile == "tank"
-            else [3033, 6609],
-            "Feridas Dolorosas quando a cura inimiga estiver decidindo as lutas.",
-        ),
-        (
-            "Contra dano magico",
-            [3102, 3157] if profile == "mage" else [3156, 3065],
-            "Protecao contra ameacas magicas; ajuste ao adversario que esta forte.",
-        ),
-        (
-            "Contra dano fisico",
-            [3157] if profile == "mage" else [3143, 3110, 6333],
-            "Armadura ou mitigacao contra as ameacas fisicas.",
-        ),
-        (
-            "Sobrevivencia",
-            [3157, 3102] if profile == "mage" else [3026, 3053, 3814],
-            "Alternativa defensiva para evitar mortes antes de contribuir.",
-        ),
-    ]
-    if tanks >= 2:
-        replacement = pick(options[0][1], 1)
-        if replacement:
-            core = [
-                *core[:1],
-                *replacement,
-                *[i for i in core[1:] if i not in replacement],
-            ]
-    for title, ids, why in options:
-        found = pick(ids, 1)
-        if found:
-            situational.append((title, found[0], why))
-    return {
-        "profile": profile,
-        "role": role or "nao identificada",
-        "starters": pick(starter, 1) + pick([2003], 1),
-        "boots": pick(boots, 1),
-        "core": pick(list(dict.fromkeys(core)), 3),
-        "situational": situational,
-        "threats": {
-            "physical": physical,
-            "magic": magic,
-            "tanks": tanks,
-            "healing": healing,
-            "cc": cc,
-        },
-        "available": bool(
-            catalog.get("version") and profile != "unknown" and map_id in (11, 12)
-        ),
-    }
 
 
 def live_embeds(game, watched, context, catalog, test=False):
     prefix = "MODO TESTE • " if test else ""
     players = game.get("participants", [])
     tracked = {p["puuid"]: p["riot_id"] for p in watched}
-    names = ", ".join(text(p["riot_id"], 70) for p in watched)
+    focus = next((p for p in players if p.get("puuid") in tracked), None)
+    highlights = []
+    for account in watched[:10]:
+        p = next((p for p in players if p.get("puuid") == account["puuid"]), {})
+        highlights.append(
+            f"**{text(account['riot_id'], 60)}** · {text(champion(catalog, p.get('championId'))['name'], 30)}"
+        )
     mode = MODES.get(
-        game.get("gameQueueConfigId"), game.get("gameMode", "Modo indisponivel")
+        game.get("gameQueueConfigId"), game.get("gameMode", "Fila indisponível")
     )
     start = game.get("gameStartTime", 0)
-    duration = (
-        f"Inicio: <t:{int(start / 1000)}:R>"
+    elapsed = (
+        f"Início <t:{int(start / 1000)}:R>"
         if start
-        else f"Duracao aproximada: {int(game['gameLength']) // 60} min"
+        else f"Tempo aproximado: {int(game['gameLength']) // 60} min"
         if game.get("gameLength")
-        else "Horario de inicio indisponivel"
+        else "Início indisponível"
     )
-    embed = discord.Embed(
+    e = discord.Embed(
         title=prefix + "LIVE MATCH",
-        description=f"**Em acompanhamento: {names}**\n{mode} · {duration}\nEstatisticas abaixo sao historicas, nao dados ao vivo de kills/ouro.",
+        description="⭐ "
+        + ("\n⭐ ".join(highlights))
+        + "\n"
+        + f"**{mode}** · {elapsed}\nDados **históricos**, não telemetria. WR ranqueado: acumulado da fila (League-V4). KDA recente: até 5 partidas anteriores (fila quando identificável). WR no campeão: amostra em até 20 jogos consultados, não total da temporada.",
         color=COLOR,
     )
-    focus = next((p for p in players if p.get("puuid") in tracked), None)
     if focus and champion_icon(catalog, focus.get("championId")):
-        embed.set_thumbnail(url=champion_icon(catalog, focus["championId"]))
+        e.set_thumbnail(url=champion_icon(catalog, focus["championId"]))
     for team, label in [(100, "🔵 Equipe azul"), (200, "🔴 Equipe vermelha")]:
-        lines = []
-        for p in [p for p in players if p.get("teamId") == team]:
+        teammates = [p for p in players if p.get("teamId") == team]
+        e.add_field(
+            name=label,
+            value=f"{len(teammates)} jogadores · Riot oficial · estatísticas históricas",
+            inline=False,
+        )
+        for p in teammates[:8]:
             puuid = p.get("puuid")
-            # Never resolve identities omitted by Spectator: no cross-lookup of hidden participants.
             rid = p.get("riotId") or (
                 f"{p['riotIdGameName']}#{p['riotIdTagline']}"
                 if p.get("riotIdGameName") and p.get("riotIdTagline")
                 else None
             )
-            visible = bool(rid)
-            identity = text(rid, 45) if visible else "Identidade ocultada/indisponivel"
-            stats = context.get(puuid, {}) if visible else {}
-            champ = text(champion(catalog, p.get("championId"))["name"], 25)
-            history = stats.get("recent")
-            recent = (
-                f"WR {history['win_rate']}% · KDA {history['kda']:.2f} · n={history['count']}"
-                if history
-                else "Historico indisponivel"
+            data = context.get(puuid, {}) if rid else {}
+            name = text(rid, 45) if rid else "Identidade ocultada/indisponível"
+            cname = text(champion(catalog, p.get("championId"))["name"], 30)
+            history = data.get("recent")
+            ranked = data.get("ranked_wr")
+            rank_queue = data.get("rank_queue_name", "Solo/Duo")
+            lines = [
+                f"**Elo {text(rank_queue, 12)}:** {text(data.get('rank', 'indisponível'), 70)}"
+            ]
+
+            def percentage(stats):
+                return f"{stats['win_rate']:.1f}".replace(".", ",") + "%"
+
+            def score(stats):
+                return (
+                    f"{stats['wins']}V/{stats['losses']}D"
+                    if "wins" in stats and "losses" in stats
+                    else f"n={stats['count']}"
+                )
+
+            if isinstance(ranked, dict) and isinstance(
+                ranked.get("win_rate"), (int, float)
+            ):
+                lines.append(
+                    f"**WR {text(ranked['queue_name'], 12)}:** **{percentage(ranked)}** · {score(ranked)}"
+                )
+            elif isinstance(ranked, dict) and ranked.get("count") == 0:
+                lines.append(
+                    f"**WR {text(ranked['queue_name'], 12)}:** sem jogos registrados"
+                )
+            else:
+                lines.append("**WR ranqueado:** indisponível")
+            if history:
+                if isinstance(history.get("kda"), (int, float)):
+                    kda_n = history.get("kda_count", history["count"])
+                    summary = f"**KDA recente:** {history['kda']:.2f} ({kda_n}j)"
+                    if all(
+                        isinstance(history.get(k), (int, float))
+                        for k in ["kills", "deaths", "assists"]
+                    ):
+                        summary += f" · K/D/A médio {history['kills']:.1f}/{history['deaths']:.1f}/{history['assists']:.1f}"
+                    lines.append(summary)
+                else:
+                    lines.append("**KDA recente:** indisponível")
+                if history.get("start_at") and history.get("end_at"):
+                    lines.append(
+                        f"Período recente: <t:{int(history['start_at'] / 1000)}:d>–<t:{int(history['end_at'] / 1000)}:d>"
+                    )
+            else:
+                lines.append("**KDA recente:** indisponível")
+            selected_wr = data.get("champion_wr")
+            window = data.get("history_window")
+            if isinstance(selected_wr, dict) and isinstance(
+                selected_wr.get("win_rate"), (int, float)
+            ):
+                lines.append(
+                    f"**WR no campeão (n={selected_wr['count']}):** **{percentage(selected_wr)}** · {score(selected_wr)}"
+                )
+                lines.append(
+                    f"{'Na mesma fila' if data.get('history_queue') is not None else 'Em filas não identificadas'}, entre {window} jogos consultados"
+                    + (" · amostra pequena" if selected_wr["count"] < 5 else "")
+                )
+            elif window is not None:
+                lines.append(
+                    f"**WR no campeão:** sem jogos nos {window} consultados da fila"
+                )
+            else:
+                lines.append("**WR no campeão:** indisponível")
+            mastery = data.get("mastery")
+            if isinstance(mastery, dict) and mastery.get("championLevel") is not None:
+                points = (
+                    f" · {mastery['championPoints']:,} pontos"
+                    if isinstance(mastery.get("championPoints"), (int, float))
+                    else ""
+                )
+                lines.append(f"**Maestria:** nível {mastery['championLevel']}{points}")
+            else:
+                lines.append("**Maestria:** indisponível")
+            e.add_field(
+                name=f"{'⭐ ' if puuid in tracked else ''}{cname} · {name}",
+                value="\n".join(lines),
+                inline=True,
             )
-            mastery = stats.get("mastery")
-            mastery_label = (
-                f" · M{mastery['championLevel']}"
-                if isinstance(mastery, dict)
-                and mastery.get("championLevel") is not None
-                else ""
-            )
-            lines.append(
-                f"{'⭐ ' if puuid in tracked else ''}**{champ}** — {identity}\n↳ {text(stats.get('rank', 'Elo indisponivel'), 45)} · {recent}{mastery_label}"
-            )
-        embed.add_field(
-            name=label,
-            value="\n".join(lines)[:1024] or "Participantes indisponiveis",
-            inline=False,
-        )
-    for p in watched[:10]:
-        participant = next(
-            (row for row in players if row.get("puuid") == p["puuid"]), {}
-        )
-        data = context.get(p["puuid"], {})
-        history = data.get("recent")
-        summary = (
-            f"WR {history['win_rate']}% · KDA medio {history['kda']:.2f} em {history['count']} partidas anteriores"
-            if history
-            else "WR/KDA historicos indisponiveis"
-        )
-        mastery = data.get("mastery")
-        summary += (
-            f"\nMaestria: nivel {mastery.get('championLevel')} · {mastery.get('championPoints', 0):,} pontos"
-            if isinstance(mastery, dict) and mastery.get("championLevel") is not None
-            else "\nMaestria indisponivel"
-        )
-        embed.add_field(
-            name=text(p["riot_id"], 80)
-            + " · "
-            + text(champion(catalog, participant.get("championId"))["name"], 40),
-            value=summary,
-            inline=False,
-        )
-    embed.set_footer(
+    e.set_footer(
         text=prefix
-        + "Riot Spectator-V5 • imagens Data Dragon • sem telemetria durante a partida"
+        + "League-V4: WR da fila • Match-V5: WR no campeão e KDA recente • remakes excluídos"
     )
-    return [embed]
+    return [e]
 
 
-def build_embeds(game, player, catalog, test=False):
+def demo_advice(catalog):
+    # This miniature fixture is ONLY used by the explicitly labeled demo, never by production advice.
+    import time
+
+    candidates = [
+        i
+        for i in [6655, 2503, 4645, 3089, 3135, 3157]
+        if available(i, catalog, 11, 103)
+    ]
+    if len(candidates) < 3:
+        return insufficient(
+            catalog, "Itens da demonstração não disponíveis neste catálogo."
+        )
+    boots = [i for i in [3020, 3158] if available(i, catalog, 11, 103)]
+    starters = [i for i in [1056, 2003] if available(i, catalog, 11, 103)]
+    rows = [
+        {
+            "match_id": f"DEMO_{i}",
+            "participant_id": 1,
+            "patch": patch_key(catalog.get("version")),
+            "played_at": time.time() - i * 3600,
+            "champion_id": 103,
+            "role": "MIDDLE",
+            "map_id": 11,
+            "queue_id": 420,
+            "win": i < 12,
+            "items": candidates[:3]
+            + boots[:1]
+            + ([3157] if i % 2 == 0 and available(3157, catalog, 11, 103) else []),
+            "enemies": [54, 86, 64, 16, 99],
+            "purchases": {"core": candidates[:3], "starters": starters},
+        }
+        for i in range(20)
+    ]
+    advice = recommend(catalog, 103, [], rows, "MIDDLE")
+    advice["source"] = "MODO TESTE — amostra fictícia"
+    advice["source_url"] = None
+    return advice
+
+
+def build_embeds(game, player, catalog, test=False, advice=None):
     prefix = "MODO TESTE • " if test else ""
-    participant = next(
+    p = next(
         (p for p in game.get("participants", []) if p.get("puuid") == player["puuid"]),
         None,
     )
-    if not participant:
+    if not p:
         return [
             discord.Embed(
-                title=prefix + "Build indisponivel",
-                description="Jogador nao identificavel na resposta oficial. Nenhuma identidade foi inferida.",
-                color=COLOR,
+                title=prefix + "BUILD INDISPONÍVEL",
+                description="Jogador não identificável na resposta oficial.",
+                color=0xE5B65A,
             )
         ]
-    enemies = [
-        p
-        for p in game.get("participants", [])
-        if p.get("teamId") != participant.get("teamId")
-    ]
-    advice = build_recommendation(
-        catalog,
-        participant.get("championId"),
-        enemies,
-        participant.get("teamPosition"),
-        game.get("mapId"),
-    )
-    c = champion(catalog, participant.get("championId"))
+    if advice is None:
+        advice = (
+            demo_advice(catalog)
+            if test
+            else insufficient(
+                catalog,
+                "Sem amostra empírica validada para este campeão, posição e patch.",
+            )
+        )
+    c = champion(catalog, p.get("championId"))
     e = discord.Embed(
         title=prefix + "BUILD • " + text(c["name"], 60),
-        description=f"**{text(player['riot_id'])}**\n**Recomendacao heuristica — sem estatisticas de win rate.**\nPatch {catalog.get('version') or 'indisponivel'} · Rota: {advice['role']}\nPerfil estimado: {advice['profile']}. Ajuste aos adversarios e ao estado real do jogo.",
+        description=f"**{text(player['riot_id'])}**\nItens ordenados por compras observadas, sem lista genérica por classe.",
         color=0xE5B65A,
     )
-    icon = champion_icon(catalog, participant.get("championId"))
+    icon = champion_icon(catalog, p.get("championId"))
     if icon:
         e.set_thumbnail(url=icon)
-    if not advice["available"]:
-        e.add_field(
-            name="Dados insuficientes",
-            value="Catalogo atual indisponivel ou modo sem guia suportado. Nenhuma ordem de itens e apresentada como validada.",
-            inline=False,
-        )
-        return [e]
-    for label, ids in [
-        ("Itens iniciais", advice["starters"]),
-        ("Botas", advice["boots"]),
-        ("Ordem principal", advice["core"]),
-    ]:
-        e.add_field(
-            name=label,
-            value=" → ".join(item_label(catalog, i) for i in ids)
-            or "Sem item elegivel neste patch/mapa",
-            inline=False,
-        )
-    threat = advice["threats"]
+    e.add_field(name="Patch", value=advice.get("patch") or "indisponível", inline=True)
     e.add_field(
-        name="Leitura heuristica da composicao",
-        value=f"Tendencias por classe: fisico {threat['physical']}, magico {threat['magic']}, tanques {threat['tanks']}, cura elevada {threat['healing']}. Classes nao medem dano real nem garantem controle de grupo. Botas defensivas priorizadas contra dano/controle estimados.",
+        name="Posição da amostra",
+        value=ROLE_NAMES.get(advice.get("role"), "não identificada")
+        + (" · sua rota não confirmada" if advice.get("role_reference") else ""),
+        inline=True,
+    )
+    e.add_field(
+        name="Amostra", value=f"**{advice.get('sample', 0)} partidas**", inline=True
+    )
+    source = text(advice.get("source", "indisponível"), 180)
+    if advice.get("source_url"):
+        source = f"[{source}]({advice['source_url']})"
+    e.add_field(
+        name="Fonte e validade",
+        value=source + "\nDados separados por campeão, posição, fila, mapa e patch.",
         inline=False,
     )
-    for label, i, why in advice["situational"]:
-        e.add_field(name=label, value=f"{item_label(catalog, i)} — {why}", inline=False)
+    if not advice.get("available"):
+        e.add_field(
+            name="Dados insuficientes",
+            value=advice.get("reason", "Fonte indisponível.")
+            + "\nNenhum núcleo genérico é apresentado como build atualizada.",
+            inline=False,
+        )
+        e.set_footer(
+            text=prefix
+            + "Sem evidência suficiente • nenhuma taxa ou ordem foi inventada"
+        )
+        return [e]
+    sequence = "\n".join(
+        f"**{index}.** {item_label(catalog, i)}"
+        for index, i in enumerate(advice["core"], 1)
+    )
+    e.add_field(name="Build principal · ordem confirmada", value=sequence, inline=False)
+    e.add_field(
+        name="Botas",
+        value=" · ".join(item_label(catalog, i) for i in advice["boots"])
+        or "Sem frequência mínima na amostra",
+        inline=True,
+    )
+    e.add_field(
+        name="Itens iniciais",
+        value=" · ".join(item_label(catalog, i) for i in advice["starters"])
+        or "Sem frequência mínima na amostra",
+        inline=True,
+    )
+    e.add_field(
+        name="Evidência do núcleo",
+        value=f"**{advice['sequence_games']} ocorrências** · {advice['sequence_pick_rate']:.1f}% das **{advice['ordered_sample']} timelines elegíveis**\nVitórias observadas: **{advice['sequence_win_rate']:.1f}%**. Associação, não garantia de eficiência.",
+        inline=False,
+    )
+    alternatives = advice.get("alternatives", [])
+    e.add_field(
+        name="Alternativas observadas",
+        value="\n".join(
+            f"{item_label(catalog, a['item_id'])} · {a['games']} jogos · presença {a['pick_rate']:.1f}% · vitórias {a['win_rate']:.1f}%"
+            for a in alternatives
+        )[:1024]
+        or "Nenhuma alternativa com amostra mínima; não improvisar substituições.",
+        inline=False,
+    )
+    for a in advice.get("adaptations", [])[:4]:
+        lines = [f"**Amostra condicional: {a['sample']} jogos.**", a["note"]]
+        lines.extend(
+            f"{item_label(catalog, i['item_id'])}: {i['games']} jogos · presença {i['pick_rate']:.1f}% · vitórias {i['win_rate']:.1f}%"
+            for i in a.get("items", [])
+        )
+        e.add_field(name=a["label"], value="\n".join(lines)[:1024], inline=False)
+    if advice.get("audit_items"):
+        e.add_field(
+            name="Yunara · frequência dos itens investigados",
+            value="\n".join(
+                f"{item_label(catalog, a['item_id'])} · {a['games']} jogos · presença {a['pick_rate']:.1f}% · "
+                + (
+                    f"vitórias {a['win_rate']:.1f}%"
+                    if a["games"] >= 5
+                    else "vitórias: amostra insuficiente"
+                )
+                for a in advice["audit_items"]
+            )[:1024],
+            inline=False,
+        )
+        e.add_field(
+            name="Sinergias: hipóteses, não prioridades fixas",
+            value="Runaan atinge inimigos próximos adicionais; Dardos fortalece ataques após a ultimate (efeitos do catálogo atual). O kit e a composição podem favorecer esses efeitos, mas a substituição exige amostra. Canhão não entra por ser um item genérico de atirador.",
+            inline=False,
+        )
+    profile = advice.get("profile", {})
+    if profile:
+        e.add_field(
+            name="Leitura dos adversários",
+            value=f"Curto alcance: {profile['short_range']}/{profile['known_ranges']} com alcance conhecido. Kits revisados: {profile['known_kits']}/{profile['total']}.\nTanques {profile['tank']} · armadura {profile['armor']} · cura {profile['healing']} · dano físico {profile['physical']} / mágico {profile['magic']} / misto {profile['mixed']}. Dados parciais não medem o dano real.",
+            inline=False,
+        )
+    e.add_field(
+        name="Período e limites",
+        value=f"<t:{int(advice['period_start'])}:d> a <t:{int(advice['period_end'])}:d>\n{advice['limitations']}",
+        inline=False,
+    )
     e.set_footer(
         text=prefix
-        + "Heuristica do Tigrao • Data Dragon valida nomes/itens/imagens, nao desempenho de builds"
+        + "Riot Match-V5 / timelines • Data Dragon apenas valida nomes, itens e imagens"
     )
     cards = [e]
-    for i in (advice["starters"][:1] + advice["boots"] + advice["core"])[:5]:
+    for i in (advice["starters"][:1] + advice["boots"][:1] + advice["core"])[:5]:
         card = discord.Embed(
             title=prefix + text(catalog["items"][str(i)]["name"], 70),
             url=item_icon(catalog, i),
@@ -490,17 +473,19 @@ def report_embeds(match, watched, context, catalog, test=False):
             or "Nenhum item registrado",
             inline=False,
         )
-        baseline = context.get(account["puuid"], {}).get("recent")
-        summary = (
-            f"Participou de {k + a} abates e sofreu {d} mortes."
-            if complete
-            else "Dados de desempenho incompletos na resposta oficial."
+        analysis = analyze(info, p, context.get(account["puuid"], {}))
+        e.add_field(
+            name="ANÁLISE DE DESEMPENHO",
+            value="Leitura contextual dos dados coletados, separada dos números da partida.",
+            inline=False,
         )
-        if cs is not None and duration:
-            summary += f" Farm medio de {cs / minutes:.1f} CS/min."
-        if baseline and kda is not None:
-            summary += f"\nKDA {kda - baseline['kda']:+.2f} em relacao a media das {baseline['count']} partidas anteriores. Comparacao historica, modos/rotas podem diferir."
-        e.add_field(name="Resumo baseado nos dados", value=summary, inline=False)
+        e.add_field(
+            name="Indicadores principais", value=analysis["indicators"], inline=False
+        )
+        e.add_field(
+            name="Comparação histórica", value=analysis["comparison"], inline=False
+        )
+        e.add_field(name="Leitura da partida", value=analysis["reading"], inline=False)
         e.set_footer(
             text=prefix
             + "Riot Match-V5 • "
@@ -549,9 +534,22 @@ def demo_data(catalog):
     context = {
         "DEMO-0": {
             "rank": "GOLD II · 42 LP (ficticio)",
+            "rank_queue_name": "Solo/Duo",
+            "ranked_wr": {
+                "queue_name": "Solo/Duo",
+                "wins": 10,
+                "losses": 10,
+                "count": 20,
+                "win_rate": 50.0,
+            },
+            "champion_wr": {"wins": 2, "losses": 1, "count": 3, "win_rate": 200 / 3},
+            "history_window": 20,
+            "history_queue": 420,
             "recent": {
                 "count": 5,
-                "win_rate": 60,
+                "win_rate": 60.0,
+                "wins": 3,
+                "losses": 2,
                 "kills": 6.2,
                 "deaths": 4,
                 "assists": 8,
@@ -575,12 +573,16 @@ def demo_data(catalog):
         "goldEarned": 14500,
         "visionScore": 24,
     }
-    b = build_recommendation(catalog, int(ids[0]), game["participants"][5:])
+    b = demo_advice(catalog)
     for index, i in enumerate((b["starters"][:1] + b["boots"] + b["core"])[:6]):
         p["item" + str(index)] = i
     result = {
         "metadata": {"matchId": "BR1_DEMO"},
-        "info": {"gameDuration": 1860, "participants": [p]},
+        "info": {
+            "gameDuration": 1860,
+            "participants": [p],
+            "teams": [{"teamId": 100, "objectives": {"champion": {"kills": 32}}}],
+        },
     }
     return game, watched, context, result
 

@@ -120,31 +120,36 @@ backoff e timeouts. Caches reduzem chamadas repetidas entre jogadores/servidores
 ## Dados, builds e apresentação
 
 Live Match mostra os dez campeões, equipes e identidades fornecidas oficialmente,
-modo e horário/duração disponíveis. Elo, WR/KDA das últimas até cinco partidas e
-maestria são consultados quando disponíveis. São **estatísticas históricas**,
+modo e horário/duração disponíveis. Elo, WR acumulado da fila, KDA recente
+(até cinco jogos) e WR do campeão (em até 20 jogos da fila) são apresentados
+separadamente, com V/D e amostra. Maestria é consultada quando disponível.
+São **estatísticas históricas**,
 com amostra explícita; a partida atual é excluída da comparação. Identidades
 omitidas pelo jogo não são resolvidas para desanonimizar outros participantes.
 Spectator não fornece kills, ouro e inventário ao vivo; o módulo não os inventa.
 O enriquecimento inicial pode atravessar mais de uma janela de rate limit.
 
-As builds são **heurísticas identificadas**, sem win rates inventados: campeão,
-rota apenas quando fornecida, composição inimiga, tendências de dano, tanques,
-cura e defesa orientam botas, três itens principais e alternativas. Classes são
-aproximações, não medição do dano real ou de todo o controle de grupo. Os itens
-precisam existir e ser compráveis no patch/mapa atual do Data Dragon. Ele fornece
-metadados/imagens, não estatísticas de desempenho. Não há runas, scraping ou fonte
-estatística externa. Modos fora de Summoner's Rift/ARAM não têm guia validado.
+As builds agora usam observações oficiais da Match-V5 e timelines, separadas por
+campeão, posição, fila, mapa e patch. A lista fixa de itens por classe foi removida.
+O núcleo exige 20 observações e cinco ocorrências de uma ordem confirmada por
+timeline; sem isso, o card sinaliza dados insuficientes. A amostra local não é o
+meta global. Data Dragon valida IDs/nomes/imagens e disponibilidade, nunca taxas
+de vitória. Não há runas nem scraping de OP.GG/U.GG/Lolalytics. Detalhes, fontes,
+limites e investigação de Yunara estão em [lol_build_sources.md](lol_build_sources.md).
 
 O pós-partida usa Match-V5 para vitória/derrota, campeão, K/D/A e KDA, CS/CS-min,
 dano causado/recebido, ouro, duração, visão e itens finais. Resumo e comparação
 usam somente dados coletados; campos ausentes são explicitamente indisponíveis.
+O topo aprovado foi preservado; a seção ANÁLISE DE DESEMPENHO agora separa
+participação percentual nos abates da equipe, indicadores, comparação e leitura.
 
 ## Persistência e migração
 
 São usadas tabelas `lol_*` no **pro_lives.sqlite3** existente, sem remover tabelas
 ou dados de outras funcionalidades. `lol_channel_config` guarda cargo/categoria e
 `lol_player_channels` guarda canal, geração de sessão, último jogo e prazo. As
-transações SQLite rodam em threads. Preserve esse banco no armazenamento
+transações SQLite rodam em threads. `lol_build_samples` mantém observações
+estatísticas anônimas separadas, sem nomes ou PUUIDs, e um cache limitado por data. Preserve esse banco no armazenamento
 persistente da hospedagem e evite duas instâncias simultâneas.
 
 Configurações antigas de canal fixo não são usadas para notificações. Após atualizar
@@ -169,13 +174,18 @@ anteriores são preservados; os canais antigos não são apagados.
 .venv/bin/python -m unittest discover -s tests -v
 ```
 
-Validação desta revisão: **268 testes aprovados, zero falhas**, incluindo os
+Validação anterior de canais privados: **268 testes aprovados, zero falhas**, incluindo os
 testes de sessões privadas, partidas em sequência e exclusão segura. A análise
 estática dos arquivos alterados, `git diff --check` e `pip check` passaram.
 
 A consulta externa real ao Data Dragon confirmou o patch 16.22.1, 173 campeões,
-863 itens e seis imagens PNG. Não havia RIOT_API_KEY no vínculo do ambiente nem
-no processo, e nenhuma autenticação Riot de proxy estava declarada. Portanto,
-Mochila#bunny não foi consultada na Riot. Nenhum canal real foi criado ou apagado
-nem mensagens reais foram enviadas: o ciclo de vida e os envios foram simulados.
-As demonstrações usam dados fictícios explícitos e metadados oficiais.
+863 itens e seis imagens PNG. Após disponibilizar RIOT_API_KEY no ambiente,
+Mochila#bunny foi consultada na Riot e foram validados conta, histórico, elo,
+maestria, timeline e contagens de WR. A auditoria de WR está documentada abaixo.
+Nenhum canal real foi criado/apagado e nenhuma mensagem real foi enviada:
+o ciclo de vida e os envios foram simulados. As demonstrações usam dados
+fictícios explicitamente identificados.
+
+A revisão visual e do sistema de builds é documentada em `docs/lol_build_sources.md`.
+
+A origem e o cálculo de cada WR, com auditoria real, estão em `docs/lol_win_rates.md`.
