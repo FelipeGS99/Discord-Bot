@@ -38,6 +38,14 @@ class LoLRepository(LiveRepository):
               channel_id INTEGER NOT NULL, message_id INTEGER,
               PRIMARY KEY(guild_id,match_id,kind,subject));
         """)
+        # Additive migration: preserve channel IDs and deadlines from existing installs.
+        if "close_reason" not in {
+            row[1] for row in c.execute("PRAGMA table_info(lol_player_channels)")
+        }:
+            c.execute("ALTER TABLE lol_player_channels ADD COLUMN close_reason TEXT")
+            # The previous implementation closed missing live channels without an expiry.
+            c.execute("""UPDATE lol_player_channels SET close_reason='missing'
+                WHERE closed=1 AND delete_at IS NULL AND channel_id IS NOT NULL""")
         return c
 
     async def configure(self, guild_id, channel_id):
@@ -259,14 +267,25 @@ class LoLRepository(LiveRepository):
 
         return await self._run(work)
 
-    async def new_session(self, gid, puuid, mid, now):
+    async def new_session(
+        self, gid, puuid, mid, now, *, delete_at=None, reset_delivery=False
+    ):
         def work(c):
             c.execute(
-                """INSERT INTO lol_player_channels VALUES (?,?,1,NULL,?,?,NULL,0)
+                """INSERT INTO lol_player_channels
+                  (guild_id,puuid,generation,channel_id,last_match,last_live,delete_at,closed,close_reason)
+                  VALUES (?,?,1,NULL,?,?,?,0,NULL)
               ON CONFLICT(guild_id,puuid) DO UPDATE SET generation=generation+1,
-              channel_id=NULL,last_match=excluded.last_match,last_live=excluded.last_live,delete_at=NULL,closed=0""",
-                (gid, puuid, mid, now),
+              channel_id=NULL,last_match=excluded.last_match,last_live=excluded.last_live,
+              delete_at=excluded.delete_at,closed=0,close_reason=NULL""",
+                (gid, puuid, mid, now, delete_at),
             )
+            if reset_delivery:
+                # Messages acknowledged in a deleted channel must be resent only to its replacement.
+                c.execute(
+                    "DELETE FROM lol_deliveries WHERE guild_id=? AND match_id=? AND subject=?",
+                    (gid, mid, puuid),
+                )
 
         await self._run(work)
         return await self.session(gid, puuid)
@@ -278,6 +297,7 @@ class LoLRepository(LiveRepository):
             "last_live",
             "delete_at",
             "closed",
+            "close_reason",
         }:
             raise ValueError("Campos de sessao invalidos.")
         fields = ",".join(f"{key}=?" for key in values)

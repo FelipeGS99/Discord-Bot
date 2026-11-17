@@ -119,7 +119,7 @@ class FootballChannelManager:
     def marker(key: str) -> str:
         return f"football-match:{key}"
 
-    async def _channel(self, guild, match: dict, key: str):
+    async def _channel(self, guild, match: dict, key: str, *, refresh=False):
         if match["channel_id"] is None:
             channels = await guild.fetch_channels()
             channel = next((c for c in channels if isinstance(c, discord.TextChannel)
@@ -129,7 +129,7 @@ class FootballChannelManager:
                 self.repository.save(self.state)
             return channel
         channel = guild.get_channel(match["channel_id"])
-        if channel is None:
+        if channel is None or refresh:
             try:
                 channel = await guild.fetch_channel(match["channel_id"])
             except discord.NotFound:
@@ -146,7 +146,7 @@ class FootballChannelManager:
             if guild is None:
                 continue
             try:
-                channel = await self._channel(guild, match, key)
+                channel = await self._channel(guild, match, key, refresh=True)
                 if channel is not None:
                     try:
                         await channel.delete(reason="Prazo apos o fim da partida encerrado")
@@ -154,10 +154,16 @@ class FootballChannelManager:
                         pass
                 # Keep a tombstone: stale live data must never recreate a deleted match.
                 match["closed"] = True
+                match["close_reason"] = "expired"
                 self.repository.save(self.state)
             except (discord.HTTPException, ValueError):
                 self.errors[guild.id] = "Nao foi possivel excluir um canal encerrado; nova tentativa no proximo ciclo."
                 log.exception("Falha ao excluir canal de futebol %s", key)
+
+    async def recover_channels(self) -> None:
+        """Resume persisted expiration even when the provider is unavailable."""
+        async with self.lock:
+            await self._cleanup()
 
     async def poll(self) -> None:
         async with self.lock:
@@ -195,7 +201,14 @@ class FootballChannelManager:
                     key = f"{gid}:{fixture.fixture_id}"
                     match = self.state["matches"].get(key)
                     if match and match.get("closed"):
-                        continue
+                        # Older versions marked a manually deleted live channel as closed.
+                        if (not match.get("close_reason") and match.get("delete_at") is None
+                                and match.get("channel_id") is not None and fixture.is_live
+                                and fixture.league_id in cfg.get("leagues", [])):
+                            match["closed"] = False
+                            self.repository.save(self.state)
+                        else:
+                            continue
                     if match is None and (fixture.league_id not in cfg.get("leagues", []) or not fixture.is_live):
                         continue
                     try:
@@ -226,6 +239,7 @@ class FootballChannelManager:
             if channel is None:
                 if not fixture.is_live or fixture.league_id not in cfg.get("leagues", []):
                     match["closed"] = True
+                    match["close_reason"] = "inactive"
                     self.repository.save(self.state)
                     return
                 category = guild.get_channel(cfg["category_id"]) if cfg.get("category_id") else None
@@ -240,12 +254,13 @@ class FootballChannelManager:
             match["channel_id"], match["role_id"] = channel.id, role.id
             self.repository.save(self.state)
         else:
-            channel = await self._channel(guild, match, key)
+            channel = await self._channel(guild, match, key, refresh=True)
             if channel is None:
-                # An explicit manual deletion is respected, rather than endlessly recreating a channel.
-                match["closed"] = True
+                # A confirmed 404 starts a durable replacement intent. Never reset on 403/timeouts.
+                match["channel_id"] = None
+                match["snapshot"] = None
                 self.repository.save(self.state)
-                return
+                return await self._update(guild, cfg, key, match, fixture, live)
             if match.get("role_id") != role.id:
                 await channel.edit(overwrites=overwrites, reason="Cargo de acesso aos jogos atualizado")
                 match["role_id"] = role.id

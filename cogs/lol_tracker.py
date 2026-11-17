@@ -234,7 +234,7 @@ class LoLTracker(commands.Cog):
             }
             mid = f"DEMO_{time.time_ns()}"
             try:
-                channel_id = await self.monitor.sessions.ensure(demo, mid)
+                channel_id = await self.monitor.sessions.ensure(demo, mid, demo=True)
                 channel = self.bot.get_channel(channel_id) if channel_id else None
                 if channel is None and channel_id:
                     channel = await self.bot.fetch_channel(channel_id)
@@ -285,6 +285,20 @@ class LoLTracker(commands.Cog):
             )
         else:
             raise error
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        try:
+            await self.monitor.recover_channels()
+        except Exception:
+            self.monitor.last_error = (
+                "Falha na recuperacao dos canais; nova tentativa no proximo ciclo."
+            )
+            log.exception("Falha ao recuperar canais LoL")
+
+    @commands.Cog.listener()
+    async def on_resumed(self):
+        await self.on_ready()
 
     @tasks.loop(seconds=60)
     async def monitoring(self):

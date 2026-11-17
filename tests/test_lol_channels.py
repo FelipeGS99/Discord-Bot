@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import asyncio
 import json
+import sqlite3
 import tempfile
 import unittest
 from pathlib import Path
@@ -311,13 +312,54 @@ class LoLChannelTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn(cid, self.channels)
         self.guild.create_text_channel.assert_awaited_once()
 
-    async def test_manual_deletion_respected_until_next_game(self):
+    async def test_manual_deletion_recreated_immediately_for_same_game(self):
+        c = await self.open()
+        await self.repo.delivery(10, "BR1_1", "live", self.player["puuid"], c.id)
+        await self.repo.acknowledge(10, "BR1_1", "live", self.player["puuid"], 123)
+        # Other players' delivery acknowledgements must remain intact.
+        await self.repo.delivery(10, "BR1_1", "live", "other", 987)
+        await self.repo.acknowledge(10, "BR1_1", "live", "other", 456)
+        self.channels.clear()
+        new = await self.manager.ensure(self.player, "BR1_1")
+        self.assertNotEqual(new, c.id)
+        self.assertEqual(await self.manager.ensure(self.player, "BR1_1"), new)
+        self.assertEqual(self.guild.create_text_channel.await_count, 2)
+        self.assertFalse(
+            await self.repo.was_delivered(10, "BR1_1", "live", self.player["puuid"])
+        )
+        self.assertTrue(await self.repo.was_delivered(10, "BR1_1", "live", "other"))
+        self.assertFalse(
+            self.channels[new].overwrites[self.guild.default_role].view_channel
+        )
+
+    async def test_missing_channel_discovered_during_delivery_can_be_recreated(self):
         c = await self.open()
         self.channels.clear()
-        self.assertIsNone(await self.manager.ensure(self.player, "BR1_1"))
-        self.assertIsNone(await self.manager.ensure(self.player, "BR1_1"))
-        new = await self.manager.ensure(self.player, "BR1_2")
-        self.assertNotEqual(new, c.id)
+        self.assertIsNone(await self.manager.channel_for(10, self.player["puuid"]))
+        self.assertNotEqual(await self.manager.ensure(self.player, "BR1_1"), c.id)
+
+    async def test_rest_404_overrides_stale_cache_without_duplicate_creations(self):
+        c = await self.open()
+        self.channels.clear()
+        self.guild.get_channel.side_effect = (
+            lambda cid: c if cid == c.id else self.channels.get(cid)
+        )
+        ids = await asyncio.gather(
+            *(self.manager.ensure(self.player, "BR1_1") for _ in range(3))
+        )
+        self.assertEqual(len(set(ids)), 1)
+        self.assertNotEqual(ids[0], c.id)
+        self.assertEqual(self.guild.create_text_channel.await_count, 2)
+
+    async def test_access_denied_does_not_mean_deleted(self):
+        c = await self.open()
+        self.guild.fetch_channel.side_effect = error(discord.Forbidden)
+        with self.assertRaises(discord.Forbidden):
+            await self.manager.ensure(self.player, "BR1_1")
+        self.guild.create_text_channel.assert_awaited_once()
+        self.assertEqual(
+            (await self.repo.session(10, self.player["puuid"]))["channel_id"], c.id
+        )
 
     async def test_auto_expired_channel_recreated_only_for_new_game(self):
         c = await self.open()
@@ -444,9 +486,15 @@ class LoLChannelTests(unittest.IsolatedAsyncioTestCase):
                 self.assertIn("MODO TESTE", embed.title)
         session = await self.repo.session(10, "demo:10")
         self.assertEqual(session["delete_at"], 4600)
+        # A single command after manual deletion must succeed, without a failed first attempt.
+        self.channels.clear()
+        await LoLTracker.demo.callback(cog, ctx)
+        replacement = next(iter(self.channels.values()))
+        self.assertNotEqual(c.id, replacement.id)
+        self.assertEqual(replacement.send.await_count, 3)
         self.now = 4600
         await self.manager.cleanup({}, {}, set())
-        c.delete.assert_awaited_once()
+        replacement.delete.assert_awaited_once()
 
     async def test_missing_lol_role_prevents_follow_before_any_riot_call(self):
         from cogs.lol_tracker import LoLTracker
@@ -533,12 +581,146 @@ class LoLChannelTests(unittest.IsolatedAsyncioTestCase):
         first, other = list(self.channels.values())
         self.channels.pop(first.id)
         await monitor.poll()
+        replacement = next(c for c in self.channels.values() if c.id != other.id)
+        self.assertNotEqual(replacement.id, first.id)
+        self.assertEqual(replacement.send.await_count, 2)
+        self.assertEqual(other.send.await_count, 2)
         riot.spectator.return_value = None
         await monitor.poll()
         self.assertEqual(await self.repo.matches(), [])
         self.now = 4600
         await monitor.poll()
         other.delete.assert_awaited_once()
+        replacement.delete.assert_awaited_once()
+
+    def recovery_monitor(self, *, key=""):
+        riot = AsyncMock(spec=RiotClient)
+        riot.key = key
+        riot.spectator.return_value = None
+        dd = AsyncMock(spec=DataDragon)
+        repo = LoLRepository(self.repo.path)
+        return LoLMonitor(
+            self.bot,
+            repo,
+            riot,
+            dd,
+            sessions=LoLChannels(self.bot, repo, clock=lambda: self.now),
+        )
+
+    async def test_login_and_resume_clean_expired_demo_without_providers(self):
+        from cogs.lol_tracker import LoLTracker
+
+        demo = {**self.player, "puuid": "demo:10"}
+        cid = await self.manager.ensure(demo, "DEMO_1", demo=True)
+        channel = self.channels[cid]
+        monitor = self.recovery_monitor()
+        cog = object.__new__(LoLTracker)
+        cog.monitor = monitor
+        self.now = 4599
+        await cog.on_ready()
+        channel.delete.assert_not_awaited()
+        self.now = 5000  # Deadline elapsed while disconnected.
+        # Recovery must work even while the regular monitor is occupied with enrichment.
+        async with monitor.lock:
+            await asyncio.wait_for(
+                asyncio.gather(cog.on_ready(), cog.on_resumed()), timeout=2
+            )
+        channel.delete.assert_awaited_once()
+        monitor.riot.spectator.assert_not_awaited()
+        monitor.riot.history.assert_not_awaited()
+        monitor.ddragon.catalog.assert_not_awaited()
+        self.assertTrue((await monitor.repository.session(10, "demo:10"))["closed"])
+
+    async def test_demo_crash_after_create_preserves_deadline_before_ack(self):
+        create = self.guild.create_text_channel.side_effect
+
+        async def timeout(*args, **kw):
+            await create(*args, **kw)
+            raise error()
+
+        self.guild.create_text_channel.side_effect = timeout
+        demo = {**self.player, "puuid": "demo:10"}
+        with self.assertRaises(discord.HTTPException):
+            await self.manager.ensure(demo, "DEMO_1", demo=True)
+        session = await self.repo.session(10, "demo:10")
+        self.assertIsNone(session["channel_id"])
+        self.assertEqual(session["delete_at"], 4600)
+        channel = next(iter(self.channels.values()))
+        self.now = 5000
+        await self.recovery_monitor().recover_channels()
+        channel.delete.assert_awaited_once()
+        self.guild.create_text_channel.assert_awaited_once()
+
+    async def test_recovery_verifies_live_state_and_retries_riot_or_discord_failures(
+        self,
+    ):
+        channel = await self.open()
+        await self.repo.follow(10, self.player["puuid"], self.player["riot_id"])
+        await self.manager.finished(10, self.player["puuid"], "BR1_1")
+        self.now = 5000
+        monitor = self.recovery_monitor()
+        await (
+            monitor.recover_channels()
+        )  # Missing key preserves potentially live games.
+        channel.delete.assert_not_awaited()
+        monitor.riot.key = "simulated"
+        monitor.riot.spectator.side_effect = RiotError(429, "simulated")
+        await monitor.recover_channels()
+        channel.delete.assert_not_awaited()
+        monitor.riot.spectator.side_effect = None
+        channel.delete.side_effect = error(discord.Forbidden)
+        await monitor.recover_channels()
+        self.assertFalse((await self.repo.session(10, self.player["puuid"]))["closed"])
+        channel.delete.side_effect = None
+        await monitor.recover_channels()
+        self.assertTrue((await self.repo.session(10, self.player["puuid"]))["closed"])
+        monitor.ddragon.catalog.assert_not_awaited()
+
+    async def test_recovery_keeps_channel_when_new_match_started_offline(self):
+        channel = await self.open()
+        await self.repo.follow(10, self.player["puuid"], self.player["riot_id"])
+        await self.manager.finished(10, self.player["puuid"], "BR1_1")
+        self.now = 5000
+        monitor = self.recovery_monitor(key="simulated")
+        monitor.riot.spectator.return_value = {"gameId": 2}
+        await monitor.recover_channels()
+        channel.delete.assert_not_awaited()
+        session = await self.repo.session(10, self.player["puuid"])
+        self.assertIsNone(session["delete_at"])
+        self.assertEqual(session["last_match"], "BR1_2")
+
+    async def test_late_result_uses_game_end_time_instead_of_restarting_hour(self):
+        channel = await self.open()
+        self.now = 5000
+        await self.manager.finished(10, self.player["puuid"], "BR1_1", ended_at=1000)
+        self.assertEqual(
+            (await self.repo.session(10, self.player["puuid"]))["delete_at"], 4600
+        )
+        await self.manager.cleanup({}, {}, set())
+        channel.delete.assert_awaited_once()
+
+    async def test_legacy_database_migration_preserves_channel_deadline(self):
+        path = Path(self.tmp.name) / "legacy.sqlite3"
+        with sqlite3.connect(path) as c:
+            c.execute("""CREATE TABLE lol_player_channels (
+                guild_id INTEGER, puuid TEXT, generation INTEGER NOT NULL,
+                channel_id INTEGER, last_match TEXT, last_live REAL, delete_at REAL,
+                closed INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(guild_id,puuid))""")
+            c.execute(
+                "INSERT INTO lol_player_channels VALUES (10,'legacy',3,123,'BR1_1',1000,4600,0)"
+            )
+            c.execute(
+                "INSERT INTO lol_player_channels VALUES (10,'missing',1,124,'BR1_1',1000,NULL,1)"
+            )
+        repo = LoLRepository(path)
+        row = await repo.session(10, "legacy")
+        self.assertEqual(
+            (row["channel_id"], row["delete_at"], row["generation"]), (123, 4600, 3)
+        )
+        self.assertIsNone(row["close_reason"])
+        self.assertEqual((await repo.session(10, "missing"))["close_reason"], "missing")
+        await repo.new_session(10, "legacy", "BR1_2", 5000)
+        self.assertEqual((await repo.session(10, "legacy"))["generation"], 4)
 
     async def test_finished_player_expires_independently_of_teammates_failed_query(
         self,

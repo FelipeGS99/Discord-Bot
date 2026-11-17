@@ -7,7 +7,8 @@ em uma partida, o bot cria um **canal privado com o nick do jogador**, por exemp
 Partidas seguidas reutilizam o mesmo canal. Ele é apagado **uma hora após o último
 encerramento confirmado, sem uma nova partida**. O prazo não corre enquanto o
 jogador está em partida. Uma nova partida cancela o prazo anterior e seu fim
-inicia outra hora. A duração não é uma hora desde a criação: um jogador pode
+inicia outra hora. Quando disponível, usa-se o horário de término da Riot, inclusive
+para resultados descobertos após uma queda. A duração não é uma hora desde a criação: um jogador pode
 jogar várias partidas durante a mesma sessão de canal.
 
 ## Privacidade e permissões
@@ -93,18 +94,25 @@ A conta demonstrativa não é cadastrada para monitoramento real.
   anterior não inicia a exclusão de um canal que já tem nova partida ativa.
 - Antes de limpar um canal de jogador ainda seguido, o monitor faz a consulta
   atual de Spectator. Nova partida cancela a exclusão; consulta que falhou ou
-  jogador ainda não verificado preserva o canal. Resultado/entrega pendente também
-  pode adiar a limpeza. O canal só expira quando o estado é seguro para removê-lo.
-- Remoção ocorre no primeiro ciclo após o prazo, não em um cronômetro desconectado
-  do monitor. Se o bot estava desligado, recupera o prazo e confirma o estado
-  antes de limpar. Sob cota ou falhas, a exclusão pode demorar mais de uma hora.
-- Apagar um canal manualmente é respeitado: ele não é recriado para o mesmo jogo;
-  uma nova partida pode criar uma nova sessão. O bot só apaga canais registrados
+  chave ausente preserva o canal. Sem resultado confirmado ainda não há prazo.
+- No login e na retomada da conexão Discord, a limpeza recupera os prazos
+  persistidos sem aguardar Data Dragon, histórico ou builds. Prazos já vencidos
+  são cumpridos após a verificação de segurança, inclusive se restar entrega pendente.
+  O monitor também tenta novamente a cada ciclo. Sob cota ou falhas, a exclusão
+  pode demorar mais de uma hora.
+- Se um canal for apagado manualmente, a primeira execução de `loltrack teste`
+  ou detecção da partida ativa já cria um substituto privado. Só um `404` confirmado
+  autoriza a recriação: falta de permissão e erros temporários preservam o vínculo.
+  As mensagens do jogador no canal removido podem ser enviadas ao substituto,
+  sem repetir as entregas dos outros jogadores. Canais expirados pelo bot não
+  são recriados para a mesma partida. O bot só apaga canais registrados
   cujo tópico contém o identificador de propriedade esperado. Não remova esse
   identificador enquanto o bot gerencia o canal.
 - A intenção de criação é persistida antes da requisição Discord. Se a criação
   tiver funcionado mas a resposta/gravação tiver sido interrompida, o identificador
   no tópico recupera o mesmo canal em vez de criar duplicatas.
+- No teste, o prazo de uma hora também é salvo antes de criar o canal: uma queda
+  entre a criação e o envio das mensagens não impede a limpeza no próximo login.
 - Canais de demonstração ou de contas cujo acompanhamento foi interrompido podem
   ser limpos sem consultar a Riot. Falhas do Discord são tentadas no ciclo seguinte.
 - Entregas são confirmadas somente após envio. Marcadores nos embeds recuperam a
@@ -147,8 +155,11 @@ participação percentual nos abates da equipe, indicadores, comparação e leit
 
 São usadas tabelas `lol_*` no **pro_lives.sqlite3** existente, sem remover tabelas
 ou dados de outras funcionalidades. `lol_channel_config` guarda cargo/categoria e
-`lol_player_channels` guarda canal, geração de sessão, último jogo e prazo. As
-transações SQLite rodam em threads. `lol_build_samples` mantém observações
+`lol_player_channels` guarda canal, geração de sessão, último jogo e prazo.
+Instalações anteriores recebem uma coluna de motivo do encerramento, preservando
+os IDs e prazos existentes. Sessões antigas encerradas por ausência do canal,
+sem prazo de exclusão, podem ser retomadas na mesma partida.
+As transações SQLite rodam em threads. `lol_build_samples` mantém observações
 estatísticas anônimas separadas, sem nomes ou PUUIDs, e um cache limitado por data. Preserve esse banco no armazenamento
 persistente da hospedagem e evite duas instâncias simultâneas.
 
@@ -177,6 +188,14 @@ anteriores são preservados; os canais antigos não são apagados.
 Validação anterior de canais privados: **268 testes aprovados, zero falhas**, incluindo os
 testes de sessões privadas, partidas em sequência e exclusão segura. A análise
 estática dos arquivos alterados, `git diff --check` e `pip check` passaram.
+
+Validação da recuperação de canais LoL/futebol: **345 testes aprovados, zero falhas**
+na suíte completa. Inclui remoção manual, recriação privada sem duplicar entregas
+de outros jogadores, cache Discord desatualizado, erro de permissão, queda após
+criar e antes de confirmar no banco, migração de banco existente, prazos antes/depois
+do reinício e eventos simultâneos de login/retomada. Ruff (`F`) e
+`git diff --check` passaram. São simulações com armazenamento temporário;
+nenhuma mensagem ou canal real foi criado, alterado ou excluído nessa validação.
 
 A consulta externa real ao Data Dragon confirmou o patch 16.22.1, 173 campeões,
 863 itens e seis imagens PNG. Após disponibilizar RIOT_API_KEY no ambiente,

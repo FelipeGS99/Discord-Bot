@@ -165,10 +165,28 @@ class LoLMonitor:
             log.warning("Falha de entrega LoL no servidor %s", gid)
             return False
 
+    async def recover_channels(self):
+        """Resume persisted deadlines without waiting for Data Dragon or match history."""
+        configs = await self.repository.session_configs()
+        players = [
+            p for p in await self.repository.players() if p["guild_id"] in configs
+        ]
+        active = {(p["guild_id"], p["puuid"]): p for p in players}
+        errors = await self.sessions.cleanup(
+            {},
+            active,
+            set(),
+            verify=self.riot.spectator if self.riot.key else None,
+            recover=True,
+        )
+        if errors:
+            self.last_error = errors[0]
+
     async def poll(self):
         async with self.lock:
             self.last_check = time.time()
             self.last_error = None
+            await self.recover_channels()
             configs = await self.repository.session_configs()
             players = [
                 p for p in await self.repository.players() if p["guild_id"] in configs
@@ -297,7 +315,7 @@ class LoLMonitor:
                     "Canal privado LOL indisponivel; notificacao pendente."
                 )
         if not any(delivered_live.values()):
-            # A channel deliberately removed by an administrator must not be recreated for the same match.
+            # Expired sessions stay closed; missing live channels are recreated by ensure on the next poll.
             sessions = [await self.repository.session(gid, p["puuid"]) for p in watched]
             abandoned = []
             for player, session in zip(watched, sessions):
@@ -306,7 +324,11 @@ class LoLMonitor:
                     state is None or f"{match['platform']}_{state['gameId']}" != mid
                 )
                 abandoned.append(
-                    bool(session and session["closed"])
+                    bool(
+                        session
+                        and session["closed"]
+                        and session.get("close_reason") != "missing"
+                    )
                     or (
                         no_longer_live
                         and (session is None or session["channel_id"] is None)
@@ -331,7 +353,11 @@ class LoLMonitor:
             puuid = player["puuid"]
             if not delivered_live[puuid]:
                 session = await self.repository.session(gid, puuid)
-                if not session or not session["closed"]:
+                if (
+                    not session
+                    or not session["closed"]
+                    or session.get("close_reason") == "missing"
+                ):
                     complete = False
                 continue
             rendered = context.setdefault("_player_rendered", {})
@@ -391,7 +417,9 @@ class LoLMonitor:
                 )
                 complete = False
                 continue
-            await self.sessions.finished(gid, puuid, mid)
+            ended_ms = result.get("info", {}).get("gameEndTimestamp")
+            ended_at = ended_ms / 1000 if isinstance(ended_ms, (int, float)) else None
+            await self.sessions.finished(gid, puuid, mid, ended_at=ended_at)
             reports = report_embeds(result, [player], context, self.catalog)
             session = await self.repository.session(gid, puuid)
             if reports and session and session["delete_at"] is not None:
