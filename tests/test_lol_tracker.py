@@ -27,6 +27,7 @@ from services.lol_tracker_repository import LoLRepository
 from services.lol_tracker_service import LoLMonitor
 from services.pro_live_service import LiveRepository
 from cogs.lol_tracker import LoLTracker
+from services.lol_channel_service import LoLChannels, LoLChannelError
 
 CATALOG = json.loads((Path(__file__).parent / "fixtures/lol_catalog.json").read_text())
 
@@ -367,8 +368,20 @@ class TrackerTests(unittest.IsolatedAsyncioTestCase):
         self.riot.match.return_value = self.result
         self.dd = AsyncMock(spec=DataDragon)
         self.dd.catalog.return_value = CATALOG
-        self.monitor = LoLMonitor(self.bot, self.repo, self.riot, self.dd)
+        self.sessions = AsyncMock(spec=LoLChannels)
+        self.sessions.ensure.return_value = 100
+        self.sessions.cleanup.return_value = []
+        self.sessions.configure.return_value = NS(id=123)
+
+        async def destination(gid, puuid):
+            return (await self.repo.channels()).get(gid)
+
+        self.sessions.channel_for.side_effect = destination
+        self.monitor = LoLMonitor(
+            self.bot, self.repo, self.riot, self.dd, sessions=self.sessions
+        )
         await self.repo.configure(1, 100)
+        await self.repo.configure_sessions(1, 123, None)
         await self.repo.follow(1, self.puuid, "Mochila#bunny")
 
     async def test_follow_duplicate_remove_and_reactivate_persist(self):
@@ -393,7 +406,11 @@ class TrackerTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(player["current_match"], self.mid)
         self.assertEqual(player["last_notified"], self.mid)
         monitor = LoLMonitor(
-            self.bot, LoLRepository(self.repo.path), self.riot, self.dd
+            self.bot,
+            LoLRepository(self.repo.path),
+            self.riot,
+            self.dd,
+            sessions=self.sessions,
         )
         await monitor.poll()
         self.assertEqual(len(self.messages), 2)
@@ -420,18 +437,18 @@ class TrackerTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(self.messages), 2)
         self.assertEqual((await self.repo.matches())[0]["phase"], "live")
 
-    async def test_two_tracked_teammates_share_live_and_report_but_get_own_build(self):
+    async def test_two_tracked_teammates_get_individual_live_build_and_report(self):
         other = self.game["participants"][1]["puuid"]
         await self.repo.follow(1, other, "Outro#TESTE")
         second = copy.deepcopy(self.result["info"]["participants"][0])
         second["puuid"] = other
         self.result["info"]["participants"].append(second)
         await self.monitor.poll()
-        self.assertEqual(len(self.messages), 3)
+        self.assertEqual(len(self.messages), 4)
         self.riot.spectator.return_value = None
         await self.monitor.poll()
-        self.assertEqual(len(self.messages), 4)
-        self.assertEqual(len(self.messages[-1].embeds), 2)
+        self.assertEqual(len(self.messages), 6)
+        self.assertEqual(len(self.messages[-1].embeds), 1)
 
     async def test_successful_send_before_ack_recovered_from_history(self):
         game = live_embeds(self.game, self.watched, self.context, CATALOG)
@@ -441,12 +458,16 @@ class TrackerTests(unittest.IsolatedAsyncioTestCase):
             side_effect=RuntimeError("simulated process interruption"),
         ):
             with self.assertRaises(RuntimeError):
-                await self.monitor.deliver(1, self.mid, "live", "game", game)
+                await self.monitor.deliver(1, self.mid, "live", self.puuid, game)
         self.assertEqual(len(self.messages), 1)
         monitor = LoLMonitor(
-            self.bot, LoLRepository(self.repo.path), self.riot, self.dd
+            self.bot,
+            LoLRepository(self.repo.path),
+            self.riot,
+            self.dd,
+            sessions=self.sessions,
         )
-        self.assertTrue(await monitor.deliver(1, self.mid, "live", "game", game))
+        self.assertTrue(await monitor.deliver(1, self.mid, "live", self.puuid, game))
         self.assertEqual(len(self.messages), 1)
 
     async def test_send_failure_remains_pending_then_retries(self):
@@ -461,13 +482,14 @@ class TrackerTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(self.messages), 2)
 
     async def test_no_destination_means_no_riot_queries_and_no_sends(self):
-        await self.repo._run(lambda c: c.execute("DELETE FROM lol_guilds"))
+        await self.repo._run(lambda c: c.execute("DELETE FROM lol_channel_config"))
         await self.monitor.poll()
         self.riot.spectator.assert_not_awaited()
         self.assertEqual(len(self.messages), 0)
 
     async def test_other_guild_and_wrong_destination_not_leaked(self):
         await self.repo.configure(2, 100)
+        await self.repo.configure_sessions(2, 123, None)
         await self.repo.follow(2, self.puuid, "Mochila#bunny")
         await self.monitor.poll()
         self.assertEqual(len(self.messages), 2)
@@ -476,7 +498,7 @@ class TrackerTests(unittest.IsolatedAsyncioTestCase):
                 2,
                 self.mid,
                 "live",
-                "game",
+                self.puuid,
                 live_embeds(self.game, self.watched, {}, CATALOG),
             )
         )
@@ -530,7 +552,8 @@ class TrackerTests(unittest.IsolatedAsyncioTestCase):
         other.history = history
         other.send = AsyncMock(return_value=NS(id=987))
         self.bot.get_channel = lambda cid: other if cid == 101 else self.channel
-        await self.repo.configure(1, 101)
+        self.sessions.channel_for.side_effect = None
+        self.sessions.channel_for.return_value = 101
         self.riot.spectator.return_value = None
         await self.monitor.poll()
         other.send.assert_awaited_once()
@@ -579,6 +602,7 @@ class TrackerTests(unittest.IsolatedAsyncioTestCase):
     def ctx(self, admin=True):
         return NS(
             guild=NS(id=1, owner_id=9999, me=NS()),
+            channel=NS(category=None),
             author=NS(
                 id=10, guild_permissions=NS(administrator=admin, manage_guild=False)
             ),
@@ -597,23 +621,25 @@ class TrackerTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(self.messages[1].embeds), 6)
         self.assertIn("https://discord.com/channels/1/100/", ctx.send.call_args.args[0])
 
-    async def test_demo_denies_unknown_destination_and_nonadmin(self):
+    async def test_demo_denies_missing_lol_role_and_nonadmin(self):
         await LoLTracker.demo.callback(self.cog(), self.ctx(False))
         self.assertEqual(len(self.messages), 0)
-        await self.repo._run(lambda c: c.execute("DELETE FROM lol_guilds"))
+        self.sessions.configure.side_effect = LoLChannelError("Cargo LOL ausente")
         await LoLTracker.demo.callback(self.cog(), self.ctx())
         self.assertEqual(len(self.messages), 0)
 
-    async def test_channel_permission_and_guild_validation(self):
+    async def test_legacy_channel_command_only_sets_category_and_checks_guild(self):
         cog = self.cog()
         ctx = self.ctx()
         self.channel.guild.id = 2
         await LoLTracker.channel.callback(cog, ctx, self.channel)
-        self.assertEqual(await self.repo.channels(), {1: 100})
+        self.sessions.configure.assert_not_awaited()
         self.channel.guild.id = 1
-        self.channel.permissions_for.return_value.embed_links = False
         await LoLTracker.channel.callback(cog, ctx, self.channel)
-        self.assertEqual(await self.repo.channels(), {1: 100})
+        self.sessions.configure.assert_awaited_once_with(
+            ctx.guild, self.channel.category
+        )
+        self.channel.send.assert_not_awaited()
 
     async def test_command_registration_preserves_old_lol_commands(self):
         from bot import create_bot
