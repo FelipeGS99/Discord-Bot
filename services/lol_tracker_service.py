@@ -14,18 +14,20 @@ from services.lol_presentation import (
     fallback_catalog,
 )
 from services.riot_service import RiotError, recent_stats
+from services.lol_channel_service import LoLChannels, LoLChannelError
 
 log = logging.getLogger(__name__)
 
 
 class LoLMonitor:
-    def __init__(self, bot, repository, riot, ddragon):
+    def __init__(self, bot, repository, riot, ddragon, sessions=None):
         self.bot, self.repository, self.riot, self.ddragon = (
             bot,
             repository,
             riot,
             ddragon,
         )
+        self.sessions = sessions or LoLChannels(bot, repository)
         self.lock = asyncio.Lock()
         self.last_check = None
         self.last_error = None
@@ -77,8 +79,7 @@ class LoLMonitor:
         return "Tigrao LoL • evento " + hashlib.sha256(key).hexdigest()[:24]
 
     async def deliver(self, gid, mid, kind, subject, embeds):
-        channels = await self.repository.channels()
-        channel_id = channels.get(gid)
+        channel_id = await self.sessions.channel_for(gid, subject)
         if not channel_id:
             return False
         if (
@@ -107,7 +108,7 @@ class LoLMonitor:
                         gid, mid, kind, subject, message.id
                     )
                     return True
-            if (await self.repository.channels()).get(gid) != channel_id:
+            if await self.sessions.channel_for(gid, subject) != channel_id:
                 return False
             outgoing = [e.copy() for e in embeds]
             if not outgoing:
@@ -120,7 +121,7 @@ class LoLMonitor:
             )
             await self.repository.acknowledge(gid, mid, kind, subject, message.id)
             return True
-        except discord.HTTPException:
+        except (discord.HTTPException, LoLChannelError):
             self.last_error = "Discord recusou a entrega ou a leitura do historico; notificacao pendente."
             log.warning("Falha de entrega LoL no servidor %s", gid)
             return False
@@ -129,14 +130,17 @@ class LoLMonitor:
         async with self.lock:
             self.last_check = time.time()
             self.last_error = None
-            channels = await self.repository.channels()
+            configs = await self.repository.session_configs()
             players = [
-                p for p in await self.repository.players() if p["guild_id"] in channels
+                p for p in await self.repository.players() if p["guild_id"] in configs
             ]
+            active = {(p["guild_id"], p["puuid"]): p for p in players}
             if not players:
+                await self.sessions.cleanup({}, active, set())
                 return
             if not self.riot.key:
                 self.last_error = "RIOT_API_KEY nao configurada."
+                await self.sessions.cleanup({}, active, set())
                 return
             observed = {}
             groups = {}
@@ -176,11 +180,17 @@ class LoLMonitor:
                     if exc.status == 429:
                         break
             for (gid, mid), group in groups.items():
+                for player in group["players"]:
+                    try:
+                        await self.sessions.ensure(player, mid)
+                    except (discord.HTTPException, LoLChannelError):
+                        self.last_error = "Nao foi possivel criar ou recuperar um canal privado LOL; nova tentativa no proximo ciclo."
+            for (gid, mid), group in groups.items():
                 await self.repository.save_match(
                     gid,
                     mid,
                     group["platform"],
-                    channels[gid],
+                    0,
                     group["game"],
                     group["players"],
                 )
@@ -196,7 +206,7 @@ class LoLMonitor:
             for match in await self.repository.matches():
                 try:
                     await self._process_match(match, players, observed, catalog_ready)
-                except (RiotError, discord.HTTPException) as exc:
+                except (RiotError, discord.HTTPException, LoLChannelError) as exc:
                     self.last_error = (
                         str(exc)
                         if isinstance(exc, RiotError)
@@ -205,6 +215,19 @@ class LoLMonitor:
                     log.warning(
                         "Partida LoL %s: processamento adiado", match["match_id"]
                     )
+
+            pending = set()
+            for match in await self.repository.matches():
+                for player in match["watched"]:
+                    if not await self.repository.was_delivered(
+                        match["guild_id"], match["match_id"], "report", player["puuid"]
+                    ):
+                        pending.add((match["guild_id"], player["puuid"]))
+            errors = await self.sessions.cleanup(
+                observed, active, pending, verify=self.riot.spectator
+            )
+            if errors:
+                self.last_error = errors[0]
 
     async def _process_match(self, match, players, observed, catalog_ready=True):
         gid, mid = match["guild_id"], match["match_id"]
@@ -218,98 +241,131 @@ class LoLMonitor:
             return
         game = match["payload"]
         context = match["context"] or {}
+        # Send each player's first message promptly, before slow optional enrichment.
+        delivered_live = {}
+        for player in watched:
+            try:
+                delivered_live[player["puuid"]] = await self.deliver(
+                    gid,
+                    mid,
+                    "live",
+                    player["puuid"],
+                    live_embeds(game, [player], context, self.catalog),
+                )
+            except (discord.HTTPException, LoLChannelError):
+                delivered_live[player["puuid"]] = False
+                self.last_error = (
+                    "Canal privado LOL indisponivel; notificacao pendente."
+                )
+        if not any(delivered_live.values()):
+            # A channel deliberately removed by an administrator must not be recreated for the same match.
+            sessions = [await self.repository.session(gid, p["puuid"]) for p in watched]
+            abandoned = []
+            for player, session in zip(watched, sessions):
+                state = observed.get((player["platform"], player["puuid"]), "unknown")
+                no_longer_live = state != "unknown" and (
+                    state is None or f"{match['platform']}_{state['gameId']}" != mid
+                )
+                abandoned.append(
+                    bool(session and session["closed"])
+                    or (
+                        no_longer_live
+                        and (session is None or session["channel_id"] is None)
+                    )
+                )
+            if all(abandoned):
+                await self.repository.phase(gid, mid, "complete")
+            return
         if not context:
-            # Notify immediately; optional historical enrichment can span several rate-limit windows.
-            if not await self.deliver(
-                gid, mid, "live", "game", live_embeds(game, watched, {}, self.catalog)
-            ):
-                return
             context = await self._context(game, watched)
             await self.repository.context(gid, mid, context)
-        if context.get("_rendered_patch") != self.catalog.get(
-            "version"
-        ) or not context.get("_rendered"):
-            if await self.refresh_live(
-                gid, mid, live_embeds(game, watched, context, self.catalog)
-            ):
-                context["_rendered_patch"] = self.catalog.get("version")
-                context["_rendered"] = True
-                await self.repository.context(gid, mid, context)
-        if await self.deliver(
-            gid, mid, "live", "game", live_embeds(game, watched, context, self.catalog)
-        ):
-            for player in watched:
-                await self.repository.mark_notified(gid, player["puuid"], mid)
-            for player in watched:
-                if self.catalog.get("version") and catalog_ready:
-                    await self.deliver(
-                        gid,
-                        mid,
-                        "build",
-                        player["puuid"],
-                        build_embeds(game, player, self.catalog),
-                    )
-        else:
-            return
-        states = [observed.get((p["platform"], p["puuid"]), "unknown") for p in watched]
-        if any(s == "unknown" for s in states):
-            return
-        if any(s and f"{match['platform']}_{s['gameId']}" == mid for s in states):
-            return
-        await self.repository.phase(gid, mid, "waiting", match.get("result"))
-        result = match.get("result") or await self.riot.match(mid, match["platform"])
-        if result is None:
-            self.last_error = (
-                "Partida encerrada; aguardando publicacao do resultado na Match-V5."
-            )
-            return
-        await self.repository.phase(gid, mid, "waiting", result)
-        reports = report_embeds(result, watched, context, self.catalog)
-        expected = {p["puuid"] for p in watched}
-        available = {
-            p.get("puuid") for p in result.get("info", {}).get("participants", [])
-        }
-        if not expected <= available:
-            self.last_error = (
-                "Resultado ainda incompleto; relatorio aguardando participantes."
-            )
-            return
-        delivered = True
-        for index in range(0, len(reports), 4):
-            delivered = (
+        result = match.get("result")
+        complete = True
+        for player in watched:
+            puuid = player["puuid"]
+            if not delivered_live[puuid]:
+                session = await self.repository.session(gid, puuid)
+                if not session or not session["closed"]:
+                    complete = False
+                continue
+            rendered = context.setdefault("_player_rendered", {})
+            if puuid not in rendered or rendered[puuid] != self.catalog.get("version"):
+                if await self.refresh_live(
+                    gid, mid, puuid, live_embeds(game, [player], context, self.catalog)
+                ):
+                    rendered[puuid] = self.catalog.get("version")
+                    await self.repository.context(gid, mid, context)
+            await self.repository.mark_notified(gid, puuid, mid)
+            if self.catalog.get("version") and catalog_ready:
                 await self.deliver(
-                    gid, mid, "report", str(index // 4), reports[index : index + 4]
+                    gid, mid, "build", puuid, build_embeds(game, player, self.catalog)
                 )
-                and delivered
-            )
-        if delivered:
+            state = observed.get((player["platform"], puuid), "unknown")
+            if state == "unknown" or (
+                state and f"{match['platform']}_{state['gameId']}" == mid
+            ):
+                complete = False
+                continue
+            result = result or await self.riot.match(mid, match["platform"])
+            if result is None:
+                self.last_error = (
+                    "Aguardando publicacao do resultado na Match-V5; canal preservado."
+                )
+                await self.repository.phase(gid, mid, "waiting")
+                complete = False
+                continue
+            await self.repository.phase(gid, mid, "waiting", result)
+            if not any(
+                p.get("puuid") == puuid
+                for p in result.get("info", {}).get("participants", [])
+            ):
+                self.last_error = (
+                    "Resultado incompleto; encerramento ainda nao confirmado."
+                )
+                complete = False
+                continue
+            await self.sessions.finished(gid, puuid, mid)
+            reports = report_embeds(result, [player], context, self.catalog)
+            session = await self.repository.session(gid, puuid)
+            if reports and session and session["delete_at"] is not None:
+                reports[0].add_field(
+                    name="Canal temporario",
+                    value=f"Exclusao <t:{int(session['delete_at'])}:R> se nao houver nova partida.",
+                    inline=False,
+                )
+            if not await self.deliver(gid, mid, "report", puuid, reports):
+                complete = False
+        if complete:
             await self.repository.phase(gid, mid, "complete", result)
 
-    async def refresh_live(self, gid, mid, embeds):
-        channel_id = (await self.repository.channels()).get(gid)
+    async def refresh_live(self, gid, mid, puuid, embeds):
+        channel_id = await self.sessions.channel_for(gid, puuid)
         if not channel_id:
-            return
-        message_id = await self.repository.delivery(
-            gid, mid, "live", "game", channel_id
-        )
+            return False
+        message_id = await self.repository.delivery(gid, mid, "live", puuid, channel_id)
         channel = self.bot.get_channel(channel_id)
+        if channel is None:
+            try:
+                channel = await self.bot.fetch_channel(channel_id)
+            except discord.HTTPException:
+                return False
         if (
             not message_id
             or not isinstance(channel, discord.TextChannel)
             or channel.guild.id != gid
         ):
-            return
+            return False
         try:
             message = await channel.fetch_message(message_id)
             if message.author.id != self.bot.user.id:
-                return
-            embeds[0].set_footer(text=self.marker(gid, mid, "live", "game"))
+                return False
+            embeds[0].set_footer(text=self.marker(gid, mid, "live", puuid))
             await message.edit(
                 embeds=embeds, allowed_mentions=discord.AllowedMentions.none()
             )
             return True
         except discord.HTTPException:
             self.last_error = (
-                "Live Match enviado; enriquecimento historico nao pode ser atualizado."
+                "Live enviado; enriquecimento historico aguardando atualizacao."
             )
-        return False
+            return False

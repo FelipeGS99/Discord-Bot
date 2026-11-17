@@ -11,6 +11,12 @@ class LoLRepository(LiveRepository):
     def _connect(self):
         c = super()._connect()
         c.executescript("""
+            CREATE TABLE IF NOT EXISTS lol_channel_config(
+              guild_id INTEGER PRIMARY KEY, role_id INTEGER NOT NULL, category_id INTEGER);
+            CREATE TABLE IF NOT EXISTS lol_player_channels(
+              guild_id INTEGER, puuid TEXT, generation INTEGER NOT NULL,
+              channel_id INTEGER, last_match TEXT, last_live REAL, delete_at REAL,
+              closed INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(guild_id,puuid));
             CREATE TABLE IF NOT EXISTS lol_guilds(guild_id INTEGER PRIMARY KEY, channel_id INTEGER NOT NULL);
             CREATE TABLE IF NOT EXISTS lol_players(
               guild_id INTEGER, puuid TEXT, riot_id TEXT NOT NULL, platform TEXT NOT NULL,
@@ -87,6 +93,11 @@ class LoLRepository(LiveRepository):
                 c.execute(
                     "UPDATE lol_matches SET watched=?,phase=CASE WHEN ?=0 THEN 'complete' ELSE phase END WHERE guild_id=? AND match_id=?",
                     (json.dumps(remaining), len(remaining), guild_id, mid),
+                )
+            for puuid in puuids:
+                c.execute(
+                    "UPDATE lol_player_channels SET delete_at=COALESCE(delete_at,?) WHERE guild_id=? AND puuid=? AND closed=0",
+                    (time.time() + 3600, guild_id, puuid),
                 )
             return bool(puuids)
 
@@ -191,5 +202,83 @@ class LoLRepository(LiveRepository):
             lambda c: c.execute(
                 "UPDATE lol_deliveries SET message_id=? WHERE guild_id=? AND match_id=? AND kind=? AND subject=?",
                 (message, gid, mid, kind, subject),
+            )
+        )
+
+    async def was_delivered(self, gid, mid, kind, subject):
+        def work(c):
+            row = c.execute(
+                "SELECT message_id FROM lol_deliveries WHERE guild_id=? AND match_id=? AND kind=? AND subject=?",
+                (gid, mid, kind, subject),
+            ).fetchone()
+            return row is not None and row[0] is not None
+
+        return await self._run(work)
+
+    async def configure_sessions(self, gid, role_id, category_id):
+        await self._run(
+            lambda c: c.execute(
+                "INSERT OR REPLACE INTO lol_channel_config VALUES (?,?,?)",
+                (gid, role_id, category_id),
+            )
+        )
+
+    async def session_configs(self):
+        def work(c):
+            c.row_factory = sqlite3.Row
+            return {
+                r["guild_id"]: dict(r)
+                for r in c.execute("SELECT * FROM lol_channel_config")
+            }
+
+        return await self._run(work)
+
+    async def session(self, gid, puuid):
+        def work(c):
+            c.row_factory = sqlite3.Row
+            row = c.execute(
+                "SELECT * FROM lol_player_channels WHERE guild_id=? AND puuid=?",
+                (gid, puuid),
+            ).fetchone()
+            return dict(row) if row else None
+
+        return await self._run(work)
+
+    async def sessions(self):
+        def work(c):
+            c.row_factory = sqlite3.Row
+            return [
+                dict(r)
+                for r in c.execute("SELECT * FROM lol_player_channels WHERE closed=0")
+            ]
+
+        return await self._run(work)
+
+    async def new_session(self, gid, puuid, mid, now):
+        def work(c):
+            c.execute(
+                """INSERT INTO lol_player_channels VALUES (?,?,1,NULL,?,?,NULL,0)
+              ON CONFLICT(guild_id,puuid) DO UPDATE SET generation=generation+1,
+              channel_id=NULL,last_match=excluded.last_match,last_live=excluded.last_live,delete_at=NULL,closed=0""",
+                (gid, puuid, mid, now),
+            )
+
+        await self._run(work)
+        return await self.session(gid, puuid)
+
+    async def session_update(self, gid, puuid, **values):
+        if not values or not set(values) <= {
+            "channel_id",
+            "last_match",
+            "last_live",
+            "delete_at",
+            "closed",
+        }:
+            raise ValueError("Campos de sessao invalidos.")
+        fields = ",".join(f"{key}=?" for key in values)
+        await self._run(
+            lambda c: c.execute(
+                f"UPDATE lol_player_channels SET {fields} WHERE guild_id=? AND puuid=?",
+                (*values.values(), gid, puuid),
             )
         )
