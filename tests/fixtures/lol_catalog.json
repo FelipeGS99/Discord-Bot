@@ -1,0 +1,1652 @@
+{
+  "version": "16.22.1",
+  "champions": {
+    "266": {
+      "version": "16.22.1",
+      "id": "Aatrox",
+      "key": "266",
+      "name": "Aatrox",
+      "title": "a Espada Darkin",
+      "blurb": "Antes defensores honrados de Shurima contra o temido Vazio, Aatrox e seus irmãos acabaram se tornando uma ameaça ainda maior para Runeterra, e a única coisa capaz de derrotá-los foi um tipo de feitiçaria mortal e traiçoeira. Mas após séculos de...",
+      "info": {
+        "attack": 8,
+        "defense": 4,
+        "magic": 3,
+        "difficulty": 4
+      },
+      "image": {
+        "full": "Aatrox.png",
+        "sprite": "champion0.png",
+        "group": "champion",
+        "x": 0,
+        "y": 0,
+        "w": 48,
+        "h": 48
+      },
+      "tags": [
+        "Fighter"
+      ],
+      "partype": "Poço de Sangue",
+      "stats": {
+        "hp": 650,
+        "hpperlevel": 114,
+        "mp": 0,
+        "mpperlevel": 0,
+        "movespeed": 345,
+        "armor": 38,
+        "armorperlevel": 4.8,
+        "spellblock": 32,
+        "spellblockperlevel": 2.05,
+        "attackrange": 175,
+        "hpregen": 3,
+        "hpregenperlevel": 0.5,
+        "mpregen": 0,
+        "mpregenperlevel": 0,
+        "crit": 0,
+        "critperlevel": 0,
+        "attackdamage": 60,
+        "attackdamageperlevel": 0,
+        "attackspeedperlevel": 2.5,
+        "attackspeed": 0.651
+      }
+    },
+    "103": {
+      "version": "16.22.1",
+      "id": "Ahri",
+      "key": "103",
+      "name": "Ahri",
+      "title": "a Raposa de Nove Caudas",
+      "blurb": "A ligação de Ahri com a magia do mundo espiritual é inata. Ela é uma vastaya com traços de raposa, capaz de manipular as emoções de sua presa e consumir sua essência, devorando também as memórias e as percepções de cada alma absorvida. Outrora uma...",
+      "info": {
+        "attack": 3,
+        "defense": 4,
+        "magic": 8,
+        "difficulty": 5
+      },
+      "image": {
+        "full": "Ahri.png",
+        "sprite": "champion0.png",
+        "group": "champion",
+        "x": 48,
+        "y": 0,
+        "w": 48,
+        "h": 48
+      },
+      "tags": [
+        "Mage",
+        "Assassin"
+      ],
+      "partype": "Mana",
+      "stats": {
+        "hp": 590,
+        "hpperlevel": 104,
+        "mp": 418,
+        "mpperlevel": 25,
+        "movespeed": 330,
+        "armor": 21,
+        "armorperlevel": 4.2,
+        "spellblock": 30,
+        "spellblockperlevel": 1.3,
+        "attackrange": 550,
+        "hpregen": 2.5,
+        "hpregenperlevel": 0.6,
+        "mpregen": 8,
+        "mpregenperlevel": 0.8,
+        "crit": 0,
+        "critperlevel": 0,
+        "attackdamage": 53,
+        "attackdamageperlevel": 0,
+        "attackspeedperlevel": 2.2,
+        "attackspeed": 0.668
+      }
+    },
+    "22": {
+      "version": "16.22.1",
+      "id": "Ashe",
+      "key": "22",
+      "name": "Ashe",
+      "title": "a Arqueira do Gelo",
+      "blurb": "A mãe de guerra Glacinata da tribo de Avarosa, Ashe comanda a horda mais populosa do norte. Estoica, inteligente e idealista, mesmo que desconfortável com seu papel de liderança, ela canaliza as magias ancestrais de sua linhagem para empunhar um arco de...",
+      "info": {
+        "attack": 7,
+        "defense": 3,
+        "magic": 2,
+        "difficulty": 4
+      },
+      "image": {
+        "full": "Ashe.png",
+        "sprite": "champion0.png",
+        "group": "champion",
+        "x": 0,
+        "y": 48,
+        "w": 48,
+        "h": 48
+      },
+      "tags": [
+        "Marksman",
+        "Support"
+      ],
+      "partype": "Mana",
+      "stats": {
+        "hp": 610,
+        "hpperlevel": 101,
+        "mp": 280,
+        "mpperlevel": 35,
+        "movespeed": 325,
+        "armor": 26,
+        "armorperlevel": 4.6,
+        "spellblock": 33,
+        "spellblockperlevel": 1.1,
+        "attackrange": 600,
+        "hpregen": 3.5,
+        "hpregenperlevel": 0.55,
+        "mpregen": 7,
+        "mpregenperlevel": 0.65,
+        "crit": 0,
+        "critperlevel": 0,
+        "attackdamage": 59,
+        "attackdamageperlevel": 0,
+        "attackspeedperlevel": 3,
+        "attackspeed": 0.658
+      }
+    },
+    "86": {
+      "version": "16.22.1",
+      "id": "Garen",
+      "key": "86",
+      "name": "Garen",
+      "title": "o Poder de Demacia",
+      "blurb": "Um guerreiro nobre e orgulhoso, Garen faz parte da Vanguarda Destemida. Popular entre seus companheiros e respeitado o suficiente por seus inimigos, sua reputação é nada mais do que o esperado de um herdeiro da prestigiosa família Stemmaguarda...",
+      "info": {
+        "attack": 7,
+        "defense": 7,
+        "magic": 1,
+        "difficulty": 5
+      },
+      "image": {
+        "full": "Garen.png",
+        "sprite": "champion1.png",
+        "group": "champion",
+        "x": 384,
+        "y": 0,
+        "w": 48,
+        "h": 48
+      },
+      "tags": [
+        "Fighter",
+        "Tank"
+      ],
+      "partype": "Nenhum",
+      "stats": {
+        "hp": 690,
+        "hpperlevel": 98,
+        "mp": 0,
+        "mpperlevel": 0,
+        "movespeed": 340,
+        "armor": 38,
+        "armorperlevel": 4.2,
+        "spellblock": 32,
+        "spellblockperlevel": 1.55,
+        "attackrange": 175,
+        "hpregen": 8,
+        "hpregenperlevel": 0.5,
+        "mpregen": 0,
+        "mpregenperlevel": 0,
+        "crit": 0,
+        "critperlevel": 0,
+        "attackdamage": 69,
+        "attackdamageperlevel": 0,
+        "attackspeedperlevel": 3.65,
+        "attackspeed": 0.625
+      }
+    },
+    "222": {
+      "version": "16.22.1",
+      "id": "Jinx",
+      "key": "222",
+      "name": "Jinx",
+      "title": "o Gatilho Desenfreado",
+      "blurb": "Jinx, uma criminosa desequilibrada e impulsiva da Subferia, é atormentada pelas consequências de seu passado, mas isso não a impede de deixar sua marca caótica de pandemônio em Piltover e Zaun. Ela usa um arsenal de armas autorais para provocar efeitos...",
+      "info": {
+        "attack": 9,
+        "defense": 2,
+        "magic": 4,
+        "difficulty": 6
+      },
+      "image": {
+        "full": "Jinx.png",
+        "sprite": "champion1.png",
+        "group": "champion",
+        "x": 192,
+        "y": 96,
+        "w": 48,
+        "h": 48
+      },
+      "tags": [
+        "Marksman"
+      ],
+      "partype": "Mana",
+      "stats": {
+        "hp": 610,
+        "hpperlevel": 105,
+        "mp": 260,
+        "mpperlevel": 50,
+        "movespeed": 325,
+        "armor": 26,
+        "armorperlevel": 4.2,
+        "spellblock": 33,
+        "spellblockperlevel": 1.1,
+        "attackrange": 525,
+        "hpregen": 3.75,
+        "hpregenperlevel": 0.5,
+        "mpregen": 6.7,
+        "mpregenperlevel": 1,
+        "crit": 0,
+        "critperlevel": 0,
+        "attackdamage": 59,
+        "attackdamageperlevel": 0,
+        "attackspeedperlevel": 1,
+        "attackspeed": 0.625
+      }
+    },
+    "64": {
+      "version": "16.22.1",
+      "id": "LeeSin",
+      "key": "64",
+      "name": "Lee Sin",
+      "title": "o Monge Cego",
+      "blurb": "Um mestre das artes marciais ancestrais de Ionia, Lee Sin é um lutador de princípios fortes que canaliza a essência do espírito do dragão para enfrentar qualquer desafio. Apesar de ter perdido a visão há muitos anos, o monge guerreiro dedicou sua vida a...",
+      "info": {
+        "attack": 8,
+        "defense": 5,
+        "magic": 3,
+        "difficulty": 6
+      },
+      "image": {
+        "full": "LeeSin.png",
+        "sprite": "champion2.png",
+        "group": "champion",
+        "x": 0,
+        "y": 48,
+        "w": 48,
+        "h": 48
+      },
+      "tags": [
+        "Fighter",
+        "Assassin"
+      ],
+      "partype": "Energia",
+      "stats": {
+        "hp": 645,
+        "hpperlevel": 108,
+        "mp": 200,
+        "mpperlevel": 0,
+        "movespeed": 345,
+        "armor": 36,
+        "armorperlevel": 4.5,
+        "spellblock": 32,
+        "spellblockperlevel": 2.05,
+        "attackrange": 125,
+        "hpregen": 7.5,
+        "hpregenperlevel": 0.7,
+        "mpregen": 50,
+        "mpregenperlevel": 0,
+        "crit": 0,
+        "critperlevel": 0,
+        "attackdamage": 66,
+        "attackdamageperlevel": 0,
+        "attackspeedperlevel": 3,
+        "attackspeed": 0.651
+      }
+    },
+    "99": {
+      "version": "16.22.1",
+      "id": "Lux",
+      "key": "99",
+      "name": "Lux",
+      "title": "a Dama da Luz",
+      "blurb": "Luxanna Stemmaguarda nasceu em Demacia, um reino insular onde habilidades mágicas são vistas com medo e desconfiança. Capaz de dobrar a luz à sua vontade, ela cresceu temendo ser descoberta e exilada, e foi forçada a manter seus poderes em segredo a fim...",
+      "info": {
+        "attack": 2,
+        "defense": 4,
+        "magic": 9,
+        "difficulty": 5
+      },
+      "image": {
+        "full": "Lux.png",
+        "sprite": "champion2.png",
+        "group": "champion",
+        "x": 336,
+        "y": 48,
+        "w": 48,
+        "h": 48
+      },
+      "tags": [
+        "Mage",
+        "Support"
+      ],
+      "partype": "Mana",
+      "stats": {
+        "hp": 580,
+        "hpperlevel": 99,
+        "mp": 440,
+        "mpperlevel": 23.5,
+        "movespeed": 330,
+        "armor": 21,
+        "armorperlevel": 5.2,
+        "spellblock": 30,
+        "spellblockperlevel": 1.3,
+        "attackrange": 550,
+        "hpregen": 5.5,
+        "hpregenperlevel": 0.55,
+        "mpregen": 9,
+        "mpregenperlevel": 0.8,
+        "crit": 0,
+        "critperlevel": 0,
+        "attackdamage": 54,
+        "attackdamageperlevel": 0,
+        "attackspeedperlevel": 3,
+        "attackspeed": 0.669
+      }
+    },
+    "54": {
+      "version": "16.22.1",
+      "id": "Malphite",
+      "key": "54",
+      "name": "Malphite",
+      "title": "o Fragmento do Monolito",
+      "blurb": "Uma criatura gigantesca de pedra viva, Malphite pena para impor ordem abençoada em um mundo caótico. Nascido como um fragmento servil de um obelisco de outro mundo conhecido como Monolito, ele usou sua tremenda força elemental para manter e proteger seu...",
+      "info": {
+        "attack": 5,
+        "defense": 9,
+        "magic": 7,
+        "difficulty": 2
+      },
+      "image": {
+        "full": "Malphite.png",
+        "sprite": "champion2.png",
+        "group": "champion",
+        "x": 384,
+        "y": 48,
+        "w": 48,
+        "h": 48
+      },
+      "tags": [
+        "Tank",
+        "Mage"
+      ],
+      "partype": "Mana",
+      "stats": {
+        "hp": 665,
+        "hpperlevel": 104,
+        "mp": 280,
+        "mpperlevel": 60,
+        "movespeed": 335,
+        "armor": 40,
+        "armorperlevel": 4.95,
+        "spellblock": 28,
+        "spellblockperlevel": 2.05,
+        "attackrange": 125,
+        "hpregen": 7,
+        "hpregenperlevel": 0.55,
+        "mpregen": 7.3,
+        "mpregenperlevel": 0.55,
+        "crit": 0,
+        "critperlevel": 0,
+        "attackdamage": 62,
+        "attackdamageperlevel": 0,
+        "attackspeedperlevel": 3.4,
+        "attackspeed": 0.736
+      }
+    },
+    "25": {
+      "version": "16.22.1",
+      "id": "Morgana",
+      "key": "25",
+      "name": "Morgana",
+      "title": "a Caída",
+      "blurb": "Dividida entre sua natureza mortal e celestial, Morgana prendeu as asas para preservar sua humanidade e inflige sua dor e amargura nos desonestos e corruptos. Ela rejeita as leis e tradições que considera injustas e luta pela verdade nas sombras de...",
+      "info": {
+        "attack": 1,
+        "defense": 6,
+        "magic": 8,
+        "difficulty": 1
+      },
+      "image": {
+        "full": "Morgana.png",
+        "sprite": "champion2.png",
+        "group": "champion",
+        "x": 336,
+        "y": 96,
+        "w": 48,
+        "h": 48
+      },
+      "tags": [
+        "Support",
+        "Mage"
+      ],
+      "partype": "Mana",
+      "stats": {
+        "hp": 630,
+        "hpperlevel": 104,
+        "mp": 340,
+        "mpperlevel": 60,
+        "movespeed": 335,
+        "armor": 25,
+        "armorperlevel": 4.2,
+        "spellblock": 30,
+        "spellblockperlevel": 1.3,
+        "attackrange": 450,
+        "hpregen": 5.5,
+        "hpregenperlevel": 0.4,
+        "mpregen": 11,
+        "mpregenperlevel": 0.4,
+        "crit": 0,
+        "critperlevel": 0,
+        "attackdamage": 56,
+        "attackdamageperlevel": 0,
+        "attackspeedperlevel": 1.53,
+        "attackspeed": 0.625
+      }
+    },
+    "16": {
+      "version": "16.22.1",
+      "id": "Soraka",
+      "key": "16",
+      "name": "Soraka",
+      "title": "a Filha das Estrelas",
+      "blurb": "Uma andarilha vinda de dimensões celestiais além do Monte Targon, Soraka desistiu de sua imortalidade para proteger as raças mortais de seus instintos mais violentos. Ela pretende espalhar as virtudes da compaixão e da misericórdia a todos que encontra...",
+      "info": {
+        "attack": 2,
+        "defense": 5,
+        "magic": 7,
+        "difficulty": 3
+      },
+      "image": {
+        "full": "Soraka.png",
+        "sprite": "champion4.png",
+        "group": "champion",
+        "x": 432,
+        "y": 0,
+        "w": 48,
+        "h": 48
+      },
+      "tags": [
+        "Support",
+        "Mage"
+      ],
+      "partype": "Mana",
+      "stats": {
+        "hp": 605,
+        "hpperlevel": 88,
+        "mp": 425,
+        "mpperlevel": 40,
+        "movespeed": 325,
+        "armor": 32,
+        "armorperlevel": 5,
+        "spellblock": 30,
+        "spellblockperlevel": 1.3,
+        "attackrange": 550,
+        "hpregen": 2.5,
+        "hpregenperlevel": 0.5,
+        "mpregen": 11.5,
+        "mpregenperlevel": 0.4,
+        "crit": 0,
+        "critperlevel": 0,
+        "attackdamage": 50,
+        "attackdamageperlevel": 0,
+        "attackspeedperlevel": 2.14,
+        "attackspeed": 0.625
+      }
+    }
+  },
+  "items": {
+    "1036": {
+      "name": "Espada Longa",
+      "gold": {
+        "base": 350,
+        "purchasable": true,
+        "total": 350,
+        "sell": 245
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Damage",
+        "Lane"
+      ]
+    },
+    "1054": {
+      "name": "Escudo de Doran",
+      "gold": {
+        "base": 450,
+        "purchasable": true,
+        "total": 450,
+        "sell": 180
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Health",
+        "HealthRegen",
+        "Lane"
+      ]
+    },
+    "1055": {
+      "name": "Lâmina de Doran",
+      "gold": {
+        "base": 450,
+        "purchasable": true,
+        "total": 450,
+        "sell": 180
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Health",
+        "Damage",
+        "LifeSteal",
+        "SpellVamp",
+        "Lane"
+      ]
+    },
+    "1056": {
+      "name": "Anel de Doran",
+      "gold": {
+        "base": 400,
+        "purchasable": true,
+        "total": 400,
+        "sell": 160
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Health",
+        "Lane",
+        "ManaRegen",
+        "SpellDamage"
+      ]
+    },
+    "2003": {
+      "name": "Poção de Vida",
+      "gold": {
+        "base": 50,
+        "purchasable": true,
+        "total": 50,
+        "sell": 20
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "HealthRegen",
+        "Consumable",
+        "Lane",
+        "Jungle"
+      ]
+    },
+    "2503": {
+      "name": "Tocha de Chamas Negras",
+      "gold": {
+        "base": 700,
+        "purchasable": true,
+        "total": 2800,
+        "sell": 1960
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "SpellDamage",
+        "Mana",
+        "CooldownReduction",
+        "AbilityHaste"
+      ]
+    },
+    "3006": {
+      "name": "Grevas do Berserker",
+      "gold": {
+        "base": 300,
+        "purchasable": true,
+        "total": 1100,
+        "sell": 770
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "AttackSpeed",
+        "Boots"
+      ]
+    },
+    "3020": {
+      "name": "Sapatos do Feiticeiro",
+      "gold": {
+        "base": 800,
+        "purchasable": true,
+        "total": 1100,
+        "sell": 770
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Boots",
+        "MagicPenetration"
+      ]
+    },
+    "3026": {
+      "name": "Anjo Guardião",
+      "gold": {
+        "base": 800,
+        "purchasable": true,
+        "total": 3200,
+        "sell": 1280
+      },
+      "maps": {
+        "11": true,
+        "12": false,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Armor",
+        "Damage"
+      ]
+    },
+    "3031": {
+      "name": "Gume do Infinito",
+      "gold": {
+        "base": 725,
+        "purchasable": true,
+        "total": 3500,
+        "sell": 2450
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "CriticalStrike",
+        "Damage"
+      ]
+    },
+    "3033": {
+      "name": "Lembrete Mortal",
+      "gold": {
+        "base": 150,
+        "purchasable": true,
+        "total": 3000,
+        "sell": 2100
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Damage",
+        "CriticalStrike",
+        "ArmorPenetration"
+      ]
+    },
+    "3036": {
+      "name": "Lembranças do Lorde Dominik",
+      "gold": {
+        "base": 550,
+        "purchasable": true,
+        "total": 3300,
+        "sell": 2310
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Damage",
+        "CriticalStrike",
+        "ArmorPenetration"
+      ]
+    },
+    "3047": {
+      "name": "Botas Galvanizadas de Aço",
+      "gold": {
+        "base": 600,
+        "purchasable": true,
+        "total": 1200,
+        "sell": 840
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Armor",
+        "Boots"
+      ]
+    },
+    "3053": {
+      "name": "Sinal de Sterak",
+      "gold": {
+        "base": 775,
+        "purchasable": true,
+        "total": 3200,
+        "sell": 2240
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Health",
+        "Damage",
+        "Tenacity"
+      ]
+    },
+    "3065": {
+      "name": "Semblante Espiritual",
+      "gold": {
+        "base": 650,
+        "purchasable": true,
+        "total": 2700,
+        "sell": 1890
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Health",
+        "SpellBlock",
+        "HealthRegen",
+        "CooldownReduction",
+        "AbilityHaste"
+      ]
+    },
+    "3068": {
+      "name": "Égide de Fogo Solar",
+      "gold": {
+        "base": 700,
+        "purchasable": true,
+        "total": 2800,
+        "sell": 1960
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Health",
+        "Armor",
+        "Aura",
+        "AbilityHaste"
+      ]
+    },
+    "3071": {
+      "name": "Cutelo Negro",
+      "gold": {
+        "base": 225,
+        "purchasable": true,
+        "total": 3000,
+        "sell": 2100
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Health",
+        "Damage",
+        "CooldownReduction",
+        "OnHit",
+        "NonbootsMovement",
+        "ArmorPenetration",
+        "AbilityHaste"
+      ]
+    },
+    "3074": {
+      "name": "Hidra Raivosa",
+      "gold": {
+        "base": 150,
+        "purchasable": true,
+        "total": 3300,
+        "sell": 2310
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Damage",
+        "LifeSteal",
+        "CooldownReduction",
+        "OnHit",
+        "AbilityHaste"
+      ]
+    },
+    "3075": {
+      "name": "Armadura de Espinhos",
+      "gold": {
+        "base": 450,
+        "purchasable": true,
+        "total": 2450,
+        "sell": 1715
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Health",
+        "Armor"
+      ]
+    },
+    "3083": {
+      "name": "Armadura de Warmog",
+      "gold": {
+        "base": 500,
+        "purchasable": true,
+        "total": 3100,
+        "sell": 2170
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Health",
+        "HealthRegen"
+      ]
+    },
+    "3085": {
+      "name": "Furacão de Runaan",
+      "gold": {
+        "base": 850,
+        "purchasable": true,
+        "total": 2650,
+        "sell": 1855
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "CriticalStrike",
+        "AttackSpeed",
+        "OnHit",
+        "NonbootsMovement"
+      ]
+    },
+    "3089": {
+      "name": "Capuz da Morte de Rabadon",
+      "gold": {
+        "base": 1100,
+        "purchasable": true,
+        "total": 3500,
+        "sell": 2450
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "SpellDamage"
+      ]
+    },
+    "3094": {
+      "name": "Canhão Fumegante",
+      "gold": {
+        "base": 850,
+        "purchasable": true,
+        "total": 2650,
+        "sell": 1855
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "CriticalStrike",
+        "AttackSpeed",
+        "NonbootsMovement"
+      ]
+    },
+    "3102": {
+      "name": "Véu da Banshee",
+      "gold": {
+        "base": 200,
+        "purchasable": true,
+        "total": 3000,
+        "sell": 2100
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "SpellBlock",
+        "SpellDamage"
+      ]
+    },
+    "3107": {
+      "name": "Redenção",
+      "gold": {
+        "base": 850,
+        "purchasable": true,
+        "total": 2300,
+        "sell": 1610
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "SpellDamage",
+        "ManaRegen",
+        "CooldownReduction",
+        "AbilityHaste"
+      ]
+    },
+    "3110": {
+      "name": "Coração Congelado",
+      "gold": {
+        "base": 600,
+        "purchasable": true,
+        "total": 2500,
+        "sell": 1750
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Armor",
+        "Mana",
+        "Aura",
+        "CooldownReduction",
+        "AbilityHaste"
+      ]
+    },
+    "3111": {
+      "name": "Passos de Mercúrio",
+      "gold": {
+        "base": 550,
+        "purchasable": true,
+        "total": 1250,
+        "sell": 875
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Boots",
+        "SpellBlock",
+        "Tenacity"
+      ]
+    },
+    "3135": {
+      "name": "Cajado do Vazio",
+      "gold": {
+        "base": 1050,
+        "purchasable": true,
+        "total": 3000,
+        "sell": 2100
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "MagicPenetration",
+        "SpellDamage"
+      ]
+    },
+    "3142": {
+      "name": "Lâmina Fantasma de Youmuu",
+      "gold": {
+        "base": 675,
+        "purchasable": true,
+        "total": 2800,
+        "sell": 1960
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Damage",
+        "Active",
+        "NonbootsMovement",
+        "ArmorPenetration"
+      ]
+    },
+    "3143": {
+      "name": "Presságio de Randuin",
+      "gold": {
+        "base": 800,
+        "purchasable": true,
+        "total": 2700,
+        "sell": 1890
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Health",
+        "Armor",
+        "Active",
+        "Slow"
+      ]
+    },
+    "3153": {
+      "name": "Espada do Rei Destruído",
+      "gold": {
+        "base": 725,
+        "purchasable": true,
+        "total": 3200,
+        "sell": 2240
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Damage",
+        "AttackSpeed",
+        "LifeSteal",
+        "Slow",
+        "OnHit"
+      ]
+    },
+    "3156": {
+      "name": "Mandíbula de Malmortius",
+      "gold": {
+        "base": 750,
+        "purchasable": true,
+        "total": 3100,
+        "sell": 2170
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "SpellBlock",
+        "Damage",
+        "LifeSteal",
+        "SpellVamp",
+        "AbilityHaste"
+      ]
+    },
+    "3157": {
+      "name": "Ampulheta de Zhonya",
+      "gold": {
+        "base": 450,
+        "purchasable": true,
+        "total": 3250,
+        "sell": 2275
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Armor",
+        "SpellDamage",
+        "Active"
+      ]
+    },
+    "3158": {
+      "name": "Botas Ionianas da Lucidez",
+      "gold": {
+        "base": 350,
+        "purchasable": true,
+        "total": 900,
+        "sell": 630
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Boots",
+        "CooldownReduction"
+      ]
+    },
+    "3161": {
+      "name": "Lança de Shojin",
+      "gold": {
+        "base": 675,
+        "purchasable": true,
+        "total": 3100,
+        "sell": 2170
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Health",
+        "Damage",
+        "AbilityHaste"
+      ]
+    },
+    "3165": {
+      "name": "Morellonomicon",
+      "gold": {
+        "base": 400,
+        "purchasable": true,
+        "total": 2850,
+        "sell": 1995
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Health",
+        "SpellDamage",
+        "CooldownReduction",
+        "AbilityHaste"
+      ]
+    },
+    "3190": {
+      "name": "Medalhão dos Solari de Ferro",
+      "gold": {
+        "base": 700,
+        "purchasable": true,
+        "total": 2200,
+        "sell": 1540
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Health",
+        "SpellBlock",
+        "Armor",
+        "Aura",
+        "Active",
+        "MagicResist",
+        "AbilityHaste"
+      ]
+    },
+    "3504": {
+      "name": "Turíbulo Ardente",
+      "gold": {
+        "base": 700,
+        "purchasable": true,
+        "total": 2200,
+        "sell": 1540
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "AttackSpeed",
+        "SpellDamage",
+        "ManaRegen",
+        "NonbootsMovement"
+      ]
+    },
+    "3508": {
+      "name": "Colhedor de Essência",
+      "gold": {
+        "base": 500,
+        "purchasable": true,
+        "total": 3050,
+        "sell": 2135
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Damage",
+        "CriticalStrike",
+        "ManaRegen",
+        "CooldownReduction",
+        "OnHit",
+        "AbilityHaste"
+      ]
+    },
+    "3814": {
+      "name": "Limiar da Noite",
+      "gold": {
+        "base": 850,
+        "purchasable": true,
+        "total": 3000,
+        "sell": 2100
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Health",
+        "Damage",
+        "ArmorPenetration"
+      ]
+    },
+    "3865": {
+      "name": "Atlas Mundial",
+      "gold": {
+        "base": 400,
+        "purchasable": true,
+        "total": 400,
+        "sell": 160
+      },
+      "maps": {
+        "11": true,
+        "12": false,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Health",
+        "ManaRegen",
+        "Vision",
+        "GoldPer",
+        "Lane"
+      ]
+    },
+    "4005": {
+      "name": "Mandato Imperial",
+      "gold": {
+        "base": 700,
+        "purchasable": true,
+        "total": 2400,
+        "sell": 1680
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "SpellDamage",
+        "ManaRegen",
+        "CooldownReduction",
+        "AbilityHaste"
+      ]
+    },
+    "4645": {
+      "name": "Chama Sombria",
+      "gold": {
+        "base": 900,
+        "purchasable": true,
+        "total": 3200,
+        "sell": 2240
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "SpellDamage",
+        "MagicPenetration"
+      ]
+    },
+    "6333": {
+      "name": "Dança da Morte",
+      "gold": {
+        "base": 275,
+        "purchasable": true,
+        "total": 3300,
+        "sell": 2310
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Armor",
+        "Damage",
+        "AbilityHaste"
+      ]
+    },
+    "6609": {
+      "name": "Serrespada Quimiopunk",
+      "gold": {
+        "base": 250,
+        "purchasable": true,
+        "total": 3000,
+        "sell": 2100
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Health",
+        "Damage",
+        "CooldownReduction",
+        "AbilityHaste"
+      ]
+    },
+    "6617": {
+      "name": "Regenerador de Pedra Lunar",
+      "gold": {
+        "base": 500,
+        "purchasable": true,
+        "total": 2200,
+        "sell": 1540
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Health",
+        "SpellDamage",
+        "ManaRegen",
+        "CooldownReduction",
+        "AbilityHaste"
+      ]
+    },
+    "6655": {
+      "name": "Eco de Luden",
+      "gold": {
+        "base": 450,
+        "purchasable": true,
+        "total": 2750,
+        "sell": 1925
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "SpellDamage",
+        "Mana",
+        "CooldownReduction",
+        "AbilityHaste"
+      ]
+    },
+    "6664": {
+      "name": "Resplendor Vazio",
+      "gold": {
+        "base": 650,
+        "purchasable": true,
+        "total": 2800,
+        "sell": 1960
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Health",
+        "SpellBlock",
+        "HealthRegen",
+        "Aura",
+        "MagicResist",
+        "AbilityHaste"
+      ]
+    },
+    "6665": {
+      "name": "Jak'Sho, o Inconstante",
+      "gold": {
+        "base": 650,
+        "purchasable": true,
+        "total": 3200,
+        "sell": 2240
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Health",
+        "SpellBlock",
+        "Armor",
+        "MagicResist"
+      ]
+    },
+    "6672": {
+      "name": "Mata-Cráquens",
+      "gold": {
+        "base": 325,
+        "purchasable": true,
+        "total": 3000,
+        "sell": 2100
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Damage",
+        "AttackSpeed",
+        "OnHit",
+        "NonbootsMovement"
+      ]
+    },
+    "6692": {
+      "name": "Eclipse",
+      "gold": {
+        "base": 625,
+        "purchasable": true,
+        "total": 2900,
+        "sell": 2030
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Damage",
+        "CooldownReduction",
+        "AbilityHaste"
+      ]
+    },
+    "6694": {
+      "name": "Rancor de Serylda",
+      "gold": {
+        "base": 500,
+        "purchasable": true,
+        "total": 3000,
+        "sell": 2100
+      },
+      "maps": {
+        "11": true,
+        "12": true,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Damage",
+        "CooldownReduction",
+        "ArmorPenetration",
+        "AbilityHaste"
+      ]
+    },
+    "6697": {
+      "name": "Húbris",
+      "gold": {
+        "base": 750,
+        "purchasable": true,
+        "total": 2800,
+        "sell": 1960
+      },
+      "maps": {
+        "11": true,
+        "12": false,
+        "22": false,
+        "30": false,
+        "453": true
+      },
+      "tags": [
+        "Damage",
+        "Active",
+        "CooldownReduction",
+        "ArmorPenetration",
+        "AbilityHaste"
+      ]
+    }
+  }
+}
