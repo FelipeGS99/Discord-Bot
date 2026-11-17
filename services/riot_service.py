@@ -254,37 +254,103 @@ class RiotClient:
             )
         return data
 
-    async def history(self, puuid, platform="BR1", count=5):
+    async def timeline(self, match_id, platform="BR1"):
+        data = await self.get(
+            self.region(platform),
+            "/lol/match/v5/matches/" + quote(match_id, safe="") + "/timeline",
+            ttl=86400,
+            missing=True,
+        )
+        if data is not None and (
+            not isinstance(data, dict)
+            or not isinstance(data.get("info"), dict)
+            or not isinstance(data["info"].get("frames"), list)
+            or data.get("metadata", {}).get("matchId") != match_id
+        ):
+            raise RiotError(200, "Timeline Riot invalida ou de outra partida.")
+        return data
+
+    async def history(self, puuid, platform="BR1", count=5, queue=None):
+        count = max(1, min(100, int(count)))
+        suffix = f"&queue={int(queue)}" if queue is not None else ""
         ids = await self.get(
             self.region(platform),
             "/lol/match/v5/matches/by-puuid/"
             + quote(puuid, safe="")
-            + f"/ids?start=0&count={count}",
+            + f"/ids?start=0&count={count}{suffix}",
             ttl=120,
         )
         if not isinstance(ids, list) or not all(isinstance(mid, str) for mid in ids):
             raise RiotError(200, "Historico Riot invalido.")
         return [m for mid in ids if (m := await self.match(mid, platform)) is not None]
 
-    async def rank(self, puuid, platform="BR1"):
+    async def rank(self, puuid, platform="BR1", queue_id=420):
         data = await self.get(
             platform.lower(),
             "/lol/league/v4/entries/by-puuid/" + quote(puuid, safe=""),
-            ttl=600,
+            ttl=120,
             missing=True,
         )
         if data is None:
             return "indisponivel"
         if not isinstance(data, list) or not all(isinstance(r, dict) for r in data):
             raise RiotError(200, "League-V4 retornou formato invalido.")
-        solo = next((r for r in data if r.get("queueType") == "RANKED_SOLO_5x5"), None)
+        solo = next(
+            (
+                r
+                for r in data
+                if r.get("queueType")
+                == ("RANKED_FLEX_SR" if queue_id == 440 else "RANKED_SOLO_5x5")
+            ),
+            None,
+        )
         if solo and not all(k in solo for k in ("tier", "rank", "leaguePoints")):
             raise RiotError(200, "Elo Riot incompleto.")
         return (
             f"{solo['tier']} {solo['rank']} · {solo.get('leaguePoints', 0)} LP"
             if solo
-            else "sem elo solo/duo"
+            else ("sem elo flex" if queue_id == 440 else "sem elo solo/duo")
         )
+
+    async def ranked_stats(self, puuid, platform="BR1", queue_id=420):
+        queue_type = "RANKED_FLEX_SR" if queue_id == 440 else "RANKED_SOLO_5x5"
+        queue_name = "Flex" if queue_id == 440 else "Solo/Duo"
+        data = await self.get(
+            platform.lower(),
+            "/lol/league/v4/entries/by-puuid/" + quote(puuid, safe=""),
+            ttl=120,
+            missing=True,
+        )
+        if data is None:
+            return None
+        if not isinstance(data, list) or not all(isinstance(r, dict) for r in data):
+            raise RiotError(200, "League-V4 retornou formato invalido.")
+        entry = next((r for r in data if r.get("queueType") == queue_type), None)
+        if entry is None:
+            return {
+                "queue_id": 440 if queue_id == 440 else 420,
+                "queue_name": queue_name,
+                "wins": 0,
+                "losses": 0,
+                "count": 0,
+                "win_rate": None,
+                "source": "League-V4",
+            }
+        wins, losses = entry.get("wins"), entry.get("losses")
+        if type(wins) is not int or type(losses) is not int or wins < 0 or losses < 0:
+            raise RiotError(
+                200, "League-V4 retornou contagens de vitorias/derrotas invalidas."
+            )
+        count = wins + losses
+        return {
+            "queue_id": 440 if queue_id == 440 else 420,
+            "queue_name": queue_name,
+            "wins": wins,
+            "losses": losses,
+            "count": count,
+            "win_rate": 100 * wins / count if count else None,
+            "source": "League-V4",
+        }
 
     async def mastery(self, puuid, champion_id, platform="BR1"):
         return await self.get(
@@ -354,49 +420,83 @@ class DataDragon:
                 "champions": {str(c["key"]): c for c in champions["data"].values()},
                 "items": items["data"],
             }
-            self.expires = time.monotonic() + 21600
+            self.expires = time.monotonic() + 1800
             return self.data
 
 
-def recent_stats(matches, puuid):
+def _history_rows(matches, puuid, champion_id=None, queue_id=None, limit=None):
     rows = []
+    seen = set()
     for match in matches:
+        mid = match.get("metadata", {}).get("matchId")
+        if mid and mid in seen:
+            continue
+        if mid:
+            seen.add(mid)
+        info = match.get("info", {})
+        if queue_id is not None and info.get("queueId") != queue_id:
+            continue
         p = next(
-            (
-                p
-                for p in match.get("info", {}).get("participants", [])
-                if p.get("puuid") == puuid
-            ),
-            None,
+            (p for p in info.get("participants", []) if p.get("puuid") == puuid), None
         )
         if (
-            p
-            and not p.get("gameEndedInEarlySurrender")
-            and match["info"].get("gameDuration", 0) >= 300
-            and isinstance(p.get("win"), bool)
-            and all(
-                isinstance(p.get(k), (int, float))
-                for k in ("kills", "deaths", "assists")
-            )
+            not p
+            or p.get("gameEndedInEarlySurrender")
+            or info.get("gameDuration", 0) < 300
+            or not isinstance(p.get("win"), bool)
+            or (champion_id is not None and p.get("championId") != champion_id)
         ):
-            rows.append(p)
-    n = len(rows)
-    if not n:
+            continue
+        rows.append((p, info))
+        if limit is not None and len(rows) >= limit:
+            break
+    return rows
+
+
+def win_rate_stats(matches, puuid, champion_id=None, queue_id=None, limit=None):
+    rows = _history_rows(matches, puuid, champion_id, queue_id, limit)
+    if not rows:
         return None
+    wins = sum(p["win"] for p, info in rows)
+    dates = [
+        info.get("gameEndTimestamp") or info.get("gameCreation") for p, info in rows
+    ]
+    dates = [v for v in dates if isinstance(v, (int, float)) and v > 0]
     return {
-        "count": n,
-        "win_rate": round(sum(bool(p.get("win")) for p in rows) * 100 / n),
-        "kills": sum(p.get("kills", 0) for p in rows) / n,
-        "deaths": sum(p.get("deaths", 0) for p in rows) / n,
-        "assists": sum(p.get("assists", 0) for p in rows) / n,
-        "kda": sum(
-            (p.get("kills", 0) + p.get("assists", 0)) / max(1, p.get("deaths", 0))
-            for p in rows
+        "count": len(rows),
+        "wins": wins,
+        "losses": len(rows) - wins,
+        "win_rate": 100 * wins / len(rows),
+        "champion_id": champion_id,
+        "queue_id": queue_id,
+        "start_at": min(dates) if dates else None,
+        "end_at": max(dates) if dates else None,
+    }
+
+
+def recent_stats(matches, puuid, queue_id=None, limit=None):
+    stats = win_rate_stats(matches, puuid, queue_id=queue_id, limit=limit)
+    if stats is None:
+        return None
+    pairs = _history_rows(matches, puuid, queue_id=queue_id, limit=limit)
+    rows = [
+        p
+        for p, info in pairs
+        if all(
+            isinstance(p.get(k), (int, float)) for k in ["kills", "deaths", "assists"]
         )
-        / n,
-        "damage": (
-            sum(p["totalDamageDealtToChampions"] for p in rows) / n
-            if all("totalDamageDealtToChampions" in p for p in rows)
-            else None
-        ),
+    ]
+    n = len(rows)
+    return {
+        **stats,
+        "kda_count": n,
+        "kills": sum(p["kills"] for p in rows) / n if n else None,
+        "deaths": sum(p["deaths"] for p in rows) / n if n else None,
+        "assists": sum(p["assists"] for p in rows) / n if n else None,
+        "kda": sum((p["kills"] + p["assists"]) / max(1, p["deaths"]) for p in rows) / n
+        if n
+        else None,
+        "damage": sum(p["totalDamageDealtToChampions"] for p in rows) / n
+        if n and all("totalDamageDealtToChampions" in p for p in rows)
+        else None,
     }

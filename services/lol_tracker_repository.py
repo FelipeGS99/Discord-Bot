@@ -11,6 +11,11 @@ class LoLRepository(LiveRepository):
     def _connect(self):
         c = super()._connect()
         c.executescript("""
+            CREATE TABLE IF NOT EXISTS lol_build_samples(
+              patch TEXT, champion_id INTEGER, role TEXT, map_id INTEGER, queue_id INTEGER,
+              match_id TEXT, participant_id INTEGER, played_at REAL, payload TEXT NOT NULL,
+              PRIMARY KEY(patch,match_id,participant_id));
+            CREATE INDEX IF NOT EXISTS lol_build_lookup ON lol_build_samples(patch,champion_id,map_id,queue_id);
             CREATE TABLE IF NOT EXISTS lol_channel_config(
               guild_id INTEGER PRIMARY KEY, role_id INTEGER NOT NULL, category_id INTEGER);
             CREATE TABLE IF NOT EXISTS lol_player_channels(
@@ -281,4 +286,47 @@ class LoLRepository(LiveRepository):
                 f"UPDATE lol_player_channels SET {fields} WHERE guild_id=? AND puuid=?",
                 (*values.values(), gid, puuid),
             )
+        )
+
+    async def store_build_samples(self, rows):
+        def work(c):
+            for row in rows:
+                old = c.execute(
+                    "SELECT payload FROM lol_build_samples WHERE patch=? AND match_id=? AND participant_id=?",
+                    (row["patch"], row["match_id"], row["participant_id"]),
+                ).fetchone()
+                if old and "purchases" not in row:
+                    previous = json.loads(old[0])
+                    if "purchases" in previous:
+                        row = {**row, "purchases": previous["purchases"]}
+                c.execute(
+                    "INSERT OR REPLACE INTO lol_build_samples VALUES (?,?,?,?,?,?,?,?,?)",
+                    (
+                        row["patch"],
+                        row["champion_id"],
+                        row["role"],
+                        row["map_id"],
+                        row["queue_id"],
+                        row["match_id"],
+                        row["participant_id"],
+                        row["played_at"],
+                        json.dumps(row),
+                    ),
+                )
+            c.execute(
+                "DELETE FROM lol_build_samples WHERE played_at<?",
+                (time.time() - 30 * 86400,),
+            )
+
+        await self._run(work)
+
+    async def build_samples(self, patch, champion_id, map_id, queue_id):
+        return await self._run(
+            lambda c: [
+                json.loads(r[0])
+                for r in c.execute(
+                    "SELECT payload FROM lol_build_samples WHERE patch=? AND champion_id=? AND map_id=? AND queue_id=? ORDER BY played_at DESC LIMIT 3000",
+                    (patch, champion_id, map_id, queue_id),
+                )
+            ]
         )

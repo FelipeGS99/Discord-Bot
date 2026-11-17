@@ -13,7 +13,9 @@ from services.lol_presentation import (
     report_embeds,
     fallback_catalog,
 )
-from services.riot_service import RiotError, recent_stats
+from services.riot_service import RiotError, recent_stats, win_rate_stats
+from services.lol_builds import BuildService, insufficient, fingerprint
+from services.lol_analysis import performance_rows
 from services.lol_channel_service import LoLChannels, LoLChannelError
 
 log = logging.getLogger(__name__)
@@ -32,11 +34,14 @@ class LoLMonitor:
         self.last_check = None
         self.last_error = None
         self.catalog = fallback_catalog()
+        self.builds = BuildService(riot, repository)
 
     async def _context(self, game, watched):
         context = {}
         tracked = {p["puuid"]: p for p in watched}
         platform = watched[0]["platform"]
+        queue = game.get("gameQueueConfigId")
+        rank_queue = queue if queue in (420, 440) else 420
         for participant in game.get("participants", []):
             puuid = participant.get("puuid")
             visible = participant.get("riotId") or (
@@ -44,26 +49,51 @@ class LoLMonitor:
             )
             if not puuid or (not visible and puuid not in tracked):
                 continue
-            row = {}
+            row = {"_wr_version": 2}
             if visible:
                 try:
-                    row["rank"] = await self.riot.rank(puuid, platform)
+                    row["rank"] = await self.riot.rank(
+                        puuid, platform, queue_id=rank_queue
+                    )
+                    row["rank_queue_name"] = "Flex" if rank_queue == 440 else "Solo/Duo"
                 except RiotError:
                     row["rank"] = "indisponivel"
+                try:
+                    ranked = await self.riot.ranked_stats(
+                        puuid, platform, queue_id=rank_queue
+                    )
+                    row["ranked_wr"] = ranked if isinstance(ranked, dict) else None
+                except RiotError:
+                    row["ranked_wr"] = None
             if visible or puuid in tracked:
                 try:
-                    previous = await self.riot.history(puuid, platform)
-                    current_id = f"{platform}_{game['gameId']}"
-                    row["recent"] = recent_stats(
-                        [
-                            m
-                            for m in previous
-                            if m.get("metadata", {}).get("matchId") != current_id
-                        ],
-                        puuid,
+                    previous = await self.riot.history(
+                        puuid, platform, count=20, queue=queue
                     )
+                    current_id = f"{platform}_{game['gameId']}"
+                    previous = [
+                        m
+                        for m in previous
+                        if m.get("metadata", {}).get("matchId") != current_id
+                    ]
+                    row["recent"] = recent_stats(
+                        previous, puuid, queue_id=queue, limit=5
+                    )
+                    row["champion_wr"] = win_rate_stats(
+                        previous,
+                        puuid,
+                        champion_id=participant.get("championId"),
+                        queue_id=queue,
+                    )
+                    row["history_window"] = len(previous)
+                    row["history_queue"] = queue
+                    row["_wr_version"] = 2
+                    row["performances"] = performance_rows(previous, puuid)
+                    await self._ingest_builds(previous)
                 except RiotError:
                     row["recent"] = None
+                    row["champion_wr"] = None
+                    row["history_window"] = None
                 try:
                     row["mastery"] = await self.riot.mastery(
                         puuid, participant["championId"], platform
@@ -72,6 +102,15 @@ class LoLMonitor:
                     row["mastery"] = None
             context[puuid] = row
         return context
+
+    async def _ingest_builds(self, matches):
+        try:
+            await self.builds.ingest(matches)
+        except Exception:
+            # Statistical collection is optional; a provider/cache failure cannot stop match tracking.
+            log.warning(
+                "Coleta estatistica de builds adiada; acompanhamento preservado"
+            )
 
     @staticmethod
     def marker(gid, mid, kind, subject):
@@ -276,7 +315,14 @@ class LoLMonitor:
             if all(abandoned):
                 await self.repository.phase(gid, mid, "complete")
             return
-        if not context:
+        if not context or any(
+            context.get(p["puuid"], {}).get("_wr_version") != 2
+            for p in game.get("participants", [])
+            if p.get("puuid")
+            and (
+                p.get("riotId") or (p.get("riotIdGameName") and p.get("riotIdTagline"))
+            )
+        ):
             context = await self._context(game, watched)
             await self.repository.context(gid, mid, context)
         result = match.get("result")
@@ -289,17 +335,37 @@ class LoLMonitor:
                     complete = False
                 continue
             rendered = context.setdefault("_player_rendered", {})
-            if puuid not in rendered or rendered[puuid] != self.catalog.get("version"):
+            if (
+                puuid not in rendered
+                or rendered[puuid] != f"{self.catalog.get('version')}:layout4"
+            ):
                 if await self.refresh_live(
                     gid, mid, puuid, live_embeds(game, [player], context, self.catalog)
                 ):
-                    rendered[puuid] = self.catalog.get("version")
+                    rendered[puuid] = f"{self.catalog.get('version')}:layout4"
                     await self.repository.context(gid, mid, context)
             await self.repository.mark_notified(gid, puuid, mid)
             if self.catalog.get("version") and catalog_ready:
-                await self.deliver(
-                    gid, mid, "build", puuid, build_embeds(game, player, self.catalog)
-                )
+                try:
+                    advice = await self.builds.advise(game, player, self.catalog)
+                except Exception:
+                    log.warning(
+                        "Fonte de builds indisponivel; monitoramento preservado"
+                    )
+                    advice = insufficient(
+                        self.catalog, "Fonte de builds temporariamente indisponível."
+                    )
+                build_cards = build_embeds(game, player, self.catalog, advice=advice)
+                old = await self.repository.was_delivered(gid, mid, "build", puuid)
+                if await self.deliver(gid, mid, "build", puuid, build_cards):
+                    signatures = context.setdefault("_build_rendered", {})
+                    signature = fingerprint(advice)
+                    if not old or signatures.get(puuid) != signature:
+                        if not old or await self.refresh_live(
+                            gid, mid, puuid, build_cards, kind="build"
+                        ):
+                            signatures[puuid] = signature
+                            await self.repository.context(gid, mid, context)
             state = observed.get((player["platform"], puuid), "unknown")
             if state == "unknown" or (
                 state and f"{match['platform']}_{state['gameId']}" == mid
@@ -315,6 +381,7 @@ class LoLMonitor:
                 complete = False
                 continue
             await self.repository.phase(gid, mid, "waiting", result)
+            await self._ingest_builds([result])
             if not any(
                 p.get("puuid") == puuid
                 for p in result.get("info", {}).get("participants", [])
@@ -338,11 +405,11 @@ class LoLMonitor:
         if complete:
             await self.repository.phase(gid, mid, "complete", result)
 
-    async def refresh_live(self, gid, mid, puuid, embeds):
+    async def refresh_live(self, gid, mid, puuid, embeds, kind="live"):
         channel_id = await self.sessions.channel_for(gid, puuid)
         if not channel_id:
             return False
-        message_id = await self.repository.delivery(gid, mid, "live", puuid, channel_id)
+        message_id = await self.repository.delivery(gid, mid, kind, puuid, channel_id)
         channel = self.bot.get_channel(channel_id)
         if channel is None:
             try:
@@ -359,7 +426,7 @@ class LoLMonitor:
             message = await channel.fetch_message(message_id)
             if message.author.id != self.bot.user.id:
                 return False
-            embeds[0].set_footer(text=self.marker(gid, mid, "live", puuid))
+            embeds[0].set_footer(text=self.marker(gid, mid, kind, puuid))
             await message.edit(
                 embeds=embeds, allowed_mentions=discord.AllowedMentions.none()
             )

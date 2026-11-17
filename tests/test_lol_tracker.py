@@ -21,6 +21,7 @@ from services.lol_presentation import (
     build_embeds,
     report_embeds,
     build_recommendation,
+    demo_advice,
     fallback_catalog,
 )
 from services.lol_tracker_repository import LoLRepository
@@ -162,6 +163,27 @@ class RiotHttpTests(unittest.IsolatedAsyncioTestCase):
         with self.assertRaises(RiotError):
             await self.client.match("BR1_123")
 
+    async def test_official_timeline_route_identity_and_cache(self):
+        self.body = {
+            "metadata": {"matchId": "BR1_123"},
+            "info": {"frames": [{"events": []}]},
+        }
+        data = await self.client.timeline("BR1_123")
+        self.assertEqual(data["metadata"]["matchId"], "BR1_123")
+        self.assertTrue(self.paths[-1].endswith("/BR1_123/timeline"))
+        await self.client.timeline("BR1_123")
+        self.assertEqual(self.count, 1)
+
+    async def test_timeline_wrong_identity_and_invalid_shape_rejected(self):
+        for body in [
+            {"metadata": {"matchId": "BR1_OTHER"}, "info": {"frames": []}},
+            {"metadata": {"matchId": "BR1_123"}, "info": {"frames": None}},
+        ]:
+            self.client.cache.clear()
+            self.body = body
+            with self.assertRaises(RiotError):
+                await self.client.timeline("BR1_123")
+
 
 class PresentationTests(unittest.TestCase):
     def setUp(self):
@@ -187,10 +209,10 @@ class PresentationTests(unittest.TestCase):
 
     def test_live_includes_both_teams_and_history_distinction(self):
         e = self.batches()[0][0]
-        self.assertIn("historicas", e.description)
+        self.assertIn("históricos", e.description)
         self.assertIn("Equipe azul", e.fields[0].name)
-        self.assertIn("Equipe vermelha", e.fields[1].name)
-        self.assertIn("partidas anteriores", e.fields[2].value)
+        self.assertTrue(any("Equipe vermelha" in f.name for f in e.fields))
+        self.assertIn("partidas anteriores", str(e.to_dict()))
 
     def test_ten_watched_players_with_historical_stats_fit_discord(self):
         watched = [
@@ -203,7 +225,7 @@ class PresentationTests(unittest.TestCase):
         self.assertLessEqual(len(e.fields), 25)
         for f in e.fields:
             self.assertLessEqual(len(f.value), 1024)
-        self.assertIn("WR", e.fields[0].value)
+        self.assertIn("WR", str(e.to_dict()))
 
     def test_hidden_identities_not_looked_up_in_context(self):
         p = self.game["participants"][1]
@@ -221,21 +243,22 @@ class PresentationTests(unittest.TestCase):
         for i in b["starters"] + b["boots"] + b["core"]:
             self.assertTrue(CATALOG["items"][str(i)]["gold"]["purchasable"])
             self.assertTrue(CATALOG["items"][str(i)]["maps"]["11"])
-        embeds = build_embeds(self.game, self.watched[0], CATALOG)
+        embeds = build_embeds(
+            self.game, self.watched[0], CATALOG, advice=demo_advice(CATALOG)
+        )
         self.assertGreater(len(embeds), 1)
         output = str([e.to_dict() for e in embeds])
-        self.assertIn("heuristica", output)
+        self.assertIn("Riot Match-V5", output)
         self.assertNotIn("runas", output.lower())
         self.assertTrue(
             embeds[1].thumbnail.url.startswith("https://ddragon.leagueoflegends.com/")
         )
 
-    def test_tanks_change_build_and_healers_are_identified(self):
+    def test_enemy_classes_cannot_create_a_validated_build_without_data(self):
         all_tanks = [{"championId": 54}, {"championId": 54}, {"championId": 16}]
         b = build_recommendation(CATALOG, 103, all_tanks)
-        self.assertEqual(b["threats"]["tanks"], 2)
-        self.assertEqual(b["threats"]["healing"], 1)
-        self.assertIn(3135, b["core"])
+        self.assertFalse(b["available"])
+        self.assertEqual(b["core"], [])
 
     def test_unavailable_patch_never_presents_validated_items(self):
         e = build_embeds(self.game, self.watched[0], fallback_catalog())[0]
@@ -246,7 +269,7 @@ class PresentationTests(unittest.TestCase):
         self.assertIn("VITORIA", e.title)
         self.assertIn("6.33", e.fields[0].value)
         self.assertIn("217 CS", e.fields[1].value)
-        self.assertIn("historica", e.fields[-1].value)
+        self.assertTrue(any(f.name == "Comparação histórica" for f in e.fields))
         self.assertIn("Itens finais", [f.name for f in e.fields])
 
     def test_missing_fields_are_not_fabricated_as_zero(self):
@@ -515,7 +538,7 @@ class TrackerTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn("RIOT_API_KEY", self.monitor.last_error)
 
     async def test_live_is_sent_before_history_then_enriched_by_edit(self):
-        async def history(puuid, platform):
+        async def history(puuid, platform, **kwargs):
             self.assertEqual(len(self.messages), 1)
             return [self.result]
 
@@ -525,6 +548,18 @@ class TrackerTests(unittest.IsolatedAsyncioTestCase):
         self.messages[0].edit.assert_awaited_once()
         self.assertEqual(self.riot.history.await_count, 10)
         self.assertEqual(self.riot.mastery.await_count, 10)
+
+    async def test_partial_hidden_identity_does_not_requery_entire_roster_each_tick(
+        self,
+    ):
+        hidden = self.game["participants"][9]
+        hidden.pop("riotId")
+        hidden["riotIdGameName"] = "Hidden partial name"
+        await self.monitor.poll()
+        calls = self.riot.history.await_count
+        self.assertEqual(calls, 9)
+        await self.monitor.poll()
+        self.assertEqual(self.riot.history.await_count, calls)
 
     async def test_enrichment_does_not_query_hidden_opponent(self):
         hidden = self.game["participants"][9]
@@ -587,6 +622,39 @@ class TrackerTests(unittest.IsolatedAsyncioTestCase):
     async def test_simultaneous_ticks_are_serialized(self):
         await asyncio.gather(self.monitor.poll(), self.monitor.poll())
         self.assertEqual(len(self.messages), 2)
+
+    async def test_build_collection_or_source_failure_does_not_interrupt_tracking(self):
+        self.monitor.builds.ingest = AsyncMock(
+            side_effect=RuntimeError("cache failure")
+        )
+        self.monitor.builds.advise = AsyncMock(
+            side_effect=RiotError(503, "source unavailable")
+        )
+        await self.monitor.poll()
+        self.assertEqual(len(self.messages), 2)
+        self.assertTrue(
+            any(
+                f.name == "Dados insuficientes"
+                for f in self.messages[1].embeds[0].fields
+            )
+        )
+        self.riot.spectator.return_value = None
+        await self.monitor.poll()
+        self.assertEqual(len(self.messages), 3)
+
+    async def test_build_source_update_edits_the_existing_message_without_duplicates(
+        self,
+    ):
+        from services.lol_builds import insufficient
+
+        first = insufficient(CATALOG, "Sem amostra", 0)
+        next_data = insufficient(CATALOG, "Amostra ainda insuficiente", 2)
+        self.monitor.builds.advise = AsyncMock(side_effect=[first, next_data])
+        await self.monitor.poll()
+        await self.monitor.poll()
+        self.assertEqual(len(self.messages), 2)
+        self.messages[1].edit.assert_awaited_once()
+        self.assertIn("2 partidas", str(self.messages[1].embeds[0].to_dict()))
 
     def cog(self):
         cog = object.__new__(LoLTracker)
