@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from datetime import date, timedelta
 from pathlib import Path
 
@@ -8,15 +9,10 @@ from discord.ext import commands, tasks
 
 from config import settings
 from cogs.football_colors import color_for_active_fixture
+from services.football_channel_service import FootballChannelManager, FootballChannelRepository
 from services.brasileirao_service import (
     ApiFootballClient,
     BrasileiraoFixture,
-    BrasileiraoStateRepository,
-    describe_fixture_update,
-    deserialize_fixtures,
-    select_missing_live_fixture_ids,
-    serialize_fixtures,
-    should_monitor_fixtures,
 )
 
 
@@ -37,6 +33,11 @@ class Futebol(commands.Cog):
         self.bot = bot
         self.api_client = ApiFootballClient(settings.bsd_api_key) if settings.bsd_api_key else None
         self.base_path = Path(__file__).resolve().parent.parent
+        self.channel_manager = FootballChannelManager(
+            bot, self.api_client, FootballChannelRepository(self.base_path / "football_channels_state.json"),
+            lambda fixture, scorers, reason, live: self._build_score_embed(
+                fixture, fixture.league_name, EMBED_COLOR, scorers, reason, live),
+        )
         self.check_scores.start()
 
     async def cog_unload(self) -> None:
@@ -54,13 +55,131 @@ class Futebol(commands.Cog):
                     f"`{prefix}futebol amanha` - Mostra os jogos de amanhã nas competições monitoradas.",
                     "",
                     "**Alertas por competicao**",
-                    f"`{prefix}brasileirao canal #canal` - Ativa alertas do Brasileirão.",
-                    f"`{prefix}libertadores canal #canal` - Ativa alertas da Libertadores.",
-                    f"`{prefix}sulamericana canal #canal` - Ativa alertas da Sul-Americana.",
-                    f"`{prefix}copadobrasil canal #canal` - Ativa alertas da Copa do Brasil.",
+                    f"`{prefix}futebol ativar brasileirao` - Ativa canais privados por partida do Brasileirao.",
+                    f"`{prefix}futebol ativar libertadores` - Ativa canais privados da Libertadores.",
+                    f"`{prefix}futebol ativar sulamericana` - Ativa canais privados da Sul-Americana.",
+                    f"`{prefix}futebol ativar copadobrasil` - Ativa canais privados da Copa do Brasil.",
+                    f"`{prefix}futebol prazo 60` - Tempo em minutos para apagar canais apos o fim (padrao: 1 hora).",
+                    f"`{prefix}futebol status` / `{prefix}futebol parar <liga>` - Consulta ou desativa ligas.",
+                    "Acesso pelo cargo Futebol e administradores. Categoria e cargo opcionais: ativar <liga> [categoria] [@cargo].",
                 ]
             )
         )
+
+    @staticmethod
+    def _league_id(name: str) -> int:
+        names = ("brasileirao", "libertadores", "sulamericana", "copadobrasil")
+        if name.casefold() not in names:
+            raise ValueError("Liga invalida. Use brasileirao, libertadores, sulamericana ou copadobrasil.")
+        return getattr(settings, COMPETITIONS[names.index(name.casefold())][2])
+
+    @staticmethod
+    def _can_configure(ctx) -> bool:
+        return ctx.guild is not None and (
+            ctx.author.id == ctx.guild.owner_id or ctx.author.guild_permissions.administrator
+            or ctx.author.guild_permissions.manage_channels
+        )
+
+    async def enable_league(self, ctx, league: str, category=None, role=None) -> None:
+        if not self._can_configure(ctx):
+            await ctx.send("Use este comando em um servidor com permissao de gerenciar canais.")
+            return
+        if self.api_client is None:
+            await ctx.send("BSD_API_KEY nao foi configurada; nao foi possivel ativar os jogos.")
+            return
+        cfg = self.channel_manager.config(ctx.guild.id)
+        if role is None:
+            role = ctx.guild.get_role(cfg["role_id"]) if cfg.get("role_id") else None
+        if role is None:
+            candidates = [r for r in ctx.guild.roles if r.name.casefold() == "futebol"]
+            if len(candidates) != 1:
+                await ctx.send("Crie um cargo chamado Futebol ou informe uma categoria e o @cargo de acesso na ativacao.")
+                return
+            role = candidates[0]
+        if category is None:
+            category = ctx.guild.get_channel(cfg["category_id"]) if cfg.get("category_id") else getattr(ctx.channel, "category", None)
+            if cfg.get("category_id") and category is None:
+                await ctx.send("A categoria configurada foi removida. Informe outra categoria na ativacao.")
+                return
+        try:
+            await self.channel_manager.enable(ctx.guild, self._league_id(league), role, category)
+        except ValueError as exc:
+            await ctx.send(str(exc))
+            return
+        except discord.HTTPException:
+            await ctx.send("Nao consegui atualizar as permissoes dos canais. Confira o acesso do bot e tente novamente.")
+            return
+        await ctx.send(
+            f"Liga {league} ativada neste servidor. Cada partida ao vivo tera um canal privado para {role.mention}. "
+            f"Exclusao {self.channel_manager.config(ctx.guild.id)['retention_minutes']} minutos apos o fim. "
+            "Administradores tambem tem acesso. Cargo e categoria valem para todas as ligas deste servidor.",
+            allowed_mentions=discord.AllowedMentions.none(),
+        )
+
+    async def disable_league(self, ctx, league: str) -> None:
+        if not self._can_configure(ctx):
+            await ctx.send("Use este comando em um servidor com permissao de gerenciar canais.")
+            return
+        try:
+            await self.channel_manager.disable(ctx.guild.id, self._league_id(league))
+        except ValueError as exc:
+            await ctx.send(str(exc))
+            return
+        await ctx.send(f"Liga {league} desativada neste servidor. Canais existentes seguem ate o fim e o prazo de exclusao.")
+
+    async def league_status(self, ctx, league: str | None = None) -> None:
+        if ctx.guild is None:
+            await ctx.send("Use este comando em um servidor.")
+            return
+        cfg = self.channel_manager.config(ctx.guild.id)
+        names = ("brasileirao", "libertadores", "sulamericana", "copadobrasil")
+        enabled = [n for n in names if self._league_id(n) in cfg.get("leagues", [])]
+        matches = [m for m in self.channel_manager.state["matches"].values()
+                   if m["guild_id"] == ctx.guild.id and not m.get("closed")]
+        lines = ["**Canais privados de futebol**", f"Ligas ativas: {', '.join(enabled) or 'nenhuma'}",
+                 f"Cargo: <@&{cfg['role_id']}>" if cfg.get("role_id") else "Cargo: nao configurado",
+                 f"Categoria: <#{cfg['category_id']}>" if cfg.get("category_id") else "Categoria: raiz do servidor",
+                 f"Exclusao apos o fim: {cfg.get('retention_minutes', 60)} minutos",
+                 f"Canais de partidas em acompanhamento: {len(matches)}", "Consulta a cada 1 minuto."]
+        if league is not None:
+            lines.append(f"{league}: {'ativada' if league in enabled else 'desativada'}")
+        if ctx.guild.id in self.channel_manager.errors:
+            lines.append(self.channel_manager.errors[ctx.guild.id])
+        await ctx.send("\n".join(lines), allowed_mentions=discord.AllowedMentions.none())
+
+    @futebol_group.command(name="ativar")
+    async def activate(self, ctx: commands.Context, liga: str,
+                       categoria: discord.CategoryChannel | None = None, cargo: discord.Role | None = None) -> None:
+        await self.enable_league(ctx, liga, categoria, cargo)
+
+    @futebol_group.command(name="parar", aliases=["desativar"])
+    async def deactivate(self, ctx: commands.Context, liga: str) -> None:
+        await self.disable_league(ctx, liga)
+
+    @futebol_group.command(name="prazo")
+    async def set_retention(self, ctx: commands.Context, minutos: int) -> None:
+        if not self._can_configure(ctx):
+            await ctx.send("Use este comando em um servidor com permissao de gerenciar canais.")
+            return
+        try:
+            await self.channel_manager.retention(ctx.guild.id, minutos)
+        except ValueError as exc:
+            await ctx.send(str(exc))
+            return
+        await ctx.send(f"Canais de jogos serao apagados {minutos} minutos apos o fim da partida.")
+
+    @futebol_group.command(name="status")
+    async def channels_status(self, ctx: commands.Context) -> None:
+        await self.league_status(ctx)
+
+    @activate.error
+    @deactivate.error
+    @set_retention.error
+    async def configuration_error(self, ctx: commands.Context, error: commands.CommandError) -> None:
+        if isinstance(error, (commands.BadArgument, commands.MissingRequiredArgument)):
+            await ctx.send("Confira os argumentos. Use futebol para ver a ajuda; prazo deve ser um numero de minutos.")
+            return
+        raise error
 
     @futebol_group.command(name="hoje")
     async def today(self, ctx: commands.Context) -> None:
@@ -105,159 +224,15 @@ class Futebol(commands.Cog):
 
     @tasks.loop(minutes=POLL_INTERVAL_MINUTES)
     async def check_scores(self) -> None:
-        if self.api_client is None:
-            return
-
         try:
-            all_live_fixtures = await self.api_client.fetch_all_live_fixtures()
-        except Exception as exc:
-            print(f"Erro ao buscar placares ao vivo: {exc}")
-            return
-
-        for competition_name, author_name, setting_name, state_name, color in COMPETITIONS:
-            league_id = getattr(settings, setting_name)
-            live_fixtures = [
-                fixture for fixture in all_live_fixtures if fixture.league_id == league_id
-            ]
-            await self._process_competition_scores(
-                competition_name=competition_name,
-                author_name=author_name,
-                state_name=state_name,
-                color=color,
-                league_id=league_id,
-                live_fixtures=live_fixtures,
-            )
+            await self.channel_manager.poll()
+        except Exception:
+            # An unexpected state/filesystem error must not permanently kill the monitor.
+            logging.getLogger(__name__).exception("Falha no monitor de canais de futebol")
 
     @check_scores.before_loop
     async def before_check_scores(self) -> None:
         await self.bot.wait_until_ready()
-
-    async def _process_competition_scores(
-        self,
-        competition_name: str,
-        author_name: str,
-        state_name: str,
-        color: int,
-        league_id: int,
-        live_fixtures: list[BrasileiraoFixture],
-    ) -> None:
-        repository = BrasileiraoStateRepository(self.base_path / state_name)
-        state = repository.load()
-        channel_ids = state["channel_ids"]
-        if not channel_ids:
-            return
-
-        checked_date = state["checked_date"]
-        fixture_snapshots = {
-            str(key): str(value) for key, value in state["fixture_snapshots"].items()
-        }
-        fixtures_today = deserialize_fixtures(state["fixtures_today"])
-        fixtures_to_compare = live_fixtures
-        if fixtures_to_compare:
-            checked_date = date.today().isoformat()
-            missing_live_fixture_ids = select_missing_live_fixture_ids(fixtures_today, live_fixtures)
-            if missing_live_fixture_ids:
-                try:
-                    fixtures_today = await self.api_client.fetch_fixtures(league_id, date.today())
-                except Exception as exc:
-                    print(f"Erro ao consultar jogos encerrados ou em intervalo de {competition_name}: {exc}")
-                    return
-
-                live_fixture_ids = {fixture.fixture_id for fixture in live_fixtures}
-                tracked_updates = [
-                    fixture
-                    for fixture in fixtures_today
-                    if fixture.fixture_id in missing_live_fixture_ids
-                    and fixture.fixture_id not in live_fixture_ids
-                ]
-                fixtures_to_compare = live_fixtures + tracked_updates
-
-        if not fixtures_to_compare:
-            had_live_snapshot = any(fixture.is_live for fixture in fixtures_today)
-            if not had_live_snapshot:
-                if checked_date == date.today().isoformat() and not should_monitor_fixtures(fixtures_today):
-                    return
-                try:
-                    fixtures_today = await self.api_client.fetch_fixtures(league_id, date.today())
-                except Exception as exc:
-                    print(f"Erro ao consultar jogos de {competition_name}: {exc}")
-                    return
-                checked_date = date.today().isoformat()
-                if not should_monitor_fixtures(fixtures_today):
-                    self._save_competition_state(repository, channel_ids, checked_date, fixture_snapshots, fixtures_today)
-                    return
-            else:
-                try:
-                    fixtures_today = await self.api_client.fetch_fixtures(league_id, date.today())
-                except Exception as exc:
-                    print(f"Erro ao consultar encerramento de {competition_name}: {exc}")
-                    return
-                checked_date = date.today().isoformat()
-
-            fixtures_to_compare = fixtures_today
-
-        changed_fixtures = [
-            fixture
-            for fixture in fixtures_to_compare
-            if fixture_snapshots.get(str(fixture.fixture_id)) != fixture.snapshot_key
-        ]
-        if not changed_fixtures:
-            self._save_competition_state(repository, channel_ids, checked_date, fixture_snapshots, fixtures_to_compare)
-            return
-
-        for fixture in changed_fixtures:
-            scorers = await self._fetch_goal_scorers(fixture)
-            reason = describe_fixture_update(fixture, fixture_snapshots.get(str(fixture.fixture_id)))
-            await self._send_score_to_channels(
-                channel_ids,
-                competition_name,
-                self._build_score_embed(fixture, author_name, color, scorers, reason, fixtures_to_compare),
-            )
-
-            fixture_snapshots[str(fixture.fixture_id)] = fixture.snapshot_key
-
-        self._save_competition_state(repository, channel_ids, checked_date, fixture_snapshots, fixtures_to_compare)
-
-    async def _send_score_to_channels(
-        self,
-        channel_ids: list[int],
-        competition_name: str,
-        embed: discord.Embed,
-    ) -> None:
-        for channel_id in channel_ids:
-            channel = self.bot.get_channel(channel_id)
-            if not isinstance(channel, discord.TextChannel):
-                print(f"Canal de placares de {competition_name} nao encontrado: {channel_id}")
-                continue
-            try:
-                await channel.send(embed=embed)
-            except discord.Forbidden:
-                print(f"Sem permissao para enviar placares no canal {channel.id}.")
-                continue
-            except discord.HTTPException as exc:
-                print(f"Erro ao enviar placar no Discord: {exc}")
-                continue
-
-    async def _fetch_goal_scorers(self, fixture: BrasileiraoFixture) -> list[str]:
-        if self.api_client is None or fixture.home_goals is None or fixture.away_goals is None:
-            return []
-        if fixture.home_goals + fixture.away_goals <= 0:
-            return []
-        try:
-            return await self.api_client.fetch_goal_scorers(fixture.fixture_id)
-        except Exception as exc:
-            print(f"Erro ao buscar autores dos gols: {exc}")
-            return []
-
-    @staticmethod
-    def _save_competition_state(
-        repository: BrasileiraoStateRepository,
-        channel_ids: list[int],
-        checked_date: str | None,
-        fixture_snapshots: dict[str, str],
-        fixtures_today: list[BrasileiraoFixture],
-    ) -> None:
-        repository.save(channel_ids, checked_date, fixture_snapshots, serialize_fixtures(fixtures_today))
 
     async def _fetch_goal_scorers_by_fixture(
         self,
