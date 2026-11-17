@@ -222,6 +222,17 @@ class Futebol(commands.Cog):
             grouped_fixtures[title] = await self.api_client.fetch_fixtures(league_id, fixture_date)
         return grouped_fixtures
 
+    @commands.Cog.listener()
+    async def on_ready(self) -> None:
+        try:
+            await self.channel_manager.recover_channels()
+        except Exception:
+            logging.getLogger(__name__).exception("Falha ao recuperar canais de futebol")
+
+    @commands.Cog.listener()
+    async def on_resumed(self) -> None:
+        await self.on_ready()
+
     @tasks.loop(minutes=POLL_INTERVAL_MINUTES)
     async def check_scores(self) -> None:
         try:

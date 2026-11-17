@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import asyncio
+from collections import defaultdict
 import hashlib
 import time
 import unicodedata
@@ -18,6 +20,7 @@ class LoLChannelError(ValueError):
 class LoLChannels:
     def __init__(self, bot, repository, clock=time.time):
         self.bot, self.repository, self.clock = bot, repository, clock
+        self._locks = defaultdict(asyncio.Lock)
 
     @staticmethod
     def overwrites(guild, role):
@@ -78,7 +81,7 @@ class LoLChannels:
         )
         return re.sub(r"[^a-z0-9]+", "-", value).strip("-")[:90] or "jogador-lol"
 
-    async def _owned(self, session):
+    async def _owned(self, session, *, refresh=False):
         gid, puuid = session["guild_id"], session["puuid"]
         guild = self.bot.get_guild(gid)
         if guild is None:
@@ -97,7 +100,7 @@ class LoLChannels:
                 await self.repository.session_update(gid, puuid, channel_id=channel.id)
             return channel
         channel = guild.get_channel(session["channel_id"])
-        if channel is None:
+        if channel is None or refresh:
             try:
                 channel = await guild.fetch_channel(session["channel_id"])
             except discord.NotFound:
@@ -112,7 +115,11 @@ class LoLChannels:
             )
         return channel
 
-    async def ensure(self, player, mid):
+    async def ensure(self, player, mid, *, demo=False):
+        async with self._locks[(player["guild_id"], player["puuid"])]:
+            return await self._ensure(player, mid, demo=demo)
+
+    async def _ensure(self, player, mid, *, demo=False):
         gid, puuid = player["guild_id"], player["puuid"]
         cfg = (await self.repository.session_configs()).get(gid)
         guild = self.bot.get_guild(gid)
@@ -121,15 +128,39 @@ class LoLChannels:
         role = guild.get_role(cfg["role_id"])
         overwrites = self.overwrites(guild, role)
         session = await self.repository.session(gid, puuid)
-        if session and session["closed"] and session["last_match"] == mid:
+        if (
+            session
+            and session["closed"]
+            and session["last_match"] == mid
+            and session.get("close_reason") != "missing"
+        ):
             return None
+        deadline = self.clock() + 3600 if demo else None
         if session is None or session["closed"]:
             # Durable creation intent lets us recover after Discord creates a channel but times out.
-            session = await self.repository.new_session(gid, puuid, mid, self.clock())
-        channel = await self._owned(session)
+            session = await self.repository.new_session(
+                gid,
+                puuid,
+                mid,
+                self.clock(),
+                delete_at=deadline,
+                reset_delivery=bool(
+                    session and session.get("close_reason") == "missing"
+                ),
+            )
+        elif demo:
+            # Persist BEFORE Discord I/O, including when reusing an existing demo channel.
+            await self.repository.session_update(gid, puuid, delete_at=deadline)
+        channel = await self._owned(session, refresh=True)
         if channel is None and session["channel_id"] is not None:
-            await self.repository.session_update(gid, puuid, closed=1)
-            return None
+            session = await self.repository.new_session(
+                gid,
+                puuid,
+                mid,
+                self.clock(),
+                delete_at=deadline,
+                reset_delivery=True,
+            )
         if channel is None:
             category = (
                 guild.get_channel(cfg["category_id"])
@@ -159,11 +190,15 @@ class LoLChannels:
             channel_id=channel.id,
             last_match=mid,
             last_live=self.clock(),
-            delete_at=None,
+            delete_at=deadline,
         )
         return channel.id
 
     async def channel_for(self, gid, puuid):
+        async with self._locks[(gid, puuid)]:
+            return await self._channel_for(gid, puuid)
+
+    async def _channel_for(self, gid, puuid):
         session = await self.repository.session(gid, puuid)
         if session is None or session["closed"]:
             return None
@@ -175,7 +210,9 @@ class LoLChannels:
         channel = await self._owned(session)
         if channel is None:
             if session["channel_id"] is not None:
-                await self.repository.session_update(gid, puuid, closed=1)
+                await self.repository.session_update(
+                    gid, puuid, closed=1, close_reason="missing"
+                )
             return None
         if channel.overwrites != overwrites:
             await channel.edit(
@@ -183,7 +220,11 @@ class LoLChannels:
             )
         return channel.id
 
-    async def finished(self, gid, puuid, mid):
+    async def finished(self, gid, puuid, mid, *, ended_at=None):
+        async with self._locks[(gid, puuid)]:
+            await self._finished(gid, puuid, mid, ended_at=ended_at)
+
+    async def _finished(self, gid, puuid, mid, *, ended_at=None):
         session = await self.repository.session(gid, puuid)
         if (
             session
@@ -191,54 +232,59 @@ class LoLChannels:
             and session["last_match"] == mid
             and session["delete_at"] is None
         ):
-            await self.repository.session_update(
-                gid, puuid, delete_at=self.clock() + 3600
-            )
+            end = self.clock()
+            if isinstance(ended_at, (int, float)) and 0 < ended_at <= end:
+                end = ended_at
+            await self.repository.session_update(gid, puuid, delete_at=end + 3600)
 
-    async def cleanup(self, observed, active, pending, verify=None):
+    async def cleanup(self, observed, active, pending, verify=None, *, recover=False):
         """Check fresh Spectator state BEFORE expiry; never delete during a queued new game."""
         errors = []
         for session in await self.repository.sessions():
             key = (session["guild_id"], session["puuid"])
-            if (
-                session["delete_at"] is None
-                or session["delete_at"] > self.clock()
-                or key in pending
-            ):
-                continue
-            if key in active:
-                state = observed.get(
-                    (active[key]["platform"], session["puuid"]), "unknown"
-                )
-                if state == "unknown" or state is not None:
+            async with self._locks[key]:
+                # Another poll/ready event may have renewed or closed this session while waiting.
+                session = await self.repository.session(*key)
+                if (
+                    not session
+                    or session["closed"]
+                    or session["delete_at"] is None
+                    or session["delete_at"] > self.clock()
+                    or key in pending
+                ):
                     continue
-                # Enrichment of other games can take minutes: recheck immediately before deleting.
-                if verify is not None:
-                    try:
-                        current = await verify(
-                            session["puuid"], active[key]["platform"]
-                        )
-                        if current is not None:
-                            await self.ensure(
-                                active[key],
-                                f"{active[key]['platform']}_{current['gameId']}",
-                            )
-                            continue
-                    except (RiotError, discord.HTTPException, LoLChannelError):
-                        errors.append(
-                            "Verificacao antes da exclusao falhou; canal LOL preservado."
-                        )
-                        continue
-            try:
-                channel = await self._owned(session)
-                if channel:
-                    try:
-                        await channel.delete(reason="Uma hora sem nova partida de LoL")
-                    except discord.NotFound:
-                        pass
-                await self.repository.session_update(*key, closed=1)
-            except (discord.HTTPException, LoLChannelError):
-                errors.append(
-                    "Falha ao excluir um canal LOL; nova tentativa no proximo ciclo."
-                )
+                error = await self._expire(session, observed, active, verify, recover)
+                if error:
+                    errors.append(error)
         return errors
+
+    async def _expire(self, session, observed, active, verify, recover):
+        key = (session["guild_id"], session["puuid"])
+        if key in active:
+            player = active[key]
+            state = observed.get((player["platform"], session["puuid"]), "unknown")
+            if state != "unknown" and state is not None:
+                return
+            if state == "unknown" and (not recover or verify is None):
+                return
+            # Recheck immediately before deleting, independently of slow match enrichment.
+            if verify is not None:
+                try:
+                    current = await verify(session["puuid"], player["platform"])
+                    if current is not None:
+                        await self._ensure(
+                            player, f"{player['platform']}_{current['gameId']}"
+                        )
+                        return
+                except (RiotError, discord.HTTPException, LoLChannelError):
+                    return "Verificacao antes da exclusao falhou; canal LOL preservado."
+        try:
+            channel = await self._owned(session, refresh=True)
+            if channel:
+                try:
+                    await channel.delete(reason="Uma hora sem nova partida de LoL")
+                except discord.NotFound:
+                    pass
+            await self.repository.session_update(*key, closed=1, close_reason="expired")
+        except (discord.HTTPException, LoLChannelError):
+            return "Falha ao excluir um canal LOL; nova tentativa no proximo ciclo."

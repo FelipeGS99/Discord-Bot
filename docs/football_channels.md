@@ -72,10 +72,14 @@ Os comandos de configuracao devem ser usados dentro de um servidor.
   e cancelado e comeca novamente no proximo encerramento.
 - A exclusao acontece no primeiro ciclo apos vencer o prazo (normalmente ate um
   minuto depois). Falhas no Discord sao tentadas novamente. Se o bot estiver
-  desligado, a limpeza pendente ocorre quando ele voltar.
+  desligado, a limpeza pendente ocorre no proximo login ou retomada da conexao,
+  sem esperar uma consulta BSD. Eventos repetidos nao duplicam a exclusao.
 - Desativar uma liga impede novos canais. Canais ja criados continuam recebendo
-  atualizacoes e sao removidos no prazo normal. Apagar um canal manualmente e
-  respeitado: a mesma partida nao gera outro canal.
+  atualizacoes e sao removidos no prazo normal. Se um canal for apagado manualmente,
+  o proximo ciclo recria um canal privado para Futebol e publica o placar atual,
+  desde que a partida continue ao vivo e a liga esteja ativada. O bot confirma a
+  ausencia pela API Discord; erros de permissao ou rede nao geram substitutos.
+  Partidas encerradas, ligas desativadas e canais ja expirados nao sao recriados.
 - O estado e salvo em `football_channels_state.json`, ignorado pelo Git. Preserve
   esse arquivo no armazenamento persistente da hospedagem. Nao rode duas instancias
   simultaneas usando esse mesmo estado. IDs de canais, partidas, entregas e prazos

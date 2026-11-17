@@ -40,6 +40,7 @@ def guild(identifier):
     g.roles = [g.default_role, role]
     g.get_role.side_effect = lambda rid: next((r for r in g.roles if r.id == rid), None)
     channels = {}
+    next_id = identifier * 1000
     g.get_channel.side_effect = channels.get
 
     async def fetch(cid):
@@ -48,8 +49,11 @@ def guild(identifier):
         return channels[cid]
 
     async def create(name, **kwargs):
+        nonlocal next_id
+        next_id += 1
         c = MagicMock(spec=discord.TextChannel)
-        c.id, c.name, c.guild, c.topic = identifier * 1000 + len(channels) + 1, name, g, kwargs['topic']
+        c.id, c.name, c.guild, c.topic = next_id, name, g, kwargs['topic']
+        c.overwrites = kwargs.get('overwrites', {})
         c.send, c.edit = AsyncMock(), AsyncMock()
 
         async def delete(**kw):
@@ -272,13 +276,98 @@ class FootballChannelTests(unittest.IsolatedAsyncioTestCase):
         await self.manager.poll()
         self.guild.create_text_channel.assert_not_awaited()
 
-    async def test_manual_deletion_is_respected(self):
+    async def test_manual_deletion_recreates_private_channel_and_current_score(self):
         c = await self.open_match()
         self.channels.clear()
         await self.manager.poll()
-        self.assertTrue(self.manager.state['matches']['10:1']['closed'])
+        replacement = next(iter(self.channels.values()))
+        self.assertNotEqual(c.id, replacement.id)
+        self.assertFalse(replacement.overwrites[self.guild.default_role].view_channel)
+        self.assertTrue(replacement.overwrites[self.role].view_channel)
+        replacement.send.assert_awaited_once()
+        self.assertIn('São Paulo', replacement.send.call_args.kwargs['embed'].title)
+        self.assertFalse(self.manager.state['matches']['10:1']['closed'])
         await self.manager.poll()
-        self.assertEqual(self.guild.create_text_channel.await_count,1)
+        self.assertEqual(self.guild.create_text_channel.await_count,2)
+        replacement.send.assert_awaited_once()
+
+    async def test_stale_cache_404_recreates_but_forbidden_preserves_channel(self):
+        c = await self.open_match()
+        self.guild.fetch_channel.side_effect = http_error(discord.Forbidden)
+        await self.manager.poll()
+        self.guild.create_text_channel.assert_awaited_once()
+        self.assertEqual(self.manager.state['matches']['10:1']['channel_id'], c.id)
+        self.channels.clear()
+        self.guild.get_channel.side_effect = lambda cid: c if cid == c.id else self.channels.get(cid)
+
+        async def fetch(cid):
+            if cid == c.id:
+                raise http_error(discord.NotFound)
+            return self.channels[cid]
+
+        self.guild.fetch_channel.side_effect = fetch
+        await asyncio.gather(self.manager.poll(), self.manager.poll())
+        self.assertEqual(self.guild.create_text_channel.await_count, 2)
+
+    async def test_legacy_manually_deleted_live_channel_can_recover(self):
+        await self.open_match()
+        self.channels.clear()
+        self.manager.state['matches']['10:1']['closed'] = True
+        self.repo.save(self.manager.state)
+        self.manager = self.build_manager()
+        await self.manager.poll()
+        self.assertEqual(self.guild.create_text_channel.await_count, 2)
+        self.assertFalse(self.repo.load()['matches']['10:1']['closed'])
+
+    async def test_deleted_finished_or_disabled_match_does_not_create_channel(self):
+        await self.open_match()
+        self.channels.clear()
+        await self.finish_match()
+        self.guild.create_text_channel.assert_awaited_once()
+        self.assertTrue(self.manager.state['matches']['10:1']['closed'])
+        # A different live match can start, but disabling its league prevents replacement.
+        self.client.fetch_all_live_fixtures.return_value = [fixture(identifier=2)]
+        await self.manager.poll()
+        self.channels.clear()
+        await self.manager.disable(10, 9)
+        await self.manager.poll()
+        self.assertEqual(self.guild.create_text_channel.await_count, 2)
+
+    async def test_login_resume_recover_deadline_without_football_api(self):
+        channel = await self.open_match()
+        await self.finish_match()
+        self.manager = self.build_manager()
+        cog = object.__new__(Futebol)
+        cog.channel_manager = self.manager
+        self.client.reset_mock()
+        self.now = 4599
+        await cog.on_ready()
+        channel.delete.assert_not_awaited()
+        self.now = 5000
+        await asyncio.gather(cog.on_ready(), cog.on_resumed())
+        channel.delete.assert_awaited_once()
+        self.assertTrue(self.repo.load()['matches']['10:1']['closed'])
+        self.client.fetch_all_live_fixtures.assert_not_awaited()
+        self.client.fetch_fixture.assert_not_awaited()
+
+    async def test_replacement_creation_timeout_recovers_after_restart(self):
+        old = await self.open_match()
+        self.channels.clear()
+        create = self.guild.create_text_channel.side_effect
+
+        async def timeout(*args, **kw):
+            await create(*args, **kw)
+            raise http_error()
+
+        self.guild.create_text_channel.side_effect = timeout
+        await self.manager.poll()
+        self.assertIsNone(self.repo.load()['matches']['10:1']['channel_id'])
+        replacement = next(iter(self.channels.values()))
+        self.assertNotEqual(old.id, replacement.id)
+        self.manager = self.build_manager()
+        await self.manager.poll()
+        self.assertEqual(self.guild.create_text_channel.await_count, 2)
+        replacement.send.assert_awaited_once()
 
     async def test_foreign_topic_never_deleted(self):
         c = await self.open_match()
