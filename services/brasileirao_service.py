@@ -82,6 +82,11 @@ class BsdFootballClient:
     async def fetch_goal_scorers(self, fixture_id: int) -> list[str]:
         return await asyncio.to_thread(self._fetch_goal_scorers, fixture_id)
 
+    async def fetch_fixture(self, fixture_id: int) -> BrasileiraoFixture | None:
+        """Read an individual match, including matches that disappeared from /live."""
+        payload = await asyncio.to_thread(self._get_json, f"/events/{fixture_id}/")
+        return _parse_bsd_fixture(payload)
+
     def _fetch_fixtures(self, league_id: int, fixture_date: date) -> list[BrasileiraoFixture]:
         query = urlencode(
             {

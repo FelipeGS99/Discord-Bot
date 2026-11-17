@@ -43,6 +43,8 @@ class Moderation(commands.Cog):
                 "Use estes comandos para abrir a ajuda detalhada de cada area:",
                 f"`{prefix}help` - Mostra esta ajuda geral.",
                 f"`{prefix}futebol` - Ver jogos de futebol do dia e de amanha.",
+                f"`{prefix}futebol ativar <liga>` - Cria canais privados por partida para o cargo Futebol.",
+                f"`{prefix}futebol prazo 60` - Apaga os canais 1 hora apos o fim do jogo.",
                 f"`{prefix}brasileirao` - Jogos, rodadas e alertas do Brasileirao Serie A.",
                 f"`{prefix}libertadores` - Jogos e alertas da Libertadores.",
                 f"`{prefix}sulamericana` - Jogos e alertas da Sul-Americana.",
