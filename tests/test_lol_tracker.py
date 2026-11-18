@@ -266,7 +266,7 @@ class PresentationTests(unittest.TestCase):
 
     def test_post_report_has_computed_stats_and_real_baseline(self):
         e = report_embeds(self.result, self.watched, self.context, CATALOG)[0]
-        self.assertIn("VITORIA", e.title)
+        self.assertIn("VITÓRIA", e.title)
         self.assertIn("6.33", e.fields[0].value)
         self.assertIn("217 CS", e.fields[1].value)
         self.assertTrue(any(f.name == "Comparação histórica" for f in e.fields))
@@ -276,9 +276,9 @@ class PresentationTests(unittest.TestCase):
         result = copy.deepcopy(self.result)
         result["info"]["participants"] = [{"puuid": "DEMO-0"}]
         e = report_embeds(result, self.watched, {}, CATALOG)[0]
-        self.assertIn("RESULTADO INDISPONIVEL", e.title)
-        self.assertEqual(e.fields[0].value, "indisponivel")
-        self.assertEqual(e.fields[2].value, "indisponivel")
+        self.assertIn("RESULTADO INDISPONÍVEL", e.title)
+        self.assertEqual(e.fields[0].value, "indisponível")
+        self.assertEqual(e.fields[2].value, "indisponível")
 
     def test_history_averages_only_collected_matches(self):
         s = recent_stats([self.result], "DEMO-0")
@@ -687,7 +687,10 @@ class TrackerTests(unittest.IsolatedAsyncioTestCase):
             all("MODO TESTE" in e.title for m in self.messages for e in m.embeds)
         )
         self.assertEqual(len(self.messages[1].embeds), 6)
-        self.assertIn("https://discord.com/channels/1/100/", ctx.send.call_args.args[0])
+        self.assertIn(
+            "https://discord.com/channels/1/100/",
+            ctx.send.call_args.kwargs["embed"].description,
+        )
 
     async def test_demo_denies_missing_lol_role_and_nonadmin(self):
         await LoLTracker.demo.callback(self.cog(), self.ctx(False))
@@ -737,7 +740,7 @@ class TrackerTests(unittest.IsolatedAsyncioTestCase):
         ctx = self.ctx()
         self.riot.account.side_effect = RiotError(404, "not found")
         await LoLTracker.follow.callback(cog, ctx, riot_id="Mochila#bunny")
-        self.assertIn("nao encontrada", ctx.send.call_args.args[0])
+        self.assertIn("não encontrada", ctx.send.call_args.kwargs["embed"].description)
         self.riot.account.side_effect = None
         self.riot.account.return_value = {
             "puuid": self.puuid,
@@ -745,7 +748,7 @@ class TrackerTests(unittest.IsolatedAsyncioTestCase):
             "tagLine": "bunny",
         }
         await LoLTracker.follow.callback(cog, ctx, riot_id="Mochila#bunny")
-        self.assertIn("ja estava", ctx.send.call_args.args[0])
+        self.assertIn("já está", ctx.send.call_args.kwargs["embed"].description)
 
 
 if __name__ == "__main__":

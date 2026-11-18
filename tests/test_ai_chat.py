@@ -166,7 +166,7 @@ class AIChatTests(unittest.IsolatedAsyncioTestCase):
 
         self.assertEqual(len(message.replies), 1)
         self.assertIn("Oi, tudo certo!", message.replies[0])
-        self.assertIn("respondi so por texto", message.replies[0])
+        self.assertIn("Resposta enviada por texto", message.replies[0])
         self.assertEqual(responder.calls[0]["prompt"], "oi")
 
     async def test_on_message_applies_user_cooldown(self) -> None:
@@ -188,7 +188,7 @@ class AIChatTests(unittest.IsolatedAsyncioTestCase):
         await cog.on_message(second_message)
 
         self.assertEqual(len(responder.calls), 1)
-        self.assertEqual(second_message.replies, ["Espera 10s antes de me chamar de novo."])
+        self.assertEqual(second_message.replies, ["Aguarde 10 segundos antes de enviar outra pergunta."])
 
     async def test_on_message_replies_and_queues_voice_when_author_is_in_voice(self) -> None:
         responder = FakeResponder("Resposta longa que deve caber")

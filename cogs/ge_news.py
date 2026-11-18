@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+
 from pathlib import Path
 
 import discord
@@ -13,6 +15,10 @@ from services.ge_news_service import (
     get_recent_unseen_news,
 )
 
+
+from services.discord_messages import response_sender, brand_embed
+
+reply = response_sender("Notícias • GE")
 
 POLL_INTERVAL_MINUTES = 5
 EMBED_COLOR = 0x06AA48
@@ -37,76 +43,108 @@ class GeNews(commands.Cog):
     @commands.group(name="genoticias", invoke_without_command=True)
     async def ge_news_group(self, ctx: commands.Context) -> None:
         prefix = ctx.prefix or "?"
-        await ctx.send(
+        await reply(
+            ctx,
             "\n".join(
                 [
-                    "**Noticias do GE**",
-                    "Use para receber novas noticias de futebol do GE automaticamente.",
-                    f"`{prefix}genoticias canal #canal` - Ativa noticias no canal marcado. Exemplo: `{prefix}genoticias canal #noticias`.",
-                    f"`{prefix}genoticias status` - Mostra se as noticias estao ativas, qual canal recebe e quantas noticias ja foram vistas.",
-                    f"`{prefix}genoticias parar` - Desativa o envio automatico de noticias.",
-                    "Ao ativar, as noticias atuais sao marcadas como vistas para evitar spam; o bot envia apenas novidades futuras.",
+                    "**Notícias do GE**",
+                    "Use para receber novas notícias de futebol do GE automaticamente.",
+                    f"`{prefix}genoticias canal #canal` — Ativa notícias no canal marcado. Exemplo: `{prefix}genoticias canal #noticias`.",
+                    f"`{prefix}genoticias status` — Consulta se as notícias estão ativas, qual canal recebe e quantas notícias já foram vistas.",
+                    f"`{prefix}genoticias parar` — Desativa o envio automático de notícias.",
+                    "Ao ativar, as notícias atuais são marcadas como vistas para evitar spam; o bot envia apenas novidades futuras.",
                 ]
-            )
+            ),
         )
 
     @ge_news_group.command(name="canal")
-    async def set_channel(self, ctx: commands.Context, channel: discord.TextChannel) -> None:
+    async def set_channel(
+        self, ctx: commands.Context, channel: discord.TextChannel
+    ) -> None:
         if not self._can_manage_news(ctx):
-            await ctx.send("Voce nao tem permissao para configurar as noticias do GE.")
+            await reply(
+                ctx,
+                "A permissão Gerenciar canais é necessária para configurar as notícias do GE.",
+                tone="warning",
+            )
             return
 
         try:
             current_items = await self.feed_client.fetch_news()
-        except Exception as exc:
-            await ctx.send(f"Nao consegui acessar o feed do GE agora: {exc}")
+        except Exception:
+            logging.getLogger(__name__).exception("Falha ao executar comando")
+            await reply(
+                ctx,
+                "Não foi possível consultar as notícias do GE. Tente novamente em alguns instantes.",
+                tone="error",
+            )
             return
 
         self.channel_id = channel.id
         self.seen_ids = [item.identifier for item in current_items]
         self._save_state()
 
-        await ctx.send(
-            f"Noticias do GE ativadas em {channel.mention}. "
-            "As noticias atuais foram marcadas como vistas; vou enviar apenas novidades futuras."
+        await reply(
+            ctx,
+            f"Notícias do GE ativadas em {channel.mention}. "
+            "A partir de agora, o canal receberá apenas notícias publicadas após esta ativação.",
+            title="Notícias ativadas",
+            tone="success",
         )
 
     @ge_news_group.command(name="status")
     async def status(self, ctx: commands.Context) -> None:
         if self.channel_id is None:
-            await ctx.send("Noticias do GE estao desativadas.")
+            await reply(ctx, "Notícias do GE estão desativadas.")
             return
 
         channel = self.bot.get_channel(self.channel_id)
-        channel_text = channel.mention if isinstance(channel, discord.TextChannel) else f"`{self.channel_id}`"
-        await ctx.send(
+        channel_text = (
+            channel.mention
+            if isinstance(channel, discord.TextChannel)
+            else f"`{self.channel_id}`"
+        )
+        await reply(
+            ctx,
             "\n".join(
                 [
-                    "**Noticias do GE**",
+                    "**Notícias do GE**",
                     f"Canal: {channel_text}",
                     f"Intervalo: {POLL_INTERVAL_MINUTES} minutos",
-                    f"Noticias vistas: {len(self.seen_ids)}",
+                    f"Notícias vistas: {len(self.seen_ids)}",
                 ]
-            )
+            ),
         )
 
     @ge_news_group.command(name="parar")
     async def stop_news(self, ctx: commands.Context) -> None:
         if not self._can_manage_news(ctx):
-            await ctx.send("Voce nao tem permissao para configurar as noticias do GE.")
+            await reply(
+                ctx,
+                "A permissão Gerenciar canais é necessária para configurar as notícias do GE.",
+                tone="warning",
+            )
             return
 
         self.channel_id = None
         self._save_state()
-        await ctx.send("Noticias do GE desativadas.")
+        await reply(ctx, "Notícias do GE desativadas.")
 
     @set_channel.error
-    async def set_channel_error(self, ctx: commands.Context, error: commands.CommandError) -> None:
+    async def set_channel_error(
+        self, ctx: commands.Context, error: commands.CommandError
+    ) -> None:
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send("Informe o canal. Exemplo: `genoticias canal #noticias`.")
+            await reply(
+                ctx,
+                "Informe o canal. Exemplo: `genoticias canal #noticias`.",
+                tone="warning",
+            )
             return
         if isinstance(error, commands.BadArgument):
-            await ctx.send("Canal invalido. Marque um canal de texto valido.")
+            await reply(
+                ctx, "Canal inválido. Marque um canal de texto válido.", tone="warning"
+            )
             return
         raise error
 
@@ -117,13 +155,13 @@ class GeNews(commands.Cog):
 
         channel = self.bot.get_channel(self.channel_id)
         if not isinstance(channel, discord.TextChannel):
-            print(f"Canal de noticias do GE nao encontrado: {self.channel_id}")
+            print(f"Canal de notícias do GE não encontrado: {self.channel_id}")
             return
 
         try:
             current_items = await self.feed_client.fetch_news()
         except Exception as exc:
-            print(f"Erro ao buscar noticias do GE: {exc}")
+            print(f"Erro ao buscar notícias do GE: {exc}")
             return
 
         unseen_items = get_recent_unseen_news(current_items, set(self.seen_ids))
@@ -133,7 +171,7 @@ class GeNews(commands.Cog):
             self.seen_ids = [item.identifier for item in current_items]
             self._save_state()
             print(
-                "GE retornou muitas noticias nao vistas de uma vez; "
+                "GE retornou muitas notícias não vistas de uma vez; "
                 f"{len(unseen_items)} itens foram marcados como vistos para evitar spam."
             )
             return
@@ -142,10 +180,12 @@ class GeNews(commands.Cog):
             try:
                 await channel.send(embed=self._build_embed(item))
             except discord.Forbidden:
-                print(f"Sem permissao para enviar noticias do GE no canal {channel.id}.")
+                print(
+                    f"Sem permissão para enviar notícias do GE no canal {channel.id}."
+                )
                 return
             except discord.HTTPException as exc:
-                print(f"Erro ao enviar noticia do GE no Discord: {exc}")
+                print(f"Erro ao enviar notícia do GE no Discord: {exc}")
                 return
 
             self.seen_ids.append(item.identifier)
@@ -182,8 +222,10 @@ class GeNews(commands.Cog):
         embed.set_author(name="GE - Futebol")
         if item.published_at is not None:
             embed.timestamp = item.published_at
-        embed.add_field(name="Link", value=f"[Abrir noticia]({item.link})", inline=False)
-        return embed
+        embed.add_field(
+            name="Link", value=f"[Abrir notícia]({item.link})", inline=False
+        )
+        return brand_embed(embed, "Notícias • GE")
 
 
 async def setup(bot: commands.Bot) -> None:

@@ -31,7 +31,7 @@ class LoLChannels:
             or guild.me is None
         ):
             raise LoLChannelError(
-                "Cargo LOL indisponivel. Crie o cargo LOL neste servidor e ative novamente."
+                "Cargo LOL indisponível. Crie o cargo LOL neste servidor e ative novamente."
             )
         return {
             guild.default_role: discord.PermissionOverwrite(view_channel=False),
@@ -85,7 +85,7 @@ class LoLChannels:
         gid, puuid = session["guild_id"], session["puuid"]
         guild = self.bot.get_guild(gid)
         if guild is None:
-            raise LoLChannelError("Servidor nao encontrado.")
+            raise LoLChannelError("Servidor não encontrado.")
         marker = self.marker(gid, puuid, session["generation"])
         if session["channel_id"] is None:
             channel = next(
@@ -111,7 +111,7 @@ class LoLChannels:
             or channel.topic != marker
         ):
             raise LoLChannelError(
-                "Identificador do canal alterado; operacao cancelada para proteger canais externos."
+                "Identificador do canal alterado; operação cancelada para proteger canais externos."
             )
         return channel
 
@@ -205,7 +205,7 @@ class LoLChannels:
         cfg = (await self.repository.session_configs()).get(gid)
         guild = self.bot.get_guild(gid)
         if cfg is None or guild is None:
-            raise LoLChannelError("Configuracao do servidor indisponivel.")
+            raise LoLChannelError("Configuração do servidor indisponível.")
         overwrites = self.overwrites(guild, guild.get_role(cfg["role_id"]))
         channel = await self._owned(session)
         if channel is None:
@@ -277,7 +277,7 @@ class LoLChannels:
                         )
                         return
                 except (RiotError, discord.HTTPException, LoLChannelError):
-                    return "Verificacao antes da exclusao falhou; canal LOL preservado."
+                    return "Verificacao antes da exclusão falhou; canal LOL preservado."
         try:
             channel = await self._owned(session, refresh=True)
             if channel:
@@ -287,4 +287,4 @@ class LoLChannels:
                     pass
             await self.repository.session_update(*key, closed=1, close_reason="expired")
         except (discord.HTTPException, LoLChannelError):
-            return "Falha ao excluir um canal LOL; nova tentativa no proximo ciclo."
+            return "Falha ao excluir um canal LOL; nova tentativa no próximo ciclo."

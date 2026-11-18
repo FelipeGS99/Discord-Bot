@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import asyncio
 import json
+import logging
 import math
 import time
 from dataclasses import dataclass
@@ -21,8 +21,9 @@ AI_CHAT_CONFIG_PATH = Path(__file__).resolve().parents[1] / "ai_chat_config.json
 class AIChatConfig:
     model: str = "gpt-5.5"
     system_prompt: str = (
-        "Voce e o Tigrao, um bot brasileiro de Discord. Responda em PT-BR, "
-        "com tom natural, bem-humorado quando combinar, e sem enrolar."
+        "Você é o Tigrão, um assistente brasileiro de Discord. Responda em português do Brasil, "
+        "com tom profissional, cordial e direto. Use acentuação correta, evite gírias, "
+        "ironia e emojis excessivos. Apresente orientações claras e reconheça quando não souber algo."
     )
     max_response_characters: int = 250
     max_prompt_characters: int = 500
@@ -52,8 +53,7 @@ class ChatResponder(Protocol):
         prompt: str,
         author_name: str,
         history: list[ConversationTurn],
-    ) -> str:
-        ...
+    ) -> str: ...
 
 
 class MissingOpenAIKey(RuntimeError):
@@ -87,14 +87,20 @@ def load_ai_chat_config(path: Path = AI_CHAT_CONFIG_PATH) -> AIChatConfig:
         with path.open("r", encoding="utf-8") as config_file:
             raw_config = json.load(config_file)
     except (OSError, json.JSONDecodeError) as exc:
-        raise RuntimeError(f"Nao foi possivel carregar a configuracao de IA em {path}.") from exc
+        raise RuntimeError(
+            f"Não foi possível carregar a configuração de IA em {path}."
+        ) from exc
 
     if not isinstance(raw_config, dict):
-        raise RuntimeError(f"A configuracao de IA em {path} precisa ser um objeto JSON.")
+        raise RuntimeError(
+            f"A configuração de IA em {path} precisa ser um objeto JSON."
+        )
 
     return AIChatConfig(
         model=_text_config(raw_config, "model", DEFAULT_AI_CHAT_CONFIG.model),
-        system_prompt=_text_config(raw_config, "system_prompt", DEFAULT_AI_CHAT_CONFIG.system_prompt),
+        system_prompt=_text_config(
+            raw_config, "system_prompt", DEFAULT_AI_CHAT_CONFIG.system_prompt
+        ),
         max_response_characters=_positive_int_config(
             raw_config,
             "max_response_characters",
@@ -125,14 +131,22 @@ def load_ai_chat_config(path: Path = AI_CHAT_CONFIG_PATH) -> AIChatConfig:
             "request_timeout_seconds",
             DEFAULT_AI_CHAT_CONFIG.request_timeout_seconds,
         ),
-        max_output_tokens=_positive_int_config(raw_config, "max_output_tokens", DEFAULT_AI_CHAT_CONFIG.max_output_tokens),
-        reasoning_effort=_text_config(raw_config, "reasoning_effort", DEFAULT_AI_CHAT_CONFIG.reasoning_effort),
-        text_verbosity=_text_config(raw_config, "text_verbosity", DEFAULT_AI_CHAT_CONFIG.text_verbosity),
+        max_output_tokens=_positive_int_config(
+            raw_config, "max_output_tokens", DEFAULT_AI_CHAT_CONFIG.max_output_tokens
+        ),
+        reasoning_effort=_text_config(
+            raw_config, "reasoning_effort", DEFAULT_AI_CHAT_CONFIG.reasoning_effort
+        ),
+        text_verbosity=_text_config(
+            raw_config, "text_verbosity", DEFAULT_AI_CHAT_CONFIG.text_verbosity
+        ),
     )
 
 
 class ChannelMemory:
-    def __init__(self, config: AIChatConfig, clock: Callable[[], float] = time.monotonic) -> None:
+    def __init__(
+        self, config: AIChatConfig, clock: Callable[[], float] = time.monotonic
+    ) -> None:
         self.config = config
         self.clock = clock
         self.turns_by_channel: dict[tuple[int, int], list[ConversationTurn]] = {}
@@ -185,7 +199,7 @@ class OpenAIChatResponder:
         history: list[ConversationTurn],
     ) -> str:
         if self.client is None:
-            raise MissingOpenAIKey("OPENAI_API_KEY nao foi configurada.")
+            raise MissingOpenAIKey("OPENAI_API_KEY não foi configurada.")
 
         response = await self.client.responses.create(
             model=self.config.model,
@@ -196,9 +210,11 @@ class OpenAIChatResponder:
             text={"verbosity": self.config.text_verbosity},
             store=False,
         )
-        output_text = normalize_response_text(getattr(response, "output_text", "") or "")
+        output_text = normalize_response_text(
+            getattr(response, "output_text", "") or ""
+        )
         if not output_text:
-            return "Nao consegui montar uma resposta agora."
+            return "Não foi possível gerar uma resposta. Tente reformular a pergunta."
         return limit_response_text(output_text, self.config.max_response_characters)
 
 
@@ -214,12 +230,16 @@ class AIChat(commands.Cog):
         self.config = config
         self.clock = clock
         self.memory = ChannelMemory(config, clock=clock)
-        self.responder = responder or OpenAIChatResponder(settings.openai_api_key, config)
+        self.responder = responder or OpenAIChatResponder(
+            settings.openai_api_key, config
+        )
         self.cooldowns: dict[tuple[int, int], float] = {}
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message) -> None:
-        if not should_handle_ai_mention(message, self.bot.user, self.bot.command_prefix):
+        if not should_handle_ai_mention(
+            message, self.bot.user, self.bot.command_prefix
+        ):
             return
 
         assert message.guild is not None
@@ -227,15 +247,25 @@ class AIChat(commands.Cog):
 
         prompt = extract_mention_prompt(message.content, self.bot.user.id)
         if not prompt:
-            await reply_without_mentions(message, "Me diga o que voce quer perguntar.")
+            await reply_without_mentions(
+                message, "Envie sua pergunta junto com a menção ao bot."
+            )
             return
         if len(prompt) > self.config.max_prompt_characters:
-            await reply_without_mentions(message, f"Sua mensagem pode ter no maximo {self.config.max_prompt_characters} caracteres.")
+            await reply_without_mentions(
+                message,
+                f"Sua mensagem pode ter no máximo {self.config.max_prompt_characters} caracteres.",
+            )
             return
 
-        cooldown_remaining = self._cooldown_remaining(message.guild.id, message.author.id)
+        cooldown_remaining = self._cooldown_remaining(
+            message.guild.id, message.author.id
+        )
         if cooldown_remaining > 0:
-            await reply_without_mentions(message, f"Espera {cooldown_remaining}s antes de me chamar de novo.")
+            await reply_without_mentions(
+                message,
+                f"Aguarde {cooldown_remaining} segundos antes de enviar outra pergunta.",
+            )
             return
         self._mark_cooldown(message.guild.id, message.author.id)
 
@@ -245,12 +275,21 @@ class AIChat(commands.Cog):
 
         try:
             async with message.channel.typing():
-                answer = await self.responder.generate_reply(prompt, author_name, history)
+                answer = await self.responder.generate_reply(
+                    prompt, author_name, history
+                )
         except MissingOpenAIKey:
-            await reply_without_mentions(message, "A OPENAI_API_KEY nao foi configurada no .env.")
+            await reply_without_mentions(
+                message,
+                "O assistente ainda não está configurado. Solicite a configuração a um administrador do bot.",
+            )
             return
         except Exception:
-            await reply_without_mentions(message, "Nao consegui falar com a OpenAI agora. Tenta de novo em instantes.")
+            logging.getLogger(__name__).exception("Falha ao consultar o assistente")
+            await reply_without_mentions(
+                message,
+                "O assistente está temporariamente indisponível. Tente novamente em alguns instantes.",
+            )
             return
 
         answer = limit_response_text(answer, self.config.max_response_characters)
@@ -259,19 +298,21 @@ class AIChat(commands.Cog):
         reply_text = answer if voice_note is None else f"{answer}\n\n{voice_note}"
         await reply_without_mentions(message, reply_text)
 
-    async def _queue_voice_response(self, message: discord.Message, answer: str) -> str | None:
+    async def _queue_voice_response(
+        self, message: discord.Message, answer: str
+    ) -> str | None:
         voice_channel = author_voice_channel(message.author)
         if voice_channel is None:
-            return "Nao encontrei voce em um canal de voz, entao respondi so por texto."
+            return "Resposta enviada por texto. Entre em um canal de voz para ouvir as próximas respostas."
 
         assert message.guild is not None
         permissions = voice_channel.permissions_for(message.guild.me)
         if not permissions.connect or not permissions.speak:
-            return "Nao tenho permissao para entrar e falar no seu canal de voz."
+            return "Não tenho permissão para entrar e falar no seu canal de voz."
 
         voice_tts = self.bot.get_cog("VoiceTTS")
         if voice_tts is None or not hasattr(voice_tts, "enqueue_speech"):
-            return "O sistema de voz nao esta carregado agora."
+            return "A reprodução por voz está temporariamente indisponível."
 
         await voice_tts.enqueue_speech(
             channel=voice_channel,
@@ -327,7 +368,9 @@ def extract_mention_prompt(content: str, bot_user_id: int) -> str:
 def author_voice_channel(author: discord.abc.User) -> discord.VoiceChannel | None:
     voice_state = getattr(author, "voice", None)
     channel = getattr(voice_state, "channel", None)
-    return channel if channel is not None and hasattr(channel, "permissions_for") else None
+    return (
+        channel if channel is not None and hasattr(channel, "permissions_for") else None
+    )
 
 
 def display_name_for(author: discord.abc.User) -> str:
@@ -345,8 +388,8 @@ async def reply_without_mentions(message: discord.Message, content: str) -> None
 def build_instructions(config: AIChatConfig) -> str:
     return (
         f"{config.system_prompt}\n\n"
-        f"Responda com no maximo {config.max_response_characters} caracteres. "
-        "Nao use Markdown, listas longas nem blocos de codigo. "
+        f"Responda com no máximo {config.max_response_characters} caracteres. "
+        "Não use Markdown, listas longas nem blocos de código. "
         "Se a pergunta for ambigua, responda de forma curta e natural."
     )
 
@@ -358,7 +401,9 @@ def build_response_input(
 ) -> list[dict[str, str]]:
     response_input: list[dict[str, str]] = []
     for turn in history:
-        response_input.append({"role": "user", "content": f"{turn.author_name}: {turn.user_text}"})
+        response_input.append(
+            {"role": "user", "content": f"{turn.author_name}: {turn.user_text}"}
+        )
         response_input.append({"role": "assistant", "content": turn.assistant_text})
     response_input.append({"role": "user", "content": f"{author_name}: {prompt}"})
     return response_input

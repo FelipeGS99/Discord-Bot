@@ -430,13 +430,13 @@ def report_embeds(match, watched, context, catalog, test=False):
         )
         minutes = max(duration / 60, 1 / 60)
         result = (
-            ("VITORIA" if p["win"] else "DERROTA")
+            ("VITÓRIA" if p["win"] else "DERROTA")
             if isinstance(p.get("win"), bool)
-            else "RESULTADO INDISPONIVEL"
+            else "RESULTADO INDISPONÍVEL"
         )
         e = discord.Embed(
             title=f"{prefix}{result} • {text(account['riot_id'], 80)}",
-            description=f"{text(p.get('championName', 'Campeao indisponivel'))} · Duracao: {int(duration) // 60}:{int(duration) % 60:02d}",
+            description=f"{text(p.get('championName', 'Campeão indisponível'))} · Duração: {int(duration) // 60}:{int(duration) % 60:02d}",
             color=0x37B878 if p.get("win") else 0xDB5964,
         )
         icon = champion_icon(catalog, p.get("championId"))
@@ -444,35 +444,35 @@ def report_embeds(match, watched, context, catalog, test=False):
             e.set_thumbnail(url=icon)
         e.add_field(
             name="K / D / A",
-            value=f"{k} / {d} / {a} · KDA {kda:.2f}" if complete else "indisponivel",
+            value=f"{k} / {d} / {a} · KDA {kda:.2f}" if complete else "indisponível",
         )
         e.add_field(
             name="Farm",
             value=f"{cs} CS · {cs / minutes:.1f} CS/min"
             if cs is not None and duration
-            else "indisponivel",
+            else "indisponível",
         )
         e.add_field(
-            name="Dano a campeoes",
+            name="Dano a campeões",
             value=f"{p['totalDamageDealtToChampions']:,}"
             if "totalDamageDealtToChampions" in p
-            else "indisponivel",
+            else "indisponível",
         )
         e.add_field(
             name="Dano recebido",
             value=f"{p['totalDamageTaken']:,}"
             if "totalDamageTaken" in p
-            else "indisponivel",
+            else "indisponível",
         )
         e.add_field(
             name="Ouro obtido",
-            value=f"{p['goldEarned']:,}" if "goldEarned" in p else "indisponivel",
+            value=f"{p['goldEarned']:,}" if "goldEarned" in p else "indisponível",
         )
         e.add_field(
-            name="Visao",
+            name="Visão",
             value=str(p["visionScore"])
             if "visionScore" in p
-            else "indisponivel neste modo",
+            else "indisponível neste modo",
         )
         items = [p.get("item" + str(i), 0) for i in range(7)]
         e.add_field(

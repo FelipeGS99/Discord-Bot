@@ -78,7 +78,7 @@ class VoiceTTSTests(unittest.IsolatedAsyncioTestCase):
 
         parsed = parse_speech_content(ctx, "")
 
-        self.assertEqual(parsed.error, "Informe o texto para eu falar.")
+        self.assertEqual(parsed.error, "Informe o texto que será reproduzido.")
 
     def test_parse_errors_when_channel_has_no_message(self) -> None:
         channel = _voice_channel(123, "Geral")
@@ -86,7 +86,7 @@ class VoiceTTSTests(unittest.IsolatedAsyncioTestCase):
 
         parsed = parse_speech_content(ctx, "<#123>")
 
-        self.assertEqual(parsed.error, "Informe o texto que devo falar depois do canal.")
+        self.assertEqual(parsed.error, "Informe o texto que será reproduzido após o canal de voz.")
 
     def test_text_limit_constant(self) -> None:
         self.assertEqual(MAX_TTS_CHARACTERS, 250)
