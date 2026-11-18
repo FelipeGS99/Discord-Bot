@@ -87,11 +87,11 @@ def baseline_for(info, player, history):
         and r.get("teamPosition") == player["teamPosition"]
     ]
     if len(comparable) >= MIN_HISTORY:
-        chosen, scope = comparable, "mesmo campeao e posicao"
+        chosen, scope = comparable, "mesmo campeão e posição"
     elif len(champ) >= MIN_HISTORY:
-        chosen, scope = champ, "mesmo campeao; posicoes podem diferir"
+        chosen, scope = champ, "mesmo campeão; posições podem diferir"
     else:
-        chosen, scope = rows, "mesma fila/mapa; campeoes e posicoes podem diferir"
+        chosen, scope = rows, "mesma fila/mapa; campeões e posições podem diferir"
     result = {
         "count": len(chosen),
         "scope": scope,
@@ -152,7 +152,7 @@ def analyze(info, player, context):
         old = context["recent"]
         base = {
             "count": old.get("count", 0),
-            "scope": "historico geral anterior; fila/posicao nao verificadas",
+            "scope": "histórico geral anterior; fila/posição não verificadas",
             "metrics": {},
             "enough": old.get("count", 0) >= MIN_HISTORY,
         }
@@ -160,7 +160,7 @@ def analyze(info, player, context):
             base["metrics"]["kda"] = old["kda"]
     comparisons = []
     readings = []
-    labels = {"kda": "KDA", "cs": "CS/min", "vision": "Visao/min", "damage": "Dano/min"}
+    labels = {"kda": "KDA", "cs": "CS/min", "vision": "Visão/min", "damage": "Dano/min"}
     for key in [
         "kda",
         "cs",
@@ -179,40 +179,40 @@ def analyze(info, player, context):
             if delta > tolerance
             else ("abaixo", "↓")
             if delta < -tolerance
-            else ("proximo", "≈")
+            else ("próximo", "≈")
         )
         comparisons.append(
-            f"{icon} **{labels[key]} {label} da media** · {value:.2f} vs {average:.2f}"
+            f"{icon} **{labels[key]} {label} da média** · {value:.2f} vs {average:.2f}"
         )
         readings.append(
-            f"{labels[key]} {'acima do seu padrao recente' if label == 'acima' else 'abaixo do seu padrao recente' if label == 'abaixo' else 'alinhado ao seu padrao recente'}"
+            f"{labels[key]} {'acima do seu padrão recente' if label == 'acima' else 'abaixo do seu padrão recente' if label == 'abaixo' else 'alinhado ao seu padrão recente'}"
         )
     indicators = [
-        f"**Participacao em abates:** {kp:.1f}% ({participation:g}/{kills:g})"
+        f"**Participação em abates:** {kp:.1f}% ({participation:g}/{kills:g})"
         if kp is not None
-        else "**Participacao em abates:** indisponivel (total da equipe ausente, zero ou inconsistente)"
+        else "**Participação em abates:** indisponível (total da equipe ausente, zero ou inconsistente)"
     ]
     if "cs" in current:
         indicators.append(f"**Farm/min:** {current['cs']:.1f}")
     if share is not None:
         indicators.append(f"**Parcela do dano da equipe:** {share:.1f}%")
     if player.get("teamPosition") == "UTILITY" and "vision" in current:
-        indicators.append(f"**Visao/min:** {current['vision']:.2f}")
+        indicators.append(f"**Visão/min:** {current['vision']:.2f}")
     if readings:
         conclusion = (
             "; ".join(readings[:2])
-            + ". Comparacao descritiva, sem isolar duracao, adversarios ou estado do jogo."
+            + ". Comparação descritiva, sem isolar duração, adversários ou estado do jogo."
         )
     elif kp is not None:
-        conclusion = "A participacao nos abates foi calculada com o total real da equipe. Sem historico comparavel suficiente para classificar o desempenho."
+        conclusion = "A participação nos abates foi calculada com o total real da equipe. Sem histórico comparável suficiente para classificar o desempenho."
     else:
-        conclusion = "Os dados atuais nao permitem avaliar o desempenho em relacao ao seu padrao. Nao ha evidencia suficiente para uma conclusao categorica."
+        conclusion = "Os dados atuais não permitem avaliar o desempenho em relação ao seu padrão. Não há evidência suficiente para uma conclusão categórica."
     comparison = (
         "\n".join(comparisons)
         if comparisons
-        else f"Amostra insuficiente para classificar acima/abaixo: {base['count']}/{MIN_HISTORY} partidas comparaveis."
+        else f"Amostra insuficiente para classificar acima/abaixo: {base['count']}/{MIN_HISTORY} partidas comparáveis."
     )
-    comparison += f"\nBase: **{base['count']} jogos** · {base['scope']}. Margens descritivas; nao sao significancia estatistica."
+    comparison += f"\nBase: **{base['count']} jogos** · {base['scope']}. Margens descritivas; não são significância estatística."
     return {
         "kp": kp,
         "damage_share": share,

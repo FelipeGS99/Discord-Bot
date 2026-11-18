@@ -232,7 +232,7 @@ class TwitchCatalogAndMonitorTests(unittest.IsolatedAsyncioTestCase):
         cog = SimpleNamespace(monitor=SimpleNamespace(catalog=catalog, reload=AsyncMock()))
         ctx = SimpleNamespace(send=AsyncMock())
         await ProLives.players.callback(cog, ctx)
-        output = '\n'.join(call.args[0] for call in ctx.send.await_args_list)
+        output = '\n'.join(call.kwargs["embed"].description for call in ctx.send.await_args_list)
         self.assertIn('https://www.twitch.tv/alice', output)
         self.assertIn('[PENDENTE] missing', output)
         self.assertIn('Confirmar o link atual', output)

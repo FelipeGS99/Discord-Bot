@@ -144,7 +144,7 @@ def load_catalog(path: Path, now: datetime | None = None) -> Catalog:
 
         verified, expires = _date(player["verified_at"]), _date(player["valid_until"])
         if expires <= now:
-            review("Prazo de revisao vencido; monitoramento mantido.")
+            review("Prazo de revisão vencido; monitoramento mantido.")
         elif verified > now or expires <= verified or expires - verified > timedelta(days=7):
             review("Datas de revisao inconsistentes ou intervalo superior a sete dias; monitoramento mantido.")
 
@@ -154,7 +154,7 @@ def load_catalog(path: Path, now: datetime | None = None) -> Catalog:
         if contract == "expired":
             review("Contrato vencido; status competitivo preservado ate confirmacao de saida Tier 1.")
         elif contract == "renewal_unconfirmed":
-            review("Renovacao contratual nao confirmada; monitoramento mantido.")
+            review("Renovação contratual não confirmada; monitoramento mantido.")
         players += 1
         if not isinstance(player["channels"], list) or len(player["channels"]) > 5:
             raise ValueError("channels deve ter ate 5 contas confirmadas.")

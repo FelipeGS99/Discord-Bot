@@ -21,6 +21,10 @@ from services.lol_presentation import (
 from services.riot_service import RiotClient, DataDragon, RiotError
 from services.lol_channel_service import LoLChannelError
 
+from services.discord_messages import response_sender
+
+reply = response_sender("LoL • Acompanhamento")
+
 BASE_PATH = Path(__file__).resolve().parents[1]
 log = logging.getLogger(__name__)
 
@@ -53,23 +57,26 @@ class LoLTracker(commands.Cog):
     async def require_admin(self, ctx):
         if self.can_manage(ctx):
             return True
-        await ctx.send(
-            "Use este comando em um servidor com permissao de gerenciar o servidor."
+        await reply(
+            ctx,
+            "Use este comando em um servidor com permissão de gerenciar o servidor.",
+            tone="warning",
         )
         return False
 
     @commands.group(name="loltrack", invoke_without_command=True)
     async def tracker(self, ctx: commands.Context):
         prefix = ctx.prefix or "?"
-        await ctx.send(
-            f"**Tigrao • LoL Live Tracker**\n"
+        await reply(
+            ctx,
+            f"**Tigrão • LoL Live Tracker**\n"
             f"`{prefix}loltrack categoria [categoria]` — categoria dos canais privados (opcional).\n"
             f"`{prefix}loltrack seguir Nome#TAG` — cria canal privado quando o jogador entrar em partida (BR1).\n"
             f"`{prefix}loltrack deixar Nome#TAG` — interrompe o acompanhamento.\n"
-            f"`{prefix}loltrack lista` / `{prefix}loltrack status` — jogadores e saude.\n"
-            f"`{prefix}loltrack teste` — cria canal privado de demonstracao para o cargo LOL.\n"
-            "Canais por jogador sao reutilizados e excluidos 1 hora apos o ultimo jogo confirmado, sem nova partida.\n"
-            "Configuracao, cadastro, remocao e teste exigem Gerenciar servidor. Campeonatos profissionais continuam em `lol`."
+            f"`{prefix}loltrack lista` / `{prefix}loltrack status` — jogadores e saúde.\n"
+            f"`{prefix}loltrack teste` — cria canal privado de demonstração para o cargo LOL.\n"
+            "Canais por jogador são reutilizados e excluídos 1 hora após o último jogo confirmado, sem nova partida.\n"
+            "Configuração, cadastro, remoção e teste exigem Gerenciar servidor. Campeonatos profissionais continuam em `lol`.",
         )
 
     @tracker.command(name="canal")
@@ -77,16 +84,17 @@ class LoLTracker(commands.Cog):
         if not await self.require_admin(ctx):
             return
         if channel.guild.id != ctx.guild.id:
-            await ctx.send("Escolha um canal deste servidor.")
+            await reply(ctx, "Escolha um canal deste servidor.", tone="warning")
             return
         async with self.monitor.lock:
             try:
                 await self.monitor.sessions.configure(ctx.guild, channel.category)
             except LoLChannelError as exc:
-                await ctx.send(str(exc))
+                await reply(ctx, str(exc), tone="warning")
                 return
-        await ctx.send(
-            "A categoria desse canal sera usada como referencia. Os alertas agora vao para canais privados por jogador, acessiveis ao cargo LOL."
+        await reply(
+            ctx,
+            "A categoria desse canal será usada como referência. Os alertas agora vão para canais privados por jogador, acessíveis ao cargo LOL.",
         )
 
     @tracker.command(name="categoria")
@@ -103,10 +111,11 @@ class LoLTracker(commands.Cog):
                         ctx.guild.id, role.id, None
                     )
             except LoLChannelError as exc:
-                await ctx.send(str(exc))
+                await reply(ctx, str(exc), tone="warning")
                 return
-        await ctx.send(
-            "Categoria dos proximos canais LOL atualizada. Sem categoria, os canais ficam na raiz do servidor."
+        await reply(
+            ctx,
+            "Categoria dos próximos canais LOL atualizada. Sem categoria, os canais ficam na raiz do servidor.",
         )
 
     @tracker.command(name="seguir")
@@ -130,17 +139,41 @@ class LoLTracker(commands.Cog):
                     ctx.guild.id, account["puuid"], canonical, platform
                 )
         except ValueError as exc:
-            await ctx.send(str(exc))
+            await reply(ctx, str(exc), tone="warning")
             return
         except RiotError as exc:
-            await ctx.send(
-                "Conta nao encontrada na Riot." if exc.status == 404 else str(exc)
+            await reply(
+                ctx,
+                "Conta não encontrada na Riot. Confira o Riot ID no formato `Nome#TAG`."
+                if exc.status == 404
+                else "O limite de consultas da Riot foi atingido. Aguarde alguns instantes e tente novamente."
+                if exc.status == 429
+                else "A Riot recusou a autenticação. Solicite a revisão da integração a um administrador do bot."
+                if exc.status in (401, 403)
+                else "Não foi possível validar a conta na Riot. Tente novamente em alguns instantes.",
+                title="Não foi possível iniciar o acompanhamento",
+                tone="error",
             )
             return
-        await ctx.send(
-            f"{text(canonical)}: {'monitoramento ativado' if added else 'ja estava sendo acompanhado'}. "
-            "O bot criara um canal privado com o nick do jogador para o cargo LOL. Partidas seguidas reutilizam o canal; exclusao apos 1 hora sem novo jogo.",
-            allowed_mentions=discord.AllowedMentions.none(),
+        await reply(
+            ctx,
+            f"**{text(canonical)}** {'será acompanhado automaticamente.' if added else 'já está sendo acompanhado neste servidor.'}",
+            title="Acompanhamento ativado" if added else "Acompanhamento já ativo",
+            tone="success" if added else "info",
+            fields=(
+                (
+                    "Canal da partida",
+                    "Criado automaticamente com o nome do jogador quando uma partida for detectada.",
+                ),
+                (
+                    "Acesso",
+                    "Privado para o cargo **LOL** e administradores do servidor.",
+                ),
+                (
+                    "Duração",
+                    "Partidas consecutivas usam o mesmo canal. A exclusão ocorre **1 hora após o fim da última partida**, caso não haja outra em andamento.",
+                ),
+            ),
         )
 
     @tracker.command(name="deixar")
@@ -149,27 +182,33 @@ class LoLTracker(commands.Cog):
             return
         async with self.monitor.lock:
             removed = await self.repository.unfollow(ctx.guild.id, riot_id.strip())
-        await ctx.send(
+        await reply(
+            ctx,
             "Monitoramento interrompido para essa conta."
             if removed
-            else "Essa conta nao esta ativa neste servidor."
+            else "Essa conta não está ativa neste servidor.",
         )
 
     @tracker.command(name="lista")
     async def players(self, ctx: commands.Context):
         if ctx.guild is None:
-            await ctx.send("Use este comando em um servidor.")
+            await reply(ctx, "Use este comando em um servidor.", tone="warning")
             return
         rows = await self.repository.players(ctx.guild.id, active=False)
         if not rows:
-            await ctx.send("Nenhum jogador cadastrado. Use `loltrack seguir Nome#TAG`.")
+            await reply(
+                ctx,
+                "Nenhum jogador cadastrado. Use `loltrack seguir Nome#TAG`.",
+                tone="warning",
+            )
             return
         lines = [
             f"{text(p['riot_id'])} · {p['platform']} · {'ativo' if p['active'] else 'inativo'} · {p['status']}"
             for p in rows
         ]
         for index in range(0, len(lines), 12):
-            await ctx.send(
+            await reply(
+                ctx,
                 "\n".join(lines[index : index + 12])[:1900],
                 allowed_mentions=discord.AllowedMentions.none(),
             )
@@ -177,26 +216,27 @@ class LoLTracker(commands.Cog):
     @tracker.command(name="status")
     async def status(self, ctx: commands.Context):
         if ctx.guild is None:
-            await ctx.send("Use este comando em um servidor.")
+            await reply(ctx, "Use este comando em um servidor.", tone="warning")
             return
         rows = await self.repository.players(ctx.guild.id)
         cfg = (await self.repository.session_configs()).get(ctx.guild.id, {})
         sessions = [
             s for s in await self.repository.sessions() if s["guild_id"] == ctx.guild.id
         ]
-        role_text = f"<@&{cfg['role_id']}>" if cfg else "nao configurado"
+        role_text = f"<@&{cfg['role_id']}>" if cfg else "não configurado"
         last = (
             f"<t:{int(self.monitor.last_check)}:R>"
             if self.monitor.last_check
-            else "ainda nao realizada"
+            else "ainda não realizada"
         )
         operational = self.monitoring.is_running() and bool(self.riot.key) and bool(cfg)
-        await ctx.send(
-            f"**LoL Tracker**\nMonitoramento: {'em execucao' if operational else 'aguardando configuracao ou tarefa parada'}\n"
+        await reply(
+            ctx,
+            f"**LoL Tracker**\nMonitoramento: {'em execução' if operational else 'aguardando configuração ou tarefa parada'}\n"
             f"Jogadores ativos: {len(rows)}\nCanais privados abertos: {len(sessions)}\nCargo: {role_text}\n"
             f"Riot: {self.riot.health}\nUltima verificacao: {last}\n"
             f"Intervalo: aproximadamente 60s; respeita espera Riot e volume de jogadores.\n"
-            f"Ultima ocorrencia: {self.monitor.last_error or 'nenhuma'}",
+            f"Última ocorrencia: {self.monitor.last_error or 'nenhuma'}",
             allowed_mentions=discord.AllowedMentions.none(),
         )
 
@@ -211,13 +251,14 @@ class LoLTracker(commands.Cog):
                     ctx.guild, getattr(ctx.channel, "category", None)
                 )
             except LoLChannelError as exc:
-                await ctx.send(str(exc))
+                await reply(ctx, str(exc), tone="warning")
                 return
             try:
                 catalog = await self.ddragon.catalog()
             except RiotError:
-                await ctx.send(
-                    "Data Dragon indisponivel; o teste visual com itens e imagens deve ser repetido quando a conexao voltar."
+                await reply(
+                    ctx,
+                    "Data Dragon indisponível; o teste visual com itens e imagens deve ser repetido quando a conexao voltar.",
                 )
                 return
             game, watched, context, result = demo_data(catalog)
@@ -242,8 +283,10 @@ class LoLTracker(commands.Cog):
                     not isinstance(channel, discord.TextChannel)
                     or channel.guild.id != ctx.guild.id
                 ):
-                    await ctx.send(
-                        "Nao foi possivel recuperar o canal privado de demonstracao."
+                    await reply(
+                        ctx,
+                        "Não foi possível recuperar o canal privado de demonstração.",
+                        tone="error",
                     )
                     return
                 sent = []
@@ -253,11 +296,17 @@ class LoLTracker(commands.Cog):
                     )
                     sent.append(message.jump_url)
             except LoLChannelError as exc:
-                await ctx.send(str(exc))
+                await reply(ctx, str(exc), tone="warning")
                 return
             finally:
                 await self.monitor.sessions.finished(ctx.guild.id, demo["puuid"], mid)
-        await ctx.send("Tres mensagens **MODO TESTE** enviadas:\n" + "\n".join(sent))
+        await reply(
+            ctx,
+            "Três exemplos foram enviados ao canal privado de demonstração.\n\n"
+            + "\n".join(sent),
+            title="Demonstração concluída",
+            tone="success",
+        )
 
     @category.error
     @channel.error
@@ -266,22 +315,26 @@ class LoLTracker(commands.Cog):
     @demo.error
     async def tracker_error(self, ctx, error):
         if isinstance(error, (commands.BadArgument, commands.MissingRequiredArgument)):
-            await ctx.send(
-                "Confira os argumentos. Use `loltrack` para ver os exemplos."
+            await reply(
+                ctx, "Confira os argumentos. Use `loltrack` para ver os exemplos."
             )
         elif isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(
-                f"Aguarde {error.retry_after:.0f}s antes de repetir o teste."
+            await reply(
+                ctx,
+                f"Aguarde {error.retry_after:.0f}s antes de repetir o teste.",
+                tone="warning",
             )
         elif isinstance(error, commands.CommandInvokeError) and isinstance(
             error.original, LoLChannelError
         ):
-            await ctx.send(str(error.original))
+            await reply(ctx, str(error.original), tone="warning")
         elif isinstance(error, commands.CommandInvokeError) and isinstance(
             error.original, discord.HTTPException
         ):
-            await ctx.send(
-                "Discord recusou a operacao. Confira as permissoes do canal configurado."
+            await reply(
+                ctx,
+                "Discord recusou a operação. Confira as permissões do canal configurado.",
+                tone="error",
             )
         else:
             raise error
@@ -292,7 +345,7 @@ class LoLTracker(commands.Cog):
             await self.monitor.recover_channels()
         except Exception:
             self.monitor.last_error = (
-                "Falha na recuperacao dos canais; nova tentativa no proximo ciclo."
+                "Falha na recuperacao dos canais; nova tentativa no próximo ciclo."
             )
             log.exception("Falha ao recuperar canais LoL")
 
@@ -305,7 +358,7 @@ class LoLTracker(commands.Cog):
         try:
             await self.monitor.poll()
         except Exception:
-            self.monitor.last_error = "Falha interna; nova tentativa no proximo ciclo."
+            self.monitor.last_error = "Falha interna; nova tentativa no próximo ciclo."
             log.exception("Falha no monitor LoL")
 
     @monitoring.before_loop

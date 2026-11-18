@@ -39,8 +39,8 @@
     }
   ],
   "top": {
-    "title": "VITORIA • Mochila#bunny",
-    "description": "Ahri · Duracao: 31:00",
+    "title": "VITÓRIA • Mochila#bunny",
+    "description": "Ahri · Duração: 31:00",
     "color": 3651704,
     "thumbnail": {
       "url": "https://ddragon.leagueoflegends.com/cdn/16.22.1/img/champion/Ahri.png"
@@ -59,7 +59,7 @@
     },
     {
       "inline": true,
-      "name": "Dano a campeoes",
+      "name": "Dano a campeões",
       "value": "28,430"
     },
     {
@@ -74,7 +74,7 @@
     },
     {
       "inline": true,
-      "name": "Visao",
+      "name": "Visão",
       "value": "24"
     },
     {

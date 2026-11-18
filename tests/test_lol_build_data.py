@@ -411,8 +411,8 @@ class PerformanceAnalysisTests(unittest.TestCase):
         extra["kills"] = 50
         result = analyze(self.m["info"], self.p, {"performances": history + [extra]})
         self.assertEqual(result["baseline"]["count"], 3)
-        self.assertEqual(result["baseline"]["scope"], "mesmo campeao e posicao")
-        self.assertIn("proximo", result["comparison"])
+        self.assertEqual(result["baseline"]["scope"], "mesmo campeão e posição")
+        self.assertIn("próximo", result["comparison"])
 
     def test_historical_comparison_filters_other_queues_and_maps(self):
         history = performance_rows([match(f"OLD_{i}") for i in range(3)], "watched")
@@ -426,7 +426,7 @@ class PerformanceAnalysisTests(unittest.TestCase):
         h = performance_rows([match("OLD")], "watched")
         result = analyze(self.m["info"], self.p, {"performances": h})
         self.assertIn("Amostra insuficiente", result["comparison"])
-        self.assertNotIn("acima da media", result["comparison"])
+        self.assertNotIn("acima da média", result["comparison"])
 
     def test_support_includes_vision_rate_and_descriptive_comparison(self):
         self.p["teamPosition"] = "UTILITY"
@@ -435,8 +435,8 @@ class PerformanceAnalysisTests(unittest.TestCase):
             "watched",
         )
         result = analyze(self.m["info"], self.p, {"performances": h})
-        self.assertIn("Visao/min", result["indicators"])
-        self.assertIn("Visao/min", result["comparison"])
+        self.assertIn("Visão/min", result["indicators"])
+        self.assertIn("Visão/min", result["comparison"])
 
     def test_duplicate_historical_match_does_not_inflate_baseline(self):
         rows = performance_rows([self.m, self.m, self.m], "watched")
@@ -447,7 +447,7 @@ class PerformanceAnalysisTests(unittest.TestCase):
         self.assertEqual(metrics({}, 1800), {})
         result = analyze({"gameDuration": 0, "participants": []}, {}, {})
         self.assertIsNone(result["kp"])
-        self.assertIn("indisponivel", result["indicators"])
+        self.assertIn("indisponível", result["indicators"])
 
 
 class NewPresentationTests(unittest.TestCase):
@@ -484,7 +484,7 @@ class NewPresentationTests(unittest.TestCase):
             self.assertIn(phrase, out)
         self.assertLessEqual(sum(len(e) for e in cards), 6000)
 
-    def test_post_match_top_is_unchanged_against_approved_golden(self):
+    def test_post_match_keeps_layout_and_values_with_revised_copy(self):
         fixture = json.loads(
             (Path(__file__).parent / "fixtures/lol_post_approved.json").read_text()
         )

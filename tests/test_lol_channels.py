@@ -515,7 +515,7 @@ class LoLChannelTests(unittest.IsolatedAsyncioTestCase):
         )
         await LoLTracker.follow.callback(cog, ctx, riot_id="Mochila#bunny")
         cog.riot.account.assert_not_awaited()
-        self.assertIn("LOL", ctx.send.call_args.args[0])
+        self.assertIn("LOL", ctx.send.call_args.kwargs["embed"].description)
 
     async def test_monitor_restarts_and_only_cleans_after_fresh_offline_confirmation(
         self,

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 import shutil
 import tempfile
 from dataclasses import dataclass
@@ -10,6 +11,10 @@ from pathlib import Path
 import discord
 from discord.ext import commands
 
+
+from services.discord_messages import response_sender
+
+reply = response_sender("Voz")
 
 VOICE_TTS_CONFIG_PATH = Path(__file__).resolve().parents[1] / "voice_tts_config.json"
 
@@ -38,17 +43,23 @@ def load_voice_tts_config(path: Path = VOICE_TTS_CONFIG_PATH) -> VoiceTTSConfig:
         with path.open("r", encoding="utf-8") as config_file:
             raw_config = json.load(config_file)
     except (OSError, json.JSONDecodeError) as exc:
-        raise RuntimeError(f"Nao foi possivel carregar a configuracao de voz em {path}.") from exc
+        raise RuntimeError(
+            f"Não foi possível carregar a configuração de voz em {path}."
+        ) from exc
 
     if not isinstance(raw_config, dict):
-        raise RuntimeError(f"A configuracao de voz em {path} precisa ser um objeto JSON.")
+        raise RuntimeError(
+            f"A configuração de voz em {path} precisa ser um objeto JSON."
+        )
 
     return VoiceTTSConfig(
         voice=_text_config(raw_config, "voice", DEFAULT_TTS_CONFIG.voice),
         rate=_text_config(raw_config, "rate", DEFAULT_TTS_CONFIG.rate),
         volume=_text_config(raw_config, "volume", DEFAULT_TTS_CONFIG.volume),
         pitch=_text_config(raw_config, "pitch", DEFAULT_TTS_CONFIG.pitch),
-        max_characters=_positive_int_config(raw_config, "max_characters", DEFAULT_TTS_CONFIG.max_characters),
+        max_characters=_positive_int_config(
+            raw_config, "max_characters", DEFAULT_TTS_CONFIG.max_characters
+        ),
         idle_disconnect_seconds=_positive_int_config(
             raw_config,
             "idle_disconnect_seconds",
@@ -64,7 +75,9 @@ def load_voice_tts_config(path: Path = VOICE_TTS_CONFIG_PATH) -> VoiceTTSConfig:
             "ffmpeg_before_options",
             DEFAULT_TTS_CONFIG.ffmpeg_before_options,
         ),
-        ffmpeg_options=_text_config(raw_config, "ffmpeg_options", DEFAULT_TTS_CONFIG.ffmpeg_options),
+        ffmpeg_options=_text_config(
+            raw_config, "ffmpeg_options", DEFAULT_TTS_CONFIG.ffmpeg_options
+        ),
     )
 
 
@@ -125,23 +138,33 @@ class VoiceTTS(commands.Cog):
     @commands.command(name="falar")
     async def speak(self, ctx: commands.Context, *, content: str | None = None) -> None:
         if ctx.guild is None:
-            await ctx.send("Esse comando so funciona dentro de um servidor.")
+            await reply(ctx, "Esse comando só funciona dentro de um servidor.")
             return
 
         parsed = parse_speech_content(ctx, content or "")
         if parsed.error is not None:
-            await ctx.send(parsed.error)
+            await reply(ctx, parsed.error)
             return
         if parsed.channel is None:
-            await ctx.send("Entre em um canal de voz ou informe um canal. Exemplo: `?falar #Geral oi`.")
+            await reply(
+                ctx,
+                "Entre em um canal de voz ou informe um canal. Exemplo: `?falar #Geral oi`.",
+                tone="warning",
+            )
             return
         if len(parsed.text) > MAX_TTS_CHARACTERS:
-            await ctx.send(f"A mensagem pode ter no maximo {MAX_TTS_CHARACTERS} caracteres.")
+            await reply(
+                ctx, f"A mensagem pode ter no máximo {MAX_TTS_CHARACTERS} caracteres."
+            )
             return
 
         permissions = parsed.channel.permissions_for(ctx.guild.me)
         if not permissions.connect or not permissions.speak:
-            await ctx.send("Nao tenho permissao para entrar e falar nesse canal de voz.")
+            await reply(
+                ctx,
+                "Não tenho permissão para entrar e falar nesse canal de voz.",
+                tone="warning",
+            )
             return
 
         await self.enqueue_speech(
@@ -150,7 +173,13 @@ class VoiceTTS(commands.Cog):
             text_channel=ctx.channel,
             requester_id=ctx.author.id,
         )
-        await ctx.send("Mensagem adicionada na fila de voz.", delete_after=5)
+        await reply(
+            ctx,
+            "A mensagem foi adicionada à fila de reprodução.",
+            delete_after=5,
+            title="Mensagem na fila",
+            tone="success",
+        )
 
     async def enqueue_speech(
         self,
@@ -170,14 +199,18 @@ class VoiceTTS(commands.Cog):
             )
         )
         if guild_id not in self.queue_tasks or self.queue_tasks[guild_id].done():
-            self.queue_tasks[guild_id] = asyncio.create_task(self._process_queue(guild_id))
+            self.queue_tasks[guild_id] = asyncio.create_task(
+                self._process_queue(guild_id)
+            )
 
     async def _process_queue(self, guild_id: int) -> None:
         queue = self.queues[guild_id]
         try:
             while True:
                 try:
-                    request = await asyncio.wait_for(queue.get(), timeout=IDLE_DISCONNECT_SECONDS)
+                    request = await asyncio.wait_for(
+                        queue.get(), timeout=IDLE_DISCONNECT_SECONDS
+                    )
                 except asyncio.TimeoutError:
                     await self._disconnect_guild_voice(guild_id)
                     return
@@ -185,8 +218,15 @@ class VoiceTTS(commands.Cog):
                 try:
                     await self._speak_request(request)
                 except Exception as exc:
+                    logging.getLogger(__name__).exception("Falha ao reproduzir áudio")
                     if request.text_channel is not None:
-                        await request.text_channel.send(f"Nao consegui reproduzir o audio: {_format_error(exc)}", delete_after=10)
+                        await reply(
+                            request.text_channel,
+                            _format_error(exc),
+                            title="Reprodução de voz indisponível",
+                            delete_after=10,
+                            tone="error",
+                        )
                 finally:
                     queue.task_done()
         except asyncio.CancelledError:
@@ -209,7 +249,9 @@ class VoiceTTS(commands.Cog):
         try:
             ffmpeg_executable = shutil.which("ffmpeg") or "ffmpeg"
             if not voice_client.is_connected():
-                raise RuntimeError("A conexao de voz nao ficou pronta antes da reproducao.")
+                raise RuntimeError(
+                    "A conexao de voz não ficou pronta antes da reprodução."
+                )
             source = discord.FFmpegOpusAudio(
                 str(audio_path),
                 executable=ffmpeg_executable,
@@ -227,12 +269,16 @@ class VoiceTTS(commands.Cog):
         finally:
             audio_path.unlink(missing_ok=True)
 
-    async def _connect_or_move(self, channel: discord.VoiceChannel) -> discord.VoiceClient:
+    async def _connect_or_move(
+        self, channel: discord.VoiceChannel
+    ) -> discord.VoiceClient:
         existing = discord.utils.get(self.bot.voice_clients, guild=channel.guild)
         if existing is not None:
             if existing.is_connected():
                 if existing.channel != channel:
-                    await existing.move_to(channel, timeout=VOICE_CONNECT_TIMEOUT_SECONDS)
+                    await existing.move_to(
+                        channel, timeout=VOICE_CONNECT_TIMEOUT_SECONDS
+                    )
                 return existing
             await existing.disconnect(force=True)
 
@@ -254,14 +300,20 @@ class VoiceTTS(commands.Cog):
         if voice_client.is_connected():
             return
 
-        connected = await asyncio.to_thread(voice_client.wait_until_connected, VOICE_CONNECT_TIMEOUT_SECONDS)
+        connected = await asyncio.to_thread(
+            voice_client.wait_until_connected, VOICE_CONNECT_TIMEOUT_SECONDS
+        )
         if not connected:
             await voice_client.disconnect(force=True)
-            raise RuntimeError("Nao consegui concluir a conexao de voz com o Discord.")
+            raise RuntimeError("Não consegui concluir a conexao de voz com o Discord.")
 
     async def _disconnect_guild_voice(self, guild_id: int) -> None:
         voice_client = next(
-            (client for client in self.bot.voice_clients if client.guild and client.guild.id == guild_id),
+            (
+                client
+                for client in self.bot.voice_clients
+                if client.guild and client.guild.id == guild_id
+            ),
             None,
         )
         if voice_client is not None:
@@ -271,9 +323,16 @@ class VoiceTTS(commands.Cog):
 def parse_speech_content(ctx: commands.Context, content: str) -> ParsedSpeech:
     text = content.strip()
     if not text:
-        return ParsedSpeech(channel=None, text="", used_explicit_channel=False, error="Informe o texto para eu falar.")
+        return ParsedSpeech(
+            channel=None,
+            text="",
+            used_explicit_channel=False,
+            error="Informe o texto que será reproduzido.",
+        )
 
-    channel, token_was_channel_reference, remainder = resolve_voice_channel_prefix(ctx.guild, text)
+    channel, token_was_channel_reference, remainder = resolve_voice_channel_prefix(
+        ctx.guild, text
+    )
     if channel is not None:
         speech_text = remainder.strip()
         if not speech_text:
@@ -281,22 +340,26 @@ def parse_speech_content(ctx: commands.Context, content: str) -> ParsedSpeech:
                 channel=channel,
                 text="",
                 used_explicit_channel=True,
-                error="Informe o texto que devo falar depois do canal.",
+                error="Informe o texto que será reproduzido após o canal de voz.",
             )
-        return ParsedSpeech(channel=channel, text=speech_text, used_explicit_channel=True)
+        return ParsedSpeech(
+            channel=channel, text=speech_text, used_explicit_channel=True
+        )
 
     if token_was_channel_reference:
         return ParsedSpeech(
             channel=None,
             text="",
             used_explicit_channel=True,
-            error="Informe um canal de voz valido.",
+            error="Informe um canal de voz válido.",
         )
 
     author_voice = getattr(ctx.author, "voice", None)
     author_channel = getattr(author_voice, "channel", None)
     if isinstance(author_channel, discord.VoiceChannel):
-        return ParsedSpeech(channel=author_channel, text=text, used_explicit_channel=False)
+        return ParsedSpeech(
+            channel=author_channel, text=text, used_explicit_channel=False
+        )
 
     return ParsedSpeech(
         channel=None,
@@ -318,22 +381,32 @@ def resolve_voice_channel_prefix(
     channel_id = _channel_id_from_token(first_token)
     if channel_id is not None:
         channel = guild.get_channel(channel_id)
-        return (channel if isinstance(channel, discord.VoiceChannel) else None), True, token_remainder
+        return (
+            (channel if isinstance(channel, discord.VoiceChannel) else None),
+            True,
+            token_remainder,
+        )
 
     normalized_content = content.casefold()
-    for channel in sorted(guild.voice_channels, key=lambda item: len(item.name), reverse=True):
+    for channel in sorted(
+        guild.voice_channels, key=lambda item: len(item.name), reverse=True
+    ):
         normalized_name = channel.name.casefold()
         if normalized_content == normalized_name:
             return channel, True, ""
         if normalized_content.startswith(f"{normalized_name} "):
-            return channel, True, content[len(channel.name):]
+            return channel, True, content[len(channel.name) :]
     return None, False, content
 
 
-async def synthesize_speech(text: str, config: VoiceTTSConfig = VOICE_TTS_CONFIG) -> Path:
+async def synthesize_speech(
+    text: str, config: VoiceTTSConfig = VOICE_TTS_CONFIG
+) -> Path:
     import edge_tts
 
-    temporary_file = tempfile.NamedTemporaryFile(prefix="discord_tts_", suffix=".mp3", delete=False)
+    temporary_file = tempfile.NamedTemporaryFile(
+        prefix="discord_tts_", suffix=".mp3", delete=False
+    )
     audio_path = Path(temporary_file.name)
     temporary_file.close()
 
@@ -346,7 +419,7 @@ async def synthesize_speech(text: str, config: VoiceTTSConfig = VOICE_TTS_CONFIG
     )
     await communicate.save(str(audio_path))
     if not audio_path.exists() or audio_path.stat().st_size <= 0:
-        raise RuntimeError("O TTS gerou um arquivo de audio vazio.")
+        raise RuntimeError("O TTS gerou um arquivo de áudio vazio.")
     return audio_path
 
 
@@ -360,11 +433,13 @@ def _channel_id_from_token(token: str) -> int | None:
 
 def _format_error(error: Exception) -> str:
     if isinstance(error, asyncio.TimeoutError):
-        return "tempo limite ao conectar no canal de voz."
+        return (
+            "A conexão com o canal de voz excedeu o tempo de espera. Tente novamente."
+        )
     message = str(error).strip()
     if "davey library needed" in message.lower():
-        return "biblioteca de voz davey ausente no ambiente."
-    return message or error.__class__.__name__
+        return "A reprodução de voz precisa de configuração adicional. Solicite a revisão a um administrador do bot."
+    return "Não foi possível reproduzir o áudio. Verifique o canal de voz e tente novamente."
 
 
 async def setup(bot: commands.Bot) -> None:

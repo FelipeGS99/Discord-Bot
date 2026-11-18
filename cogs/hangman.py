@@ -8,6 +8,11 @@ from discord.ext import commands
 from services.hangman_service import HangmanGame, WordRepository, normalize_difficulty
 
 
+from services.discord_messages import response_sender
+
+reply = response_sender("Jogo da Forca")
+
+
 class Hangman(commands.Cog):
     def __init__(self, bot) -> None:
         self.bot = bot
@@ -18,32 +23,41 @@ class Hangman(commands.Cog):
     @commands.group(name="forca", invoke_without_command=True)
     async def hangman_group(self, ctx: commands.Context) -> None:
         prefix = ctx.prefix or "?"
-        await ctx.send(
+        await reply(
+            ctx,
             "\n".join(
                 [
                     "**Jogo da Forca**",
-                    "Use para jogar forca com o pessoal do canal. Cada canal pode ter uma partida ativa.",
-                    f"`{prefix}forca iniciar <facil|medio|dificil>` - Comeca uma partida. Exemplo: `{prefix}forca iniciar medio`.",
+                    "Jogue uma partida de forca com os membros do canal. Cada canal pode ter uma partida ativa.",
+                    f"`{prefix}forca iniciar <facil|medio|dificil>` - Começa uma partida. Exemplo: `{prefix}forca iniciar medio`.",
                     f"`{prefix}forca letra <letra>` - Tenta uma letra. Exemplo: `{prefix}forca letra a`.",
-                    f"`{prefix}forca palavra <palpite>` - Chuta a palavra inteira. Exemplo: `{prefix}forca palavra futebol`.",
-                    f"`{prefix}forca status` - Mostra palavra parcial, erros e tentativas ja feitas.",
+                    f"`{prefix}forca palavra <palpite>` - Envia um palpite para a palavra completa. Exemplo: `{prefix}forca palavra futebol`.",
+                    f"`{prefix}forca status` — Consulta palavra parcial, erros e tentativas já feitas.",
                     f"`{prefix}forca parar` - Encerra a partida atual e mostra a resposta.",
-                    "Durante a partida, tambem da para mandar uma letra ou palavra direto no chat.",
+                    "Durante a partida, também é possível enviar uma letra ou palavra diretamente neste canal.",
                 ]
-            )
+            ),
         )
 
     @hangman_group.command(name="iniciar")
     async def start_game(self, ctx: commands.Context, dificuldade: str) -> None:
         channel_id = ctx.channel.id
         if channel_id in self.active_games:
-            await ctx.send("Ja existe uma partida em andamento neste canal. Use `forca parar` para encerrar.")
+            await reply(
+                ctx,
+                "Já existe uma partida em andamento neste canal. Use `forca parar` para encerrar.",
+                tone="warning",
+            )
             return
 
         try:
             normalized_difficulty = normalize_difficulty(dificuldade)
         except ValueError:
-            await ctx.send("Escolha uma dificuldade valida: `facil`, `medio` ou `dificil`.")
+            await reply(
+                ctx,
+                "Escolha uma dificuldade válida: `facil`, `medio` ou `dificil`.",
+                tone="warning",
+            )
             return
 
         selected_word = self.word_repository.draw_word(normalized_difficulty)
@@ -54,12 +68,16 @@ class Hangman(commands.Cog):
         )
         self.active_games[channel_id] = game
 
-        await ctx.send(self._format_game_message(game, title="Partida iniciada"))
+        await reply(ctx, self._format_game_message(game, title="Partida iniciada"))
 
     @hangman_group.command(name="letra")
     async def guess_letter(self, ctx: commands.Context, letra: str) -> None:
         if ctx.channel.id not in self.active_games:
-            await ctx.send("Nao ha partida ativa neste canal. Use `forca iniciar <dificuldade>`.")
+            await reply(
+                ctx,
+                "Não ha partida ativa neste canal. Use `forca iniciar <dificuldade>`.",
+                tone="warning",
+            )
             return
 
         await self._handle_letter_guess(ctx.channel, ctx.channel.id, letra)
@@ -67,7 +85,11 @@ class Hangman(commands.Cog):
     @hangman_group.command(name="palavra")
     async def guess_full_word(self, ctx: commands.Context, *, palpite: str) -> None:
         if ctx.channel.id not in self.active_games:
-            await ctx.send("Nao ha partida ativa neste canal. Use `forca iniciar <dificuldade>`.")
+            await reply(
+                ctx,
+                "Não ha partida ativa neste canal. Use `forca iniciar <dificuldade>`.",
+                tone="warning",
+            )
             return
 
         await self._handle_word_guess(ctx.channel, ctx.channel.id, palpite)
@@ -76,26 +98,32 @@ class Hangman(commands.Cog):
     async def game_status(self, ctx: commands.Context) -> None:
         game = self.active_games.get(ctx.channel.id)
         if game is None:
-            await ctx.send("Nao ha partida ativa neste canal.")
+            await reply(ctx, "Não ha partida ativa neste canal.", tone="warning")
             return
 
-        await ctx.send(self._format_game_message(game, title="Status da partida"))
+        await reply(ctx, self._format_game_message(game, title="Status da partida"))
 
     @hangman_group.command(name="parar")
     async def stop_game(self, ctx: commands.Context) -> None:
         game = self.active_games.pop(ctx.channel.id, None)
         if game is None:
-            await ctx.send("Nao ha partida ativa neste canal.")
+            await reply(ctx, "Não ha partida ativa neste canal.", tone="warning")
             return
 
-        await ctx.send(f"Partida encerrada. A palavra era `{game.word}`.")
+        await reply(ctx, f"Partida encerrada. A palavra era `{game.word}`.")
 
     @start_game.error
     @guess_letter.error
     @guess_full_word.error
-    async def hangman_error(self, ctx: commands.Context, error: commands.CommandError) -> None:
+    async def hangman_error(
+        self, ctx: commands.Context, error: commands.CommandError
+    ) -> None:
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send("Faltou um argumento no comando. Use `forca` para ver como jogar.")
+            await reply(
+                ctx,
+                "Faltou um argumento no comando. Use `forca` para ver como jogar.",
+                tone="warning",
+            )
             return
         raise error
 
@@ -139,22 +167,24 @@ class Hangman(commands.Cog):
         game = self.active_games[channel_id]
         result = game.guess(letter)
         if result == "invalid":
-            await channel.send("Envie apenas uma letra por vez.")
+            await reply(channel, "Envie apenas uma letra por vez.")
             return
         if result == "repeated":
-            await channel.send("Essa letra ja foi tentada. Escolha outra.")
+            await reply(
+                channel, "Essa letra já foi tentada. Escolha outra.", tone="warning"
+            )
             return
 
         if game.is_won:
-            await self._finish_game(channel, channel_id, game, "Voce venceu!")
+            await self._finish_game(channel, channel_id, game, "Vitória na partida")
             return
 
         if game.is_lost:
-            await self._finish_game(channel, channel_id, game, "Voce perdeu!")
+            await self._finish_game(channel, channel_id, game, "Tentativas esgotadas")
             return
 
-        feedback = "Letra correta!" if result == "correct" else "Letra incorreta."
-        await channel.send(self._format_game_message(game, title=feedback))
+        feedback = "Letra correta" if result == "correct" else "Letra incorreta."
+        await reply(channel, self._format_game_message(game, title=feedback))
 
     async def _handle_word_guess(
         self,
@@ -165,26 +195,31 @@ class Hangman(commands.Cog):
         game = self.active_games[channel_id]
         result = game.guess_word(guessed_word)
         if result == "invalid":
-            await channel.send("Envie uma palavra valida para o palpite.")
+            await reply(channel, "Envie uma palavra válida para o palpite.")
             return
         if result == "repeated":
-            await channel.send("Essa palavra ja foi tentada. Escolha outro palpite.")
+            await reply(
+                channel,
+                "Essa palavra já foi tentada. Escolha outro palpite.",
+                tone="warning",
+            )
             return
 
         if game.is_won:
-            await self._finish_game(channel, channel_id, game, "Voce venceu!")
+            await self._finish_game(channel, channel_id, game, "Vitória na partida")
             return
 
         if game.is_lost:
-            await self._finish_game(channel, channel_id, game, "Voce perdeu!")
+            await self._finish_game(channel, channel_id, game, "Tentativas esgotadas")
             return
 
-        await channel.send(
+        await reply(
+            channel,
             self._format_game_message(
                 game,
                 title="Palpite incorreto.",
                 extra_line="Nenhuma letra foi revelada.",
-            )
+            ),
         )
 
     async def _finish_game(
@@ -194,23 +229,30 @@ class Hangman(commands.Cog):
         game: HangmanGame,
         title: str,
     ) -> None:
-        await channel.send(
+        await reply(
+            channel,
             self._format_game_message(
                 game,
                 title=title,
                 extra_line=f"A palavra era `{game.word}`.",
-            )
+            ),
         )
         self.active_games.pop(channel_id, None)
 
     @staticmethod
-    def _format_game_message(game: HangmanGame, title: str, extra_line: str | None = None) -> str:
-        wrong_letters = ", ".join(sorted(game.wrong_letters)) if game.wrong_letters else "nenhuma"
-        wrong_words = ", ".join(sorted(game.wrong_words)) if game.wrong_words else "nenhum"
+    def _format_game_message(
+        game: HangmanGame, title: str, extra_line: str | None = None
+    ) -> str:
+        wrong_letters = (
+            ", ".join(sorted(game.wrong_letters)) if game.wrong_letters else "nenhuma"
+        )
+        wrong_words = (
+            ", ".join(sorted(game.wrong_words)) if game.wrong_words else "nenhum"
+        )
         lines = [
             f"**{title}**",
             f"Tema: **{game.theme}**",
-            f"Dificuldade: **{game.difficulty}**",
+            f"Dificuldade: **{ {'facil': 'Fácil', 'medio': 'Médio', 'dificil': 'Difícil'}.get(game.difficulty, game.difficulty) }**",
             f"Palavra: `{game.masked_word}`",
             f"Letras erradas: `{wrong_letters}`",
             f"Palavras erradas: `{wrong_words}`",
