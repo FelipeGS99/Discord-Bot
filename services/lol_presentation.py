@@ -118,6 +118,14 @@ def live_embeds(game, watched, context, catalog, test=False):
             data = context.get(puuid, {}) if rid else {}
             name = text(rid, 45) if rid else "Identidade ocultada/indisponível"
             cname = text(champion(catalog, p.get("championId"))["name"], 30)
+            field_name = f"{'⭐ ' if puuid in tracked else ''}{cname} · {name}"
+            if not context and rid and puuid:
+                e.add_field(
+                    name=field_name,
+                    value="⏳ Carregando estatísticas…",
+                    inline=True,
+                )
+                continue
             history = data.get("recent")
             ranked = data.get("ranked_wr")
             rank_queue = data.get("rank_queue_name", "Solo/Duo")
@@ -194,7 +202,7 @@ def live_embeds(game, watched, context, catalog, test=False):
             else:
                 lines.append("**Maestria:** indisponível")
             e.add_field(
-                name=f"{'⭐ ' if puuid in tracked else ''}{cname} · {name}",
+                name=field_name,
                 value="\n".join(lines),
                 inline=True,
             )
